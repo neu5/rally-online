@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "es6",
+    "strict": true,
+    "noImplicitAny": true,
+    "noEmit": true,
+    "allowJs": true,
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "paths": {
+      "~/*": ["./*"]
+    },
+    "typeRoots": ["babylonjs"]
+  },
+  "include": ["**/*.ts"]
+}
