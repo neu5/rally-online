@@ -17,12 +17,7 @@ jobs:
           node-version: "16.13.x"
 
       - name: Install dependencies
-        uses: ./
         run: yarn --immutable
-
-      - name: Lint
-        uses: ./
-        run: yarn lint
 
       - name: Build app
         run: yarn build
