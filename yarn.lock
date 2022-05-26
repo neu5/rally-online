@@ -246,6 +246,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babylonjs/core@npm:^5.8.0":
+  version: 5.8.0
+  resolution: "@babylonjs/core@npm:5.8.0"
+  dependencies:
+    tslib: ^2.3.1
+  checksum: b95c74b1aff070541882a6358ace71f3c43347585ef8e3c25affcaddb6646837788d09afa581fc2c665b59614a8e59cfdc40a23a6c3267f6baecf52e9539f991
+  languageName: node
+  linkType: hard
+
 "@cspotcode/source-map-support@npm:^0.8.0":
   version: 0.8.1
   resolution: "@cspotcode/source-map-support@npm:0.8.1"
@@ -1694,13 +1703,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babylonjs@npm:^5.7.0":
-  version: 5.7.0
-  resolution: "babylonjs@npm:5.7.0"
-  checksum: 6af36747dcac3596de3f88fe6e010b25b1dfc3ecbd0f2a6979f8fb9533132015150b673cef7a8f8c78e15406ced213c40e6889c389d0da7f7c354ae9b240da56
-  languageName: node
-  linkType: hard
-
 "balanced-match@npm:^1.0.0":
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
@@ -1897,7 +1899,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "client@workspace:packages/client"
   dependencies:
-    babylonjs: ^5.7.0
+    "@babylonjs/core": ^5.8.0
     parcel: ^2.6.0
     typescript: ^4.7.2
   languageName: unknown
@@ -5011,7 +5013,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.4.0":
+"tslib@npm:^2.3.1, tslib@npm:^2.4.0":
   version: 2.4.0
   resolution: "tslib@npm:2.4.0"
   checksum: 8c4aa6a3c5a754bf76aefc38026134180c053b7bd2f81338cb5e5ebf96fefa0f417bff221592bf801077f5bf990562f6264fecbc42cd3309b33872cb6fc3b113
