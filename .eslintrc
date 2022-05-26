@@ -6,13 +6,14 @@
     "mocha": true,
     "node": true
   },
-  "extends": ["airbnb-base", "plugin:prettier/recommended"],
-  "parser": "@babel/eslint-parser",
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2021,
-    "requireConfigFile": false
+    "requireConfigFile": false,
+    "project": ["packages/**/tsconfig.json"]
   },
-  "plugins": ["import"],
+  "plugins": ["import", "@typescript-eslint"],
+  "extends": ["airbnb-typescript"],
   "rules": {
     "import/no-unresolved": 2,
     "import/no-commonjs": 2,
@@ -22,36 +23,9 @@
     "import/extensions": [2, "ignorePackages"],
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "no-param-reassign": ["error", { "props": false }],
-    "sort-imports": ["error", { "ignoreDeclarationSort": true }]
-  },
-  "overrides": [
-    {
-      "files": ["**/*.ts"],
-      "parser": "@typescript-eslint/parser",
-      "parserOptions": {
-        "ecmaVersion": 2021,
-        "requireConfigFile": false,
-        "project": ["tsconfig.json"]
-      },
-      "plugins": ["import", "@typescript-eslint"],
-      "extends": ["airbnb-typescript"],
-      "rules": {
-        "import/no-unresolved": 2,
-        "import/no-commonjs": 2,
-        "no-console": 0,
-        "import/prefer-default-export": 0,
-        "import/no-default-export": 1,
-        "import/extensions": [2, "ignorePackages"],
-        "import/no-extraneous-dependencies": [
-          "error",
-          { "devDependencies": true }
-        ],
-        "no-param-reassign": ["error", { "props": false }],
-        "sort-imports": ["error", { "ignoreDeclarationSort": true }],
-        "@typescript-eslint/quotes": "off",
-        "@typescript-eslint/comma-dangle": "off",
-        "react/jsx-filename-extension": "off"
-      }
-    }
-  ]
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }],
+    "@typescript-eslint/quotes": "off",
+    "@typescript-eslint/comma-dangle": "off",
+    "react/jsx-filename-extension": "off"
+  }
 }

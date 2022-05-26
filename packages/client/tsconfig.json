@@ -17,5 +17,5 @@
     },
     "typeRoots": ["babylonjs"]
   },
-  "include": ["**/*.ts"]
+  "include": ["src/**/*.ts"]
 }

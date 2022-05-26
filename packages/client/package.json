@@ -14,6 +14,7 @@
     "babylonjs": "^5.7.0"
   },
   "scripts": {
+    "build": "NODE_ENV=production parcel build src/index.html",
     "start": "parcel src/index.html"
   }
 }
