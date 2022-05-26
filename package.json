@@ -21,6 +21,7 @@
   },
   "scripts": {
     "build": "yarn workspace client build && yarn workspace server build",
+    "client:watch": "yarn workspace client watch",
     "lint": "eslint 'packages/**/*.ts'",
     "serve": "yarn workspace server serve"
   }
