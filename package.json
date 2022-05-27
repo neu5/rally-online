@@ -19,6 +19,10 @@
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.6.2"
   },
+  "staticFiles": {
+    "staticPath": "src/assets",
+    "staticOutPath": "assets"
+  },
   "scripts": {
     "build": "yarn workspace client build && yarn workspace server build",
     "client:watch": "yarn workspace client watch",
