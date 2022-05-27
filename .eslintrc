@@ -20,7 +20,13 @@
     "no-console": 0,
     "import/prefer-default-export": 0,
     "import/no-default-export": 1,
-    "import/extensions": [2, "ignorePackages"],
+    "import/extensions": [
+      2,
+      "ignorePackages",
+      {
+        "ts": "never"
+      }
+    ],
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "no-param-reassign": ["error", { "props": false }],
     "sort-imports": ["error", { "ignoreDeclarationSort": true }],
