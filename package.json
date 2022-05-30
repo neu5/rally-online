@@ -11,6 +11,7 @@
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
     "buffer": "^6.0.3",
+    "concurrently": "^7.2.1",
     "eslint": "^8.16.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
@@ -27,7 +28,10 @@
   },
   "scripts": {
     "build": "yarn workspaces foreach -p run build",
-    "client:watch": "yarn workspace client watch",
+    "watch": "concurrently -k \"yarn:watch:*\"",
+    "watch:client": "yarn workspace client watch",
+    "watch:server": "yarn workspace server watch",
+    "watch:serve": "yarn workspace server watch:serve",
     "lint": "eslint 'packages/**/*.ts'",
     "serve": "yarn workspace server serve"
   }
