@@ -10,6 +10,8 @@
     "@babylonjs/core": "^5.8.0",
     "@parcel/config-default": "^2.6.0",
     "@types/earcut": "^2.1.1",
+    "ammo.js": "^0.0.10",
+    "ammojs-typed": "^1.0.6",
     "earcut": "^2.2.3",
     "parcel": "^2.6.0",
     "parcel-reporter-clean-dist": "^1.0.4",
