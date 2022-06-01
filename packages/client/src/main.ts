@@ -21,7 +21,7 @@ const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     "camera",
     -Math.PI / 2,
     Math.PI / 3,
-    14,
+    100,
     new Vector3(0, 0, 0)
   );
 
