@@ -5,10 +5,6 @@ import {
   Vector3,
 } from "@babylonjs/core";
 
-// Side-effects only imports allowing the standard material to be used as default.
-import "@babylonjs/core/Materials/standardMaterial";
-import "@babylonjs/core/Animations/animatable";
-
 import { createScene } from "./scene/scene";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -20,8 +16,8 @@ const canvas = document.getElementById("canvas") as HTMLCanvasElement;
   const camera = new ArcRotateCamera(
     "camera",
     -Math.PI / 2,
-    Math.PI / 3,
-    14,
+    Math.PI / 3.5,
+    130,
     new Vector3(0, 0, 0)
   );
 

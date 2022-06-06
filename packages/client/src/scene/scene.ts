@@ -11,38 +11,56 @@ import Ammo from "ammojs-typed";
 import { buildCar } from "../objects/car";
 
 export const createScene = async (engine: Engine) => {
-  const scene = new Scene(engine);
+  const scene: Scene = new Scene(engine);
 
   const gravityVector = new Vector3(0, -9.81, 0);
-  await Ammo();
+  const AmmoJS = await Ammo();
   scene.enablePhysics(gravityVector, new AmmoJSPlugin());
 
   const ground = MeshBuilder.CreateGround(
     "ground1",
-    { width: 10, height: 10, subdivisions: 2 },
+    { width: 100, height: 100, subdivisions: 2 },
     scene
   );
 
-  const box = MeshBuilder.CreateBox("box1");
-  box.setAbsolutePosition(new Vector3(1, 1, 1));
+  // const box = MeshBuilder.CreateBox("box1");
+  // box.setAbsolutePosition(new Vector3(1, 1, 1));
+  // box.physicsImpostor = new PhysicsImpostor(
+  //   box,
+  //   PhysicsImpostor.BoxImpostor,
+  //   { mass: 1, restitution: 0.2 },
+  //   scene
+  // );
 
-  box.physicsImpostor = new PhysicsImpostor(
-    box,
-    PhysicsImpostor.BoxImpostor,
-    { mass: 1, restitution: 0.2 },
-    scene
-  );
+  type BuilderCar = {
+    scene: Scene;
+    AmmoJS: AmmoJSPlugin;
+    startingPos: Vector3;
+    isCurrentPlayer?: boolean;
+  };
 
-  const car = buildCar(scene);
-  car.setAbsolutePosition(new Vector3(-1, 1, 1));
-  car.rotate(new Vector3(-1, 0, 0), 1.5);
+  const cars: Array<BuilderCar> = [
+    {
+      scene,
+      AmmoJS,
+      startingPos: { x: 0, y: 5, z: 0 },
+      isCurrentPlayer: true,
+    },
+    { scene, AmmoJS, startingPos: { x: 10, y: 5, z: 0 } },
+    { scene, AmmoJS, startingPos: { x: -10, y: 5, z: 0 } },
+    { scene, AmmoJS, startingPos: { x: 15, y: 5, z: 0 } },
+  ].map((car) => buildCar(car));
 
-  car.physicsImpostor = new PhysicsImpostor(
-    car,
-    PhysicsImpostor.BoxImpostor,
-    { mass: 1, restitution: 0.4 },
-    scene
-  );
+  console.log(cars);
+  // car.setAbsolutePosition(new Vector3(-1, 1, 1));
+  // car.rotate(new Vector3(-1, 0, 0), 1.5);
+
+  // car.physicsImpostor = new PhysicsImpostor(
+  //   car,
+  //   PhysicsImpostor.BoxImpostor,
+  //   { mass: 1, restitution: 0.4 },
+  //   scene
+  // );
 
   ground.physicsImpostor = new PhysicsImpostor(
     ground,
