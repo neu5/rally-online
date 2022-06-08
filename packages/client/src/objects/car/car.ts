@@ -1,6 +1,21 @@
-import { Axis, MeshBuilder, Quaternion } from "@babylonjs/core";
+import { Axis, Quaternion, Scene } from "@babylonjs/core";
+import Ammo from "ammojs-typed";
 
-var actions = { accelerate: false, brake: false, right: false, left: false };
+import { createChassisMesh } from "./chassis";
+import { addWheel } from "./wheel";
+
+type Actions = {
+  accelerate: boolean;
+  brake: boolean;
+  right: boolean;
+  left: boolean;
+};
+const actions: Actions = {
+  accelerate: false,
+  brake: false,
+  right: false,
+  left: false,
+};
 
 interface KeysActions {
   KeyW: string;
@@ -24,8 +39,8 @@ var chassisLength = 4;
 var massVehicle = 200;
 
 var wheelAxisPositionBack = -1;
-var wheelRadiusBack = 0.4;
-var wheelWidthBack = 0.3;
+// var wheelRadiusBack = 0.4;
+// var wheelWidthBack = 0.3;
 var wheelHalfTrackBack = 1;
 var wheelAxisHeightBack = 0.4;
 
@@ -34,13 +49,6 @@ var wheelHalfTrackFront = 1;
 var wheelAxisHeightFront = 0.4;
 var wheelRadiusFront = 0.4;
 var wheelWidthFront = 0.3;
-
-// var friction = 5;
-var suspensionStiffness = 10;
-var suspensionDamping = 0.3;
-var suspensionCompression = 4.4;
-var suspensionRestLength = 0.6;
-var rollInfluence = 0.0;
 
 var steeringIncrement = 0.01;
 var steeringClamp = 0.2;
@@ -56,102 +64,55 @@ var BACK_RIGHT = 3;
 function keyup(e: KeyboardEvent) {
   if ((keysActions as KeysActions)[e.code]) {
     actions[keysActions[e.code]] = false;
-    //e.preventDefault();
-    //e.stopPropagation();
-
-    //return false;
   }
 }
 
 function keydown(e: KeyboardEvent) {
   if (keysActions[e.code]) {
     actions[keysActions[e.code]] = true;
-    //e.preventDefault();
-    //e.stopPropagation();
-
-    //return false;
   }
 }
 
-function createChassisMesh(w, l, h, scene) {
-  const mesh = new MeshBuilder.CreateBox(
-    "box",
-    { width: w, depth: h, height: l },
-    scene
-  );
-  mesh.rotationQuaternion = new Quaternion();
-
-  return mesh;
-}
-
-function createWheelMesh(radius, width, scene) {
-  //var mesh = new BABYLON.MeshBuilder.CreateBox("wheel", {width:.82, height:.82, depth:.82}, scene);
-  var mesh = new MeshBuilder.CreateCylinder(
-    "Wheel",
-    { diameter: 1, height: 0.5, tessellation: 36 },
-    scene
-  );
-  mesh.rotationQuaternion = new Quaternion();
-  // mesh.material = blackMaterial;
-
-  return mesh;
-}
-
-function addWheel(
-  isFront,
-  pos,
-  radius,
-  width,
-  index,
-  vehicle,
+type Vehicle = {
+  AmmoJS: Ammo;
+  quat: Quaternion;
+  scene: Scene;
+  startingPos: { x: number; y: number; z: number };
+};
+const createVehicle = ({
+  AmmoJS,
+  quat,
   scene,
-  wheelDirectionCS0,
-  wheelAxleCS,
-  tuning,
-  wheelMeshes
-) {
-  var wheelInfo = vehicle.addWheel(
-    pos,
-    wheelDirectionCS0,
-    wheelAxleCS,
-    suspensionRestLength,
-    radius,
-    tuning,
-    isFront
-  );
+  startingPos: { x, y, z },
+}: Vehicle) => {
+  const physicsEngine = scene.getPhysicsEngine();
 
-  wheelInfo.set_m_suspensionStiffness(suspensionStiffness);
-  wheelInfo.set_m_wheelsDampingRelaxation(suspensionDamping);
-  wheelInfo.set_m_wheelsDampingCompression(suspensionCompression);
-  wheelInfo.set_m_maxSuspensionForce(600000);
-  wheelInfo.set_m_frictionSlip(40);
-  wheelInfo.set_m_rollInfluence(rollInfluence);
+  if (physicsEngine === null) {
+    throw new Error("Physics Engine is null");
+  }
 
-  wheelMeshes[index] = createWheelMesh(radius, width, scene);
-}
+  const physicsWorld = physicsEngine.getPhysicsPlugin().world;
+  const wheelMeshes: Array<any> = [];
 
-function createVehicle({ quat, Ammo, scene, startingPos: { x, y, z } }) {
-  //Going Native
-  var physicsWorld = scene.getPhysicsEngine().getPhysicsPlugin().world;
-  const wheelMeshes = [];
+  const wheelDirectionCS0 = new AmmoJS.btVector3(0, -1, 0);
+  const wheelAxleCS = new AmmoJS.btVector3(-1, 0, 0);
 
-  wheelDirectionCS0 = new Ammo.btVector3(0, -1, 0);
-  wheelAxleCS = new Ammo.btVector3(-1, 0, 0);
-
-  var geometry = new Ammo.btBoxShape(
-    new Ammo.btVector3(
+  var geometry = new AmmoJS.btBoxShape(
+    new AmmoJS.btVector3(
       chassisWidth * 0.5,
       chassisHeight * 0.5,
       chassisLength * 0.5
     )
   );
 
-  var transform = new Ammo.btTransform();
+  var transform = new AmmoJS.btTransform();
   transform.setIdentity();
-  transform.setOrigin(new Ammo.btVector3(x, y, z));
-  transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
-  var motionState = new Ammo.btDefaultMotionState(transform);
-  var localInertia = new Ammo.btVector3(0, 0, 0);
+  transform.setOrigin(new AmmoJS.btVector3(x, y, z));
+  transform.setRotation(
+    new AmmoJS.btQuaternion(quat.x, quat.y, quat.z, quat.w)
+  );
+  var motionState = new AmmoJS.btDefaultMotionState(transform);
+  var localInertia = new AmmoJS.btVector3(0, 0, 0);
   geometry.calculateLocalInertia(massVehicle, localInertia);
 
   const chassisMesh = createChassisMesh(
@@ -161,15 +122,15 @@ function createVehicle({ quat, Ammo, scene, startingPos: { x, y, z } }) {
     scene
   );
 
-  var massOffset = new Ammo.btVector3(0, 0.4, 0);
-  var transform2 = new Ammo.btTransform();
+  var massOffset = new AmmoJS.btVector3(0, 0.4, 0);
+  var transform2 = new AmmoJS.btTransform();
   transform2.setIdentity();
   transform2.setOrigin(massOffset);
-  var compound = new Ammo.btCompoundShape();
+  var compound = new AmmoJS.btCompoundShape();
   compound.addChildShape(transform2, geometry);
 
-  var body = new Ammo.btRigidBody(
-    new Ammo.btRigidBodyConstructionInfo(
+  var body = new AmmoJS.btRigidBody(
+    new AmmoJS.btRigidBodyConstructionInfo(
       massVehicle,
       motionState,
       compound,
@@ -180,105 +141,108 @@ function createVehicle({ quat, Ammo, scene, startingPos: { x, y, z } }) {
 
   physicsWorld.addRigidBody(body);
 
-  var tuning = new Ammo.btVehicleTuning();
-  var rayCaster = new Ammo.btDefaultVehicleRaycaster(physicsWorld);
-  const vehicle = new Ammo.btRaycastVehicle(tuning, body, rayCaster);
+  var tuning = new AmmoJS.btVehicleTuning();
+  var rayCaster = new AmmoJS.btDefaultVehicleRaycaster(physicsWorld);
+  const vehicle = new AmmoJS.btRaycastVehicle(tuning, body, rayCaster);
   vehicle.setCoordinateSystem(0, 1, 2);
   physicsWorld.addAction(vehicle);
 
   vehicle.getChassisWorldTransform();
 
-  console.log(
-    new Ammo.btVector3(
-      wheelHalfTrackFront,
-      wheelAxisHeightFront,
-      wheelAxisFrontPosition
-    ),
-    wheelHalfTrackFront,
-    wheelAxisHeightFront,
-    wheelAxisFrontPosition
-  );
+  // const addWheel2 = ()
 
-  addWheel(
-    true,
-    new Ammo.btVector3(
+  addWheel({
+    isFront: true,
+    position: new AmmoJS.btVector3(
       wheelHalfTrackFront,
       wheelAxisHeightFront,
       wheelAxisFrontPosition
     ),
-    wheelRadiusFront,
-    wheelWidthFront,
-    FRONT_LEFT,
+    radius: wheelRadiusFront,
+    width: wheelWidthFront,
+    index: FRONT_LEFT,
     vehicle,
     scene,
     wheelDirectionCS0,
     wheelAxleCS,
     tuning,
-    wheelMeshes
-  );
-  addWheel(
-    true,
-    new Ammo.btVector3(
+    wheelMeshes,
+  });
+  addWheel({
+    isFront: true,
+    position: new AmmoJS.btVector3(
       -wheelHalfTrackFront,
       wheelAxisHeightFront,
       wheelAxisFrontPosition
     ),
-    wheelRadiusFront,
-    wheelWidthFront,
-    FRONT_RIGHT,
+    radius: wheelRadiusFront,
+    width: wheelWidthFront,
+    index: FRONT_RIGHT,
     vehicle,
     scene,
     wheelDirectionCS0,
     wheelAxleCS,
     tuning,
-    wheelMeshes
-  );
-  addWheel(
-    false,
-    new Ammo.btVector3(
+    wheelMeshes,
+  });
+  addWheel({
+    isFront: false,
+    position: new AmmoJS.btVector3(
       -wheelHalfTrackBack,
       wheelAxisHeightBack,
       wheelAxisPositionBack
     ),
-    wheelRadiusBack,
-    wheelWidthBack,
-    BACK_LEFT,
+    radius: wheelRadiusFront,
+    width: wheelWidthFront,
+    index: BACK_LEFT,
     vehicle,
     scene,
     wheelDirectionCS0,
     wheelAxleCS,
     tuning,
-    wheelMeshes
-  );
-  addWheel(
-    false,
-    new Ammo.btVector3(
+    wheelMeshes,
+  });
+  addWheel({
+    isFront: false,
+    position: new AmmoJS.btVector3(
       wheelHalfTrackBack,
       wheelAxisHeightBack,
       wheelAxisPositionBack
     ),
-    wheelRadiusBack,
-    wheelWidthBack,
-    BACK_RIGHT,
+    radius: wheelRadiusFront,
+    width: wheelWidthFront,
+    index: BACK_RIGHT,
     vehicle,
     scene,
     wheelDirectionCS0,
     wheelAxleCS,
     tuning,
-    wheelMeshes
-  );
+    wheelMeshes,
+  });
 
   return { vehicle, chassisMesh, wheelMeshes };
-}
+};
 
-export const buildCar = ({ scene, AmmoJS, startingPos, isCurrentPlayer }) => {
+export type BuilderCar = {
+  AmmoJS: Ammo;
+  isCurrentPlayer?: boolean;
+  scene: Scene;
+  startingPos: { x: number; y: number; z: number };
+};
+export const buildCar = ({
+  AmmoJS,
+  scene,
+  startingPos,
+  isCurrentPlayer = false,
+}: BuilderCar) => {
   const { vehicle, chassisMesh, wheelMeshes } = createVehicle({
+    AmmoJS,
     quat: ZERO_QUATERNION,
-    Ammo: AmmoJS,
     scene,
     startingPos,
-    isCurrentPlayer,
   });
+
+  let vehicleSteering = 0;
 
   scene.registerBeforeRender(function () {
     // var dt = engine.getDeltaTime().toFixed() / 1000;
@@ -286,8 +250,8 @@ export const buildCar = ({ scene, AmmoJS, startingPos, isCurrentPlayer }) => {
     if (vehicle !== undefined) {
       var speed = vehicle.getCurrentSpeedKmHour();
       // var maxSteerVal = 0.2;
-      breakingForce = 0;
-      engineForce = 0;
+      let breakingForce = 0;
+      let engineForce = 0;
 
       if (isCurrentPlayer) {
         if (actions.acceleration) {
