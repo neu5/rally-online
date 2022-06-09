@@ -8,7 +8,7 @@ import {
 } from "@babylonjs/core";
 import Ammo from "ammojs-typed";
 
-import { BuilderCar, buildCar } from "../objects/car/car";
+import { buildCar } from "../objects/car/car";
 
 export const createScene = async (engine: Engine) => {
   const scene: Scene = new Scene(engine);
@@ -31,30 +31,31 @@ export const createScene = async (engine: Engine) => {
   //   { mass: 1, restitution: 0.2 },
   //   scene
   // );
-
-  const cars: Array<BuilderCar> = [
-    {
-      AmmoJS,
-      isCurrentPlayer: true,
-      scene,
-      startingPos: { x: 0, y: 5, z: 0 },
-    },
-    {
-      AmmoJS,
-      scene,
-      startingPos: { x: 10, y: 5, z: 0 },
-    },
-    {
-      AmmoJS,
-      scene,
-      startingPos: { x: -10, y: 5, z: 0 },
-    },
-    {
-      AmmoJS,
-      scene,
-      startingPos: { x: 15, y: 5, z: 0 },
-    },
-  ].map((car) => buildCar(car));
+  (() => {
+    [
+      {
+        AmmoJS,
+        isCurrentPlayer: true,
+        scene,
+        startingPos: { x: 0, y: 5, z: 0 },
+      },
+      {
+        AmmoJS,
+        scene,
+        startingPos: { x: 10, y: 5, z: 0 },
+      },
+      {
+        AmmoJS,
+        scene,
+        startingPos: { x: -10, y: 5, z: 0 },
+      },
+      {
+        AmmoJS,
+        scene,
+        startingPos: { x: 15, y: 5, z: 0 },
+      },
+    ].map((car) => buildCar(car));
+  })();
 
   // car.setAbsolutePosition(new Vector3(-1, 1, 1));
   // car.rotate(new Vector3(-1, 0, 0), 1.5);

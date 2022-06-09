@@ -10,6 +10,7 @@ const rollInfluence = 0.0;
 
 function createWheelMesh(radius: number, width: number, scene: Scene) {
   //const mesh = new BABYLON.MeshBuilder.CreateBox("wheel", {width:.82, height:.82, depth:.82}, scene);
+  // @ts-ignore
   const mesh = new MeshBuilder.CreateCylinder(
     "Wheel",
     { diameter: 1, height: 0.5, tessellation: 18 },
@@ -22,7 +23,7 @@ function createWheelMesh(radius: number, width: number, scene: Scene) {
 }
 
 type Wheel = {
-  isFront: boolean;
+  isFront?: boolean;
   position: Ammo.btVector3;
   radius: number;
   width: number;
@@ -35,7 +36,7 @@ type Wheel = {
   wheelMeshes: Array<Wheel>;
 };
 export const addWheel = ({
-  isFront,
+  isFront = true,
   position,
   radius,
   width,
