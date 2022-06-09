@@ -18,8 +18,11 @@ const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     -Math.PI / 2,
     Math.PI / 3.5,
     130,
-    new Vector3(0, 0, 0)
+    Vector3.Zero()
   );
+
+  camera.lowerBetaLimit = -Math.PI / 2;
+  camera.upperBetaLimit = Math.PI / 2;
 
   camera.attachControl(canvas, true);
   const light = new HemisphericLight("light", new Vector3(1, 1, 0), scene);
