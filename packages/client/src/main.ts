@@ -33,4 +33,8 @@ const canvas = document.getElementById("canvas") as HTMLCanvasElement;
   engine.runRenderLoop(() => {
     scene.render();
   });
+
+  window.addEventListener("resize", () => {
+    engine.resize();
+  });
 })();
