@@ -23,6 +23,8 @@ const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
   camera.lowerBetaLimit = -Math.PI / 2;
   camera.upperBetaLimit = Math.PI / 2;
+  camera.lowerRadiusLimit = 10;
+  camera.upperRadiusLimit = 200;
 
   camera.attachControl(canvas, true);
   const light = new HemisphericLight("light", new Vector3(1, 1, 0), scene);
