@@ -8,6 +8,8 @@ import {
 import { createScene } from "./scene/scene";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+const FPSEl = document.getElementById("fps") as HTMLElement;
+const development = process.env.NODE_ENV === "development";
 
 (async () => {
   const engine: Engine = new Engine(canvas);
@@ -34,6 +36,10 @@ const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
   engine.runRenderLoop(() => {
     scene.render();
+
+    if (development) {
+      FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
+    }
   });
 
   window.addEventListener("resize", () => {
