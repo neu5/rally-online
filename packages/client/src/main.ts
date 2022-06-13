@@ -9,7 +9,32 @@ import { createScene } from "./scene/scene";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
-const development = process.env.NODE_ENV === "development";
+// const development = process.env.NODE_ENV === "development";
+type WindowSize = {
+  width: number;
+  height: number;
+};
+let windowSize: WindowSize = { width: Infinity, height: Infinity };
+
+const isTouchDevice = () => "ontouchstart" in window;
+
+const updateWindowSize = () => {
+  windowSize = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+
+  console.log(windowSize);
+};
+
+const updateControls = () => {
+  if (isTouchDevice() && windowSize.width / windowSize.height < 1) {
+    // show alert to turn device horizontally
+  }
+};
+
+updateWindowSize();
+updateControls();
 
 (async () => {
   const engine: Engine = new Engine(canvas);
@@ -37,12 +62,13 @@ const development = process.env.NODE_ENV === "development";
   engine.runRenderLoop(() => {
     scene.render();
 
-    if (development) {
-      FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
-    }
+    FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
   });
 
   window.addEventListener("resize", () => {
     engine.resize();
+
+    updateWindowSize();
+    updateControls();
   });
 })();
