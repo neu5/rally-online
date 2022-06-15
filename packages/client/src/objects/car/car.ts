@@ -7,14 +7,26 @@ type AmmoType = Ammo;
 import { createChassisMesh } from "./chassis";
 import { addWheel } from "./wheel";
 
+const ACCELERATE = "accelerate";
+const BRAKE = "brake";
+const LEFT = "left";
+const RIGHT = "right";
+
+type ActionTypes = {
+  [ACCELERATE]: "accelerate";
+  [BRAKE]: "brake";
+  [LEFT]: "left";
+  [RIGHT]: "right";
+};
+
 interface Actions {
-  accelerate: boolean;
+  [ACCELERATE]: boolean;
   brake: boolean;
   right: boolean;
   left: boolean;
 }
 const actions: Actions = {
-  accelerate: false,
+  [ACCELERATE]: false,
   brake: false,
   right: false,
   left: false,
@@ -28,7 +40,7 @@ interface KeysActions {
 }
 
 const keysActions: KeysActions = {
-  KeyW: "accelerate",
+  KeyW: ACCELERATE,
   KeyS: "brake",
   KeyA: "left",
   KeyD: "right",
@@ -299,5 +311,42 @@ export const buildCar = ({
   return vehicle;
 };
 
+const touchStart = (ev: TouchEvent) => {
+  const target = ev.target as HTMLElement | null;
+
+  if (target === null) {
+    return;
+  }
+
+  const type: string | undefined = target.dataset.type;
+
+  if (type !== undefined && actions[type as keyof ActionTypes] !== undefined) {
+    actions[type as keyof ActionTypes] = true;
+  }
+};
+
+const touchEnd = (ev: TouchEvent) => {
+  const target = ev.target as HTMLElement | null;
+
+  if (target === null) {
+    return;
+  }
+
+  const type: string | undefined = target.dataset.type;
+
+  if (type !== undefined && actions[type as keyof ActionTypes] !== undefined) {
+    actions[type as keyof ActionTypes] = false;
+  }
+};
+
 window.addEventListener("keydown", keydown);
 window.addEventListener("keyup", keyup);
+
+const mobileControlsEl = document.getElementById(
+  "mobile-controls"
+) as HTMLElement | null;
+
+if (mobileControlsEl) {
+  mobileControlsEl.addEventListener("touchstart", touchStart);
+  mobileControlsEl.addEventListener("touchend", touchEnd);
+}

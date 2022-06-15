@@ -2,39 +2,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./styles/styles.scss" />
     <title>Rally Online</title>
-    <style>
-      body {
-        background-color: black;
-      }
-      #canvas {
-        width: 80%;
-        height: 80%;
-        margin: 5% auto;
-        display: block;
-      }
-      #fps {
-        position: absolute;
-        background-color: black;
-        border: 2px solid red;
-        text-align: center;
-        font-size: 16px;
-        color: white;
-        top: 15px;
-        right: 10px;
-        width: 60px;
-        height: 20px;
-      }
-    </style>
   </head>
   <body>
     <canvas id="canvas"></canvas>
     <div id="fps">0</div>
-    <div id="mobile-controls">
-      <button>accelerate</button>
-      <button>break</button>
-      <button>left</button>
-      <button>right</button>
+    <div class="mobile-controls acceleration hide">
+      <button data-type="accelerate">accelerate</button>
+      <button data-type="brake">brake</button>
+    </div>
+    <div class="mobile-controls turning hide">
+      <button data-type="left">left</button>
+      <button data-type="right">right</button>
     </div>
     <script type="module" src="main.ts"></script>
   </body>

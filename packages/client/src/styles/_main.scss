@@ -1,0 +1,48 @@
+body {
+  background-color: black;
+}
+#canvas {
+  width: 80%;
+  height: 80%;
+  margin: 5% auto;
+  display: block;
+}
+#fps {
+  position: absolute;
+  background-color: black;
+  border: 2px solid red;
+  text-align: center;
+  font-size: 16px;
+  color: white;
+  top: 15px;
+  right: 10px;
+  width: 60px;
+  height: 20px;
+}
+.mobile-controls {
+  position: absolute;
+
+  &.acceleration {
+    right: 0;
+    bottom: 0;
+
+    button {
+      display: block;
+    }
+  }
+
+  &.turning {
+    bottom: 0;
+    left: 0;
+  }
+
+  button {
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+  }
+}
+
+.hide {
+  display: none;
+}
