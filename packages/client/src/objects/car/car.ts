@@ -342,11 +342,13 @@ const touchEnd = (ev: TouchEvent) => {
 window.addEventListener("keydown", keydown);
 window.addEventListener("keyup", keyup);
 
-const mobileControlsEl = document.getElementById(
+const [...mobileControlsEls] = document.getElementsByClassName(
   "mobile-controls"
-) as HTMLElement | null;
+) as HTMLCollectionOf<HTMLElement>;
 
-if (mobileControlsEl) {
-  mobileControlsEl.addEventListener("touchstart", touchStart);
-  mobileControlsEl.addEventListener("touchend", touchEnd);
+if (mobileControlsEls.length) {
+  mobileControlsEls.forEach((el) => {
+    el.addEventListener("touchstart", touchStart);
+    el.addEventListener("touchend", touchEnd);
+  });
 }
