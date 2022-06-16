@@ -21,15 +21,15 @@ type ActionTypes = {
 
 interface Actions {
   [ACCELERATE]: boolean;
-  brake: boolean;
-  right: boolean;
-  left: boolean;
+  [BRAKE]: boolean;
+  [LEFT]: boolean;
+  [RIGHT]: boolean;
 }
 const actions: Actions = {
   [ACCELERATE]: false,
-  brake: false,
-  right: false,
-  left: false,
+  [BRAKE]: false,
+  [LEFT]: false,
+  [RIGHT]: false,
 };
 
 interface KeysActions {
@@ -41,9 +41,9 @@ interface KeysActions {
 
 const keysActions: KeysActions = {
   KeyW: ACCELERATE,
-  KeyS: "brake",
-  KeyA: "left",
-  KeyD: "right",
+  KeyS: BRAKE,
+  KeyA: LEFT,
+  KeyD: RIGHT,
 };
 
 const ZERO_QUATERNION = new Quaternion();
