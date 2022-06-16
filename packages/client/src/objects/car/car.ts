@@ -339,6 +339,12 @@ const touchEnd = (ev: TouchEvent) => {
   }
 };
 
+const preventSelection = () => false;
+
+const preventContextMenu = (ev: Event) => {
+  ev.preventDefault();
+};
+
 window.addEventListener("keydown", keydown);
 window.addEventListener("keyup", keyup);
 
@@ -350,5 +356,7 @@ if (mobileControlsEls.length) {
   mobileControlsEls.forEach((el) => {
     el.addEventListener("touchstart", touchStart);
     el.addEventListener("touchend", touchEnd);
+    el.addEventListener("selectstart", preventSelection);
+    el.addEventListener("contextmenu", preventContextMenu);
   });
 }
