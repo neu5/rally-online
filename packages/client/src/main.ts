@@ -9,7 +9,38 @@ import { createScene } from "./scene/scene";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
-const development = process.env.NODE_ENV === "development";
+const [...mobileControlsEls] = document.getElementsByClassName(
+  "mobile-controls"
+) as HTMLCollectionOf<HTMLElement>;
+// const development = process.env.NODE_ENV === "development";
+type WindowSize = {
+  width: number;
+  height: number;
+};
+let windowSize: WindowSize = { width: Infinity, height: Infinity };
+
+const isTouchDevice = () => "ontouchstart" in window;
+
+const updateWindowSize = () => {
+  windowSize = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+};
+
+const updateControls = () => {
+  if (isTouchDevice()) {
+    mobileControlsEls.forEach((el) => el.classList.remove("hide"));
+  } else {
+    mobileControlsEls.forEach((el) => el.classList.add("hide"));
+  }
+  if (isTouchDevice() && windowSize.width / windowSize.height < 1) {
+    // show alert to turn device horizontally
+  }
+};
+
+updateWindowSize();
+updateControls();
 
 (async () => {
   const engine: Engine = new Engine(canvas);
@@ -23,8 +54,8 @@ const development = process.env.NODE_ENV === "development";
     Vector3.Zero()
   );
 
-  camera.lowerBetaLimit = -Math.PI / 2;
-  camera.upperBetaLimit = Math.PI / 2;
+  camera.lowerBetaLimit = -Math.PI / 2.5;
+  camera.upperBetaLimit = Math.PI / 2.5;
   camera.lowerRadiusLimit = 10;
   camera.upperRadiusLimit = 200;
 
@@ -37,12 +68,13 @@ const development = process.env.NODE_ENV === "development";
   engine.runRenderLoop(() => {
     scene.render();
 
-    if (development) {
-      FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
-    }
+    FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
   });
 
   window.addEventListener("resize", () => {
     engine.resize();
+
+    updateWindowSize();
+    updateControls();
   });
 })();

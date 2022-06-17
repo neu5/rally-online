@@ -7,17 +7,29 @@ type AmmoType = Ammo;
 import { createChassisMesh } from "./chassis";
 import { addWheel } from "./wheel";
 
+const ACCELERATE = "accelerate";
+const BRAKE = "brake";
+const LEFT = "left";
+const RIGHT = "right";
+
+type ActionTypes = {
+  [ACCELERATE]: "accelerate";
+  [BRAKE]: "brake";
+  [LEFT]: "left";
+  [RIGHT]: "right";
+};
+
 interface Actions {
-  accelerate: boolean;
-  brake: boolean;
-  right: boolean;
-  left: boolean;
+  [ACCELERATE]: boolean;
+  [BRAKE]: boolean;
+  [LEFT]: boolean;
+  [RIGHT]: boolean;
 }
 const actions: Actions = {
-  accelerate: false,
-  brake: false,
-  right: false,
-  left: false,
+  [ACCELERATE]: false,
+  [BRAKE]: false,
+  [LEFT]: false,
+  [RIGHT]: false,
 };
 
 interface KeysActions {
@@ -28,10 +40,10 @@ interface KeysActions {
 }
 
 const keysActions: KeysActions = {
-  KeyW: "accelerate",
-  KeyS: "brake",
-  KeyA: "left",
-  KeyD: "right",
+  KeyW: ACCELERATE,
+  KeyS: BRAKE,
+  KeyA: LEFT,
+  KeyD: RIGHT,
 };
 
 const ZERO_QUATERNION = new Quaternion();
@@ -299,5 +311,53 @@ export const buildCar = ({
   return vehicle;
 };
 
+const touchStart = (ev: TouchEvent) => {
+  const target = ev.target as HTMLElement | null;
+
+  if (target === null) {
+    return;
+  }
+
+  const type: string | undefined = target.dataset.type;
+
+  if (type !== undefined && actions[type as keyof ActionTypes] !== undefined) {
+    actions[type as keyof ActionTypes] = true;
+  }
+};
+
+const touchEnd = (ev: TouchEvent) => {
+  const target = ev.target as HTMLElement | null;
+
+  if (target === null) {
+    return;
+  }
+
+  const type: string | undefined = target.dataset.type;
+
+  if (type !== undefined && actions[type as keyof ActionTypes] !== undefined) {
+    actions[type as keyof ActionTypes] = false;
+  }
+};
+
+const preventSelection = () => false;
+
+const preventContextMenu = (ev: Event) => {
+  ev.preventDefault();
+};
+
 window.addEventListener("keydown", keydown);
 window.addEventListener("keyup", keyup);
+
+const [...mobileControlsEls] = document.getElementsByClassName(
+  "mobile-controls"
+) as HTMLCollectionOf<HTMLElement>;
+
+if (mobileControlsEls.length) {
+  mobileControlsEls.forEach((el) => {
+    el.addEventListener("touchstart", touchStart);
+    el.addEventListener("touchend", touchEnd);
+    el.addEventListener("contextmenu", preventContextMenu);
+    el.addEventListener("selectionchange", preventSelection);
+    el.addEventListener("selectstart", preventSelection);
+  });
+}
