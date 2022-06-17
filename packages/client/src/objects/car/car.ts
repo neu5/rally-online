@@ -356,7 +356,8 @@ if (mobileControlsEls.length) {
   mobileControlsEls.forEach((el) => {
     el.addEventListener("touchstart", touchStart);
     el.addEventListener("touchend", touchEnd);
-    el.addEventListener("selectstart", preventSelection);
     el.addEventListener("contextmenu", preventContextMenu);
+    el.addEventListener("selectionchange", preventSelection);
+    el.addEventListener("selectstart", preventSelection);
   });
 }
