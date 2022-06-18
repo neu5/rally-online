@@ -218,6 +218,8 @@ const createVehicle = ({
   return { vehicle, chassisMesh, wheelMeshes };
 };
 
+const speedometerEl = document.getElementById("speedometer") as HTMLElement;
+
 export type BuilderCar = {
   AmmoJS: AmmoType;
   isCurrentPlayer?: boolean;
@@ -285,6 +287,10 @@ export const buildCar = ({
 
         vehicle.setSteeringValue(vehicleSteering, FRONT_LEFT);
         vehicle.setSteeringValue(vehicleSteering, FRONT_RIGHT);
+
+        speedometerEl.textContent = `${vehicle
+          .getCurrentSpeedKmHour()
+          .toFixed()} km/h`;
       }
 
       let tm, p, q, i;
