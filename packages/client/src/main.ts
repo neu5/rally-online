@@ -4,11 +4,13 @@ import {
   HemisphericLight,
   Vector3,
 } from "@babylonjs/core";
+import { Socket, io } from "socket.io-client";
 
 import { createScene } from "./scene/scene";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
+const playersListEl = document.getElementById("players-list") as HTMLElement;
 const [...mobileControlsEls] = document.getElementsByClassName(
   "mobile-controls"
 ) as HTMLCollectionOf<HTMLElement>;
@@ -64,6 +66,44 @@ updateControls();
 
   // Default intensity is 1. Let's dim the light a small amount
   light.intensity = 0.7;
+
+  // share sockets interfaces?
+  const socket: Socket<ServerToClientEvents> = io();
+
+  socket.on(
+    "playerConnected",
+    (playersList: Array<{ data: { name: string } }>) => {
+      playersListEl.textContent = "";
+
+      const fragment = new DocumentFragment();
+
+      playersList.forEach(({ data }) => {
+        console.log(data);
+        const li = document.createElement("li");
+        li.textContent = data.name;
+
+        fragment.appendChild(li);
+      });
+
+      playersListEl.appendChild(fragment);
+    }
+  );
+
+  socket.on("playerLeft", (playersList: Array<{ data: { name: string } }>) => {
+    playersListEl.textContent = "";
+
+    const fragment = new DocumentFragment();
+
+    playersList.forEach(({ data }) => {
+      console.log(data);
+      const li = document.createElement("li");
+      li.textContent = data.name;
+
+      fragment.appendChild(li);
+    });
+
+    playersListEl.appendChild(fragment);
+  });
 
   engine.runRenderLoop(() => {
     scene.render();

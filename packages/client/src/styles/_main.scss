@@ -31,6 +31,16 @@ body {
   width: 60px;
   height: 20px;
 }
+#players {
+  position: absolute;
+  top: 10;
+  left: 10;
+  color: white;
+
+  h2 {
+    font-size: 14px;
+  }
+}
 .mobile-controls {
   position: absolute;
 
