@@ -7,10 +7,12 @@ import {
 import { Socket, io } from "socket.io-client";
 
 import { createScene } from "./scene/scene";
+import { createList } from "./ui";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
+
 const [...mobileControlsEls] = document.getElementsByClassName(
   "mobile-controls"
 ) as HTMLCollectionOf<HTMLElement>;
@@ -44,6 +46,20 @@ const updateControls = () => {
 updateWindowSize();
 updateControls();
 
+let currentPlayerId: string | undefined = undefined;
+
+const setCurrentPlayer = (id: string) => {
+  [...playersListEl.children].find((el: HTMLElement) => {
+    if (el.dataset.id === id) {
+      el.classList.add("you");
+      currentPlayerId = id;
+      return true;
+    }
+
+    return false;
+  });
+};
+
 (async () => {
   const engine: Engine = new Engine(canvas);
   const scene = await createScene(engine);
@@ -73,36 +89,28 @@ updateControls();
   socket.on(
     "playerConnected",
     (playersList: Array<{ data: { name: string } }>) => {
-      playersListEl.textContent = "";
+      createList(playersListEl, playersList);
 
-      const fragment = new DocumentFragment();
-
-      playersList.forEach(({ data }) => {
-        console.log(data);
-        const li = document.createElement("li");
-        li.textContent = data.name;
-
-        fragment.appendChild(li);
-      });
-
-      playersListEl.appendChild(fragment);
+      if (currentPlayerId !== undefined) {
+        setCurrentPlayer(currentPlayerId);
+      }
     }
   );
 
+  socket.on("playerID", (id: string) => {
+    if (playersListEl.childElementCount > 0) {
+      setCurrentPlayer(id);
+    } else {
+      setTimeout(() => setCurrentPlayer(id), 1000);
+    }
+  });
+
   socket.on("playerLeft", (playersList: Array<{ data: { name: string } }>) => {
-    playersListEl.textContent = "";
+    createList(playersListEl, playersList);
 
-    const fragment = new DocumentFragment();
-
-    playersList.forEach(({ data }) => {
-      console.log(data);
-      const li = document.createElement("li");
-      li.textContent = data.name;
-
-      fragment.appendChild(li);
-    });
-
-    playersListEl.appendChild(fragment);
+    if (currentPlayerId !== undefined) {
+      setCurrentPlayer(currentPlayerId);
+    }
   });
 
   engine.runRenderLoop(() => {
