@@ -6,6 +6,8 @@ import {
 } from "@babylonjs/core";
 import { Socket, io } from "socket.io-client";
 
+import { ServerToClientEvents } from "shared/src/type";
+
 import { createScene } from "./scene/scene";
 import { createList } from "./ui";
 
@@ -86,10 +88,25 @@ const setCurrentPlayer = (id: string) => {
   // share sockets interfaces?
   const socket: Socket<ServerToClientEvents> = io();
 
+  // type CarPosition = {
+  //   x: number;
+  //   y: number;
+  //   z: number;
+  // };
   socket.on(
-    "playerConnected",
-    (playersList: Array<{ data: { name: string } }>) => {
+    "playerListUpdate",
+    (playersList: Array<{ data: { name: string; pos: CarPosition } }>) => {
       createList(playersListEl, playersList);
+
+      // playersList.forEach((player) => {
+      //   player.car = buildCar({
+      //     AmmoJS,
+      //     scene,
+      //     startingPos: player.data.pos,
+      //   });
+
+      //   playersListOnClient.push(player);
+      // });
 
       if (currentPlayerId !== undefined) {
         setCurrentPlayer(currentPlayerId);
@@ -102,14 +119,6 @@ const setCurrentPlayer = (id: string) => {
       setCurrentPlayer(id);
     } else {
       setTimeout(() => setCurrentPlayer(id), 1000);
-    }
-  });
-
-  socket.on("playerLeft", (playersList: Array<{ data: { name: string } }>) => {
-    createList(playersListEl, playersList);
-
-    if (currentPlayerId !== undefined) {
-      setCurrentPlayer(currentPlayerId);
     }
   });
 

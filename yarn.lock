@@ -246,6 +246,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babylonjs/core@npm:^5.12.1":
+  version: 5.12.1
+  resolution: "@babylonjs/core@npm:5.12.1"
+  dependencies:
+    tslib: ^2.4.0
+  checksum: 092887f42f4f031522a9425252714cc724575c584aa27588c0bff9255867f1125ac136296ee163b0b2296fc593498676702d35e3cd1c53973f916edf7dd28ae6
+  languageName: node
+  linkType: hard
+
 "@babylonjs/core@npm:^5.8.0":
   version: 5.8.0
   resolution: "@babylonjs/core@npm:5.8.0"
@@ -2132,6 +2141,7 @@ __metadata:
     parcel-reporter-clean-dist: ^1.0.4
     parcel-reporter-static-files-copy: ^1.3.4
     sass: ^1.52.3
+    shared: 0.0.1
     socket.io-client: ^4.5.1
     typescript: ^4.7.2
   languageName: unknown
@@ -5531,9 +5541,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "server@workspace:packages/server"
   dependencies:
+    "@babylonjs/core": ^5.12.1
     "@types/express": ^4.17.13
+    ammo.js: ^0.0.10
+    ammojs-typed: ^1.0.6
     express: ^4.18.1
     nodemon: ^2.0.16
+    shared: 0.0.1
     socket.io: ^4.5.1
     ts-node: ^10.8.0
     typescript: ^4.6.4
@@ -5553,6 +5567,17 @@ __metadata:
   checksum: be18cbbf70e7d8097c97f713a2e76edf84e87299b40d085c6bf8b65314e994cc15e2e317727342fa6996e38e1f52c59720b53fe621e2eb593a6847bf0356db89
   languageName: node
   linkType: hard
+
+"shared@0.0.1, shared@workspace:packages/shared":
+  version: 0.0.0-use.local
+  resolution: "shared@workspace:packages/shared"
+  dependencies:
+    "@babylonjs/core": ^5.12.1
+    "@types/express": ^4.17.13
+    ammo.js: ^0.0.10
+    ammojs-typed: ^1.0.6
+  languageName: unknown
+  linkType: soft
 
 "shebang-command@npm:^2.0.0":
   version: 2.0.0

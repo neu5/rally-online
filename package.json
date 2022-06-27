@@ -2,7 +2,8 @@
   "private": true,
   "workspaces": [
     "packages/client",
-    "packages/server"
+    "packages/server",
+    "packages/shared"
   ],
   "packageManager": "yarn@3.1.1",
   "devDependencies": {

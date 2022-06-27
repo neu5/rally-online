@@ -241,7 +241,7 @@ export const buildCar = ({
 
   let vehicleSteering = 0;
 
-  scene.registerBeforeRender(function () {
+  scene.registerBeforeRender(() => {
     // const dt = engine.getDeltaTime().toFixed() / 1000;
 
     if (vehicle !== undefined) {
