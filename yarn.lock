@@ -5571,11 +5571,6 @@ __metadata:
 "shared@0.0.1, shared@workspace:packages/shared":
   version: 0.0.0-use.local
   resolution: "shared@workspace:packages/shared"
-  dependencies:
-    "@babylonjs/core": ^5.12.1
-    "@types/express": ^4.17.13
-    ammo.js: ^0.0.10
-    ammojs-typed: ^1.0.6
   languageName: unknown
   linkType: soft
 

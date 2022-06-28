@@ -8,7 +8,7 @@ import {
 } from "@babylonjs/core";
 import Ammo from "ammojs-typed";
 
-import { buildCar } from "shared/src/model";
+import { buildCar } from "../model";
 
 export const createScene = async (engine: Engine) => {
   const scene: Scene = new Scene(engine);

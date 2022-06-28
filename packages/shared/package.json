@@ -5,11 +5,5 @@
   "repository": "https://github.com/neu5-przenz-games/the-game",
   "author": "neu5",
   "license": "MIT",
-  "packageManager": "yarn@3.1.1",
-  "devDependencies": {
-    "@babylonjs/core": "^5.12.1",
-    "@types/express": "^4.17.13",
-    "ammo.js": "^0.0.10",
-    "ammojs-typed": "^1.0.6"
-  }
+  "packageManager": "yarn@3.1.1"
 }

@@ -29,7 +29,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "serve": "node dist/index.js",
+    "serve": "node --experimental-specifier-resolution=node dist/index.js",
     "watch": "tsc --watch",
     "watch:serve": "nodemon dist/index.js"
   }

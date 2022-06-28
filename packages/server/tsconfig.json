@@ -7,7 +7,12 @@
     "strict": true,
     "noImplicitAny": true,
     "sourceMap": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["node"],
+    "typeRoots": ["babylonjs", "node_modules/ammojs-typed/ammo/ambient"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
