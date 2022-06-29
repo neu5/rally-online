@@ -23,14 +23,6 @@ export const createScene = async (engine: Engine) => {
     scene
   );
 
-  // const box = MeshBuilder.CreateBox("box1");
-  // box.setAbsolutePosition(new Vector3(1, 1, 1));
-  // box.physicsImpostor = new PhysicsImpostor(
-  //   box,
-  //   PhysicsImpostor.BoxImpostor,
-  //   { mass: 1, restitution: 0.2 },
-  //   scene
-  // );
   (() => {
     [
       {
@@ -56,16 +48,6 @@ export const createScene = async (engine: Engine) => {
       },
     ].map((car) => buildCar(car));
   })();
-
-  // car.setAbsolutePosition(new Vector3(-1, 1, 1));
-  // car.rotate(new Vector3(-1, 0, 0), 1.5);
-
-  // car.physicsImpostor = new PhysicsImpostor(
-  //   car,
-  //   PhysicsImpostor.BoxImpostor,
-  //   { mass: 1, restitution: 0.4 },
-  //   scene
-  // );
 
   ground.physicsImpostor = new PhysicsImpostor(
     ground,

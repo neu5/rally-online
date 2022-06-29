@@ -246,6 +246,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babylonjs/core@npm:^5.12.1":
+  version: 5.12.1
+  resolution: "@babylonjs/core@npm:5.12.1"
+  dependencies:
+    tslib: ^2.4.0
+  checksum: 092887f42f4f031522a9425252714cc724575c584aa27588c0bff9255867f1125ac136296ee163b0b2296fc593498676702d35e3cd1c53973f916edf7dd28ae6
+  languageName: node
+  linkType: hard
+
 "@babylonjs/core@npm:^5.8.0":
   version: 5.8.0
   resolution: "@babylonjs/core@npm:5.8.0"
@@ -2127,13 +2136,12 @@ __metadata:
     "@types/earcut": ^2.1.1
     ammo.js: ^0.0.10
     ammojs-typed: ^1.0.6
-    earcut: ^2.2.3
     parcel: ^2.6.0
     parcel-reporter-clean-dist: ^1.0.4
     parcel-reporter-static-files-copy: ^1.3.4
     sass: ^1.52.3
     socket.io-client: ^4.5.1
-    typescript: ^4.7.2
+    typescript: ^4.7.4
   languageName: unknown
   linkType: soft
 
@@ -2626,13 +2634,6 @@ __metadata:
   version: 0.1.4
   resolution: "duplexer3@npm:0.1.4"
   checksum: c2fd6969314607d23439c583699aaa43c4100d66b3e161df55dccd731acc57d5c81a64bb4f250805fbe434ddb1d2623fee2386fb890f5886ca1298690ec53415
-  languageName: node
-  linkType: hard
-
-"earcut@npm:^2.2.3":
-  version: 2.2.3
-  resolution: "earcut@npm:2.2.3"
-  checksum: 4e3bab80366c49e0332a0bb061649a3b9354dcbfa636155c7eee250be0670d7139d53f2aebbcf90788507c71b76ec1713c20e36527f202b9abb79c9e5858ec35
   languageName: node
   linkType: hard
 
@@ -5531,12 +5532,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "server@workspace:packages/server"
   dependencies:
+    "@babylonjs/core": ^5.12.1
     "@types/express": ^4.17.13
+    ammo.js: ^0.0.10
+    ammojs-typed: ^1.0.6
     express: ^4.18.1
     nodemon: ^2.0.16
     socket.io: ^4.5.1
     ts-node: ^10.8.0
-    typescript: ^4.6.4
+    typescript: ^4.7.4
   languageName: unknown
   linkType: soft
 
@@ -6088,23 +6092,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^4.6.4, typescript@npm:^4.7.2":
-  version: 4.7.2
-  resolution: "typescript@npm:4.7.2"
+"typescript@npm:^4.7.4":
+  version: 4.7.4
+  resolution: "typescript@npm:4.7.4"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 5163585e6b56410f77d5483b698d9489bbee8902c99029eb70cf6d21525a186530ce19a00951af84eefd4a131cc51d0959f5118e25e70ab61f45ac4057dbd1ef
+  checksum: 5750181b1cd7e6482c4195825547e70f944114fb47e58e4aa7553e62f11b3f3173766aef9c281783edfd881f7b8299cf35e3ca8caebe73d8464528c907a164df
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.6.4#~builtin<compat/typescript>, typescript@patch:typescript@^4.7.2#~builtin<compat/typescript>":
-  version: 4.7.2
-  resolution: "typescript@patch:typescript@npm%3A4.7.2#~builtin<compat/typescript>::version=4.7.2&hash=493e53"
+"typescript@patch:typescript@^4.7.4#~builtin<compat/typescript>":
+  version: 4.7.4
+  resolution: "typescript@patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=493e53"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 09d93fc0983d38eadd9b0427f790b49b4437f45002a87d447be3fbe53120880e87a91dd03e1d900498f99205d6e0b7c9784fe41fca11d56f4bbce371f74bb160
+  checksum: 96d3030cb01143570567cb4f3a616b10df65f658f0e74e853e77a089a6a954e35c800be7db8b9bfe9a1ae05d9c2897e281359f65e4caa1caf266368e1c4febd3
   languageName: node
   linkType: hard
 

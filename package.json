@@ -28,6 +28,7 @@
   },
   "scripts": {
     "build": "yarn workspaces foreach -p run build",
+    "clean": "rm -Rf packages/client/dist && rm -Rf packages/server/dist && cd packages/client && mkdir dist && cd ../server && mkdir dist && echo 'done'",
     "watch": "concurrently -k \"yarn:watch:*\"",
     "watch:client": "yarn workspace client watch",
     "watch:server": "yarn workspace server watch",

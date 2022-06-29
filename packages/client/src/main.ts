@@ -87,7 +87,7 @@ const setCurrentPlayer = (id: string) => {
   const socket: Socket<ServerToClientEvents> = io();
 
   socket.on(
-    "playerConnected",
+    "playerListUpdate",
     (playersList: Array<{ data: { name: string } }>) => {
       createList(playersListEl, playersList);
 
@@ -102,14 +102,6 @@ const setCurrentPlayer = (id: string) => {
       setCurrentPlayer(id);
     } else {
       setTimeout(() => setCurrentPlayer(id), 1000);
-    }
-  });
-
-  socket.on("playerLeft", (playersList: Array<{ data: { name: string } }>) => {
-    createList(playersListEl, playersList);
-
-    if (currentPlayerId !== undefined) {
-      setCurrentPlayer(currentPlayerId);
     }
   });
 

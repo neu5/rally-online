@@ -7,8 +7,10 @@
     "strict": true,
     "noImplicitAny": true,
     "sourceMap": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["node", "express"],
+    "typeRoots": ["babylonjs", "node_modules/ammojs-typed/ammo/ambient"]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*.ts"]
 }

@@ -6,6 +6,7 @@ export const createChassisMesh = (
   h: number,
   scene: Scene
 ) => {
+  // @ts-ignore
   const mesh = new MeshBuilder.CreateBox(
     "box",
     { width: w, depth: h, height: l },
