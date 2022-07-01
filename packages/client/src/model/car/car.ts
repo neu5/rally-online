@@ -1,5 +1,6 @@
 import { Axis, Quaternion, Scene } from "@babylonjs/core";
 import Ammo from "ammojs-typed";
+import { Socket } from "socket.io-client";
 
 // @ts-ignore
 type AmmoType = Ammo;
@@ -31,6 +32,8 @@ const actions: Actions = {
   [LEFT]: false,
   [RIGHT]: false,
 };
+
+const actionsFromServer = actions;
 
 interface KeysActions {
   KeyW: string;
@@ -230,19 +233,21 @@ export type BuilderCar = {
   scene: Scene;
   startingPos: { x: number; y: number; z: number };
 };
-export const buildCar = ({
-  AmmoJS,
-  color,
-  scene,
-  startingPos,
-  isCurrentPlayer = false,
-}: BuilderCar) => {
+
+export const buildCar = (
+  { AmmoJS, color, scene, startingPos, isCurrentPlayer = false }: BuilderCar,
+  socket: Socket
+) => {
   const { vehicle, chassisMesh, wheelMeshes } = createVehicle({
     AmmoJS,
     color,
     quat: ZERO_QUATERNION,
     scene,
     startingPos,
+  });
+
+  socket.on("server:action", (data: { action: keyof ActionTypes }) => {
+    actionsFromServer[data.action] = true;
   });
 
   let vehicleSteering = 0;
@@ -257,13 +262,13 @@ export const buildCar = ({
       let engineForce = 0;
 
       if (isCurrentPlayer) {
-        if (actions.accelerate) {
+        if (actionsFromServer.accelerate) {
           if (speed < -1) {
             breakingForce = maxBreakingForce;
           } else {
             engineForce = maxEngineForce;
           }
-        } else if (actions.brake) {
+        } else if (actionsFromServer.brake) {
           if (speed > 1) {
             breakingForce = maxBreakingForce;
           } else {
@@ -271,29 +276,36 @@ export const buildCar = ({
           }
         }
 
-        if (actions.right) {
-          if (vehicleSteering < steeringClamp) {
-            vehicleSteering += steeringIncrement;
-          }
-        } else if (actions.left) {
-          if (vehicleSteering > -steeringClamp) {
-            vehicleSteering -= steeringIncrement;
-          }
-        } else {
-          vehicleSteering = 0;
+        if (actions.accelerate) {
+          socket.emit("player:action", {
+            id: 0,
+            action: "accelerate",
+          });
+        } else if (actions.brake) {
+          socket.emit("player:action", {
+            id: 0,
+            action: "brake",
+          });
         }
-
+        // if (actions.right) {
+        //   if (vehicleSteering < steeringClamp) {
+        //     vehicleSteering += steeringIncrement;
+        //   }
+        // } else if (actions.left) {
+        //   if (vehicleSteering > -steeringClamp) {
+        //     vehicleSteering -= steeringIncrement;
+        //   }
+        // } else {
+        //   vehicleSteering = 0;
+        // }
         vehicle.applyEngineForce(engineForce, FRONT_LEFT);
         vehicle.applyEngineForce(engineForce, FRONT_RIGHT);
-
         vehicle.setBrake(breakingForce / 2, FRONT_LEFT);
         vehicle.setBrake(breakingForce / 2, FRONT_RIGHT);
         vehicle.setBrake(breakingForce, BACK_LEFT);
         vehicle.setBrake(breakingForce, BACK_RIGHT);
-
         vehicle.setSteeringValue(vehicleSteering, FRONT_LEFT);
         vehicle.setSteeringValue(vehicleSteering, FRONT_RIGHT);
-
         speedometerEl.textContent = `${vehicle
           .getCurrentSpeedKmHour()
           .toFixed()} km/h`;

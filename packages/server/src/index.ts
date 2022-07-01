@@ -34,30 +34,6 @@ const io = new Server<ServerToClientEvents>(httpServer);
 
 const playersList = new Map();
 
-const createSocketHandlers = (socket: Socket) => {
-  socket.on("disconnect", () => {
-    playersList.delete(socket.id);
-
-    io.emit(
-      "playerListUpdate",
-      Array.from(playersList, ([id, data]) => ({ id, data }))
-    );
-  });
-};
-
-io.on("connection", (socket) => {
-  playersList.set(socket.id, { name: socket.id });
-
-  createSocketHandlers(socket);
-
-  io.emit(
-    "playerListUpdate",
-    Array.from(playersList, ([id, data]) => ({ id, data }))
-  );
-
-  socket.emit("playerID", socket.id);
-});
-
 (async () => {
   const engine = new NullEngine();
   const scene = await createScene(engine);
@@ -69,6 +45,38 @@ io.on("connection", (socket) => {
     130,
     Vector3.Zero()
   );
+
+  const createSocketHandlers = (socket: Socket) => {
+    socket.on("player:action", (data) => {
+      io.emit("server:action", data);
+    });
+
+    socket.on("disconnect", () => {
+      playersList.delete(socket.id);
+
+      io.emit(
+        "playerListUpdate",
+        Array.from(playersList, ([id, data]) => ({ id, data }))
+      );
+    });
+  };
+
+  io.on("connection", (socket) => {
+    playersList.set(socket.id, { name: socket.id });
+
+    createSocketHandlers(socket);
+
+    io.emit(
+      "playerListUpdate",
+      Array.from(playersList, ([id, data]) => ({ id, data }))
+    );
+
+    socket.emit("playerID", socket.id);
+  });
+
+  // setInterval(() => {
+  //   console.log(scene.meshes[1].position);
+  // }, 1000);
 
   engine.runRenderLoop(() => {
     scene.render();
