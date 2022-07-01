@@ -29,6 +29,7 @@ const httpServer = createServer(app);
 interface ServerToClientEvents {
   playerListUpdate: (playersList: Object) => void;
   playerID: (id: string) => void;
+  "server:action": (data: Object) => void;
 }
 const io = new Server<ServerToClientEvents>(httpServer);
 
