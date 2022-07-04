@@ -1,4 +1,10 @@
-import { MeshBuilder, Quaternion, Scene } from "@babylonjs/core";
+import {
+  Color3,
+  MeshBuilder,
+  Quaternion,
+  Scene,
+  StandardMaterial,
+} from "@babylonjs/core";
 
 export const createChassisMesh = (
   w: number,
@@ -6,6 +12,10 @@ export const createChassisMesh = (
   h: number,
   scene: Scene
 ) => {
+  const blueMaterial = new StandardMaterial("BlueMaterial", scene);
+  blueMaterial.diffuseColor = new Color3(0.3, 0.5, 0.8);
+  blueMaterial.emissiveColor = new Color3(0.3, 0.5, 0.8);
+
   // @ts-ignore
   const mesh = new MeshBuilder.CreateBox(
     "box",
@@ -13,6 +23,7 @@ export const createChassisMesh = (
     scene
   );
   mesh.rotationQuaternion = new Quaternion();
+  mesh.material = blueMaterial;
 
   return mesh;
 };
