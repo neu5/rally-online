@@ -90,12 +90,14 @@ const keydown = (e: KeyboardEvent) => {
 
 type Vehicle = {
   AmmoJS: AmmoType;
+  color: string;
   quat: Quaternion;
   scene: Scene;
   startingPos: { x: number; y: number; z: number };
 };
 const createVehicle = ({
   AmmoJS,
+  color,
   quat,
   scene,
   startingPos: { x, y, z },
@@ -130,12 +132,13 @@ const createVehicle = ({
   const localInertia = new AmmoJS.btVector3(0, 0, 0);
   geometry.calculateLocalInertia(massVehicle, localInertia);
 
-  const chassisMesh = createChassisMesh(
-    chassisWidth,
-    chassisHeight,
-    chassisLength,
-    scene
-  );
+  const chassisMesh = createChassisMesh({
+    color,
+    w: chassisWidth,
+    l: chassisHeight,
+    h: chassisLength,
+    scene,
+  });
 
   const massOffset = new AmmoJS.btVector3(0, 0.4, 0);
   const transform2 = new AmmoJS.btTransform();
@@ -222,18 +225,21 @@ const speedometerEl = document.getElementById("speedometer") as HTMLElement;
 
 export type BuilderCar = {
   AmmoJS: AmmoType;
+  color: string;
   isCurrentPlayer?: boolean;
   scene: Scene;
   startingPos: { x: number; y: number; z: number };
 };
 export const buildCar = ({
   AmmoJS,
+  color,
   scene,
   startingPos,
   isCurrentPlayer = false,
 }: BuilderCar) => {
   const { vehicle, chassisMesh, wheelMeshes } = createVehicle({
     AmmoJS,
+    color,
     quat: ZERO_QUATERNION,
     scene,
     startingPos,

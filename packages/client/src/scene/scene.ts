@@ -9,6 +9,7 @@ import {
 import Ammo from "ammojs-typed";
 
 import { buildCar } from "../model/car/car";
+import { addColors } from "../utils/colors";
 
 export const createScene = async (engine: Engine) => {
   const scene: Scene = new Scene(engine);
@@ -23,6 +24,8 @@ export const createScene = async (engine: Engine) => {
     scene
   );
 
+  addColors(scene);
+
   // const box = MeshBuilder.CreateBox("box1");
   // box.setAbsolutePosition(new Vector3(1, 1, 1));
   // box.physicsImpostor = new PhysicsImpostor(
@@ -35,22 +38,26 @@ export const createScene = async (engine: Engine) => {
     [
       {
         AmmoJS,
+        color: "BlueMaterial",
         isCurrentPlayer: true,
         scene,
         startingPos: { x: 0, y: 5, z: 0 },
       },
       {
         AmmoJS,
+        color: "RedMaterial",
         scene,
         startingPos: { x: 10, y: 5, z: 0 },
       },
       {
         AmmoJS,
+        color: "GreenMaterial",
         scene,
         startingPos: { x: -10, y: 5, z: 0 },
       },
       {
         AmmoJS,
+        color: "YellowMaterial",
         scene,
         startingPos: { x: 15, y: 5, z: 0 },
       },

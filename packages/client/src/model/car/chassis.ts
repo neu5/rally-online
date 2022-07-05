@@ -1,21 +1,18 @@
-import {
-  Color3,
-  MeshBuilder,
-  Quaternion,
-  Scene,
-  StandardMaterial,
-} from "@babylonjs/core";
+import { MeshBuilder, Quaternion, Scene } from "@babylonjs/core";
 
-export const createChassisMesh = (
-  w: number,
-  l: number,
-  h: number,
-  scene: Scene
-) => {
-  const blueMaterial = new StandardMaterial("BlueMaterial", scene);
-  blueMaterial.diffuseColor = new Color3(0.3, 0.5, 0.8);
-  blueMaterial.emissiveColor = new Color3(0.3, 0.5, 0.8);
-
+export const createChassisMesh = ({
+  color,
+  w,
+  l,
+  h,
+  scene,
+}: {
+  color: string;
+  w: number;
+  l: number;
+  h: number;
+  scene: Scene;
+}) => {
   // @ts-ignore
   const mesh = new MeshBuilder.CreateBox(
     "box",
@@ -23,7 +20,7 @@ export const createChassisMesh = (
     scene
   );
   mesh.rotationQuaternion = new Quaternion();
-  mesh.material = blueMaterial;
+  mesh.material = scene.getMaterialByName(color);
 
   return mesh;
 };
