@@ -62,7 +62,11 @@ const setCurrentPlayer = (id: string) => {
 
 (async () => {
   const engine: Engine = new Engine(canvas);
-  const scene = await createScene(engine);
+
+  // share sockets interfaces?
+  const socket: Socket<ServerToClientEvents> = io();
+
+  const scene = await createScene(engine, socket);
 
   const camera = new ArcRotateCamera(
     "camera",
@@ -82,9 +86,6 @@ const setCurrentPlayer = (id: string) => {
 
   // Default intensity is 1. Let's dim the light a small amount
   light.intensity = 0.7;
-
-  // share sockets interfaces?
-  const socket: Socket<ServerToClientEvents> = io();
 
   socket.on(
     "playerListUpdate",

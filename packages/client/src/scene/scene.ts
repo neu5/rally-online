@@ -7,11 +7,12 @@ import {
   Vector3,
 } from "@babylonjs/core";
 import Ammo from "ammojs-typed";
+import { Socket } from "socket.io-client";
 
 import { buildCar } from "../model/car/car";
 import { addColors } from "../utils/colors";
 
-export const createScene = async (engine: Engine) => {
+export const createScene = async (engine: Engine, socket: Socket) => {
   const scene: Scene = new Scene(engine);
 
   const gravityVector = new Vector3(0, -9.81, 0);
@@ -43,25 +44,25 @@ export const createScene = async (engine: Engine) => {
         scene,
         startingPos: { x: 0, y: 5, z: 0 },
       },
-      {
-        AmmoJS,
-        color: "RedMaterial",
-        scene,
-        startingPos: { x: 10, y: 5, z: 0 },
-      },
-      {
-        AmmoJS,
-        color: "GreenMaterial",
-        scene,
-        startingPos: { x: -10, y: 5, z: 0 },
-      },
-      {
-        AmmoJS,
-        color: "YellowMaterial",
-        scene,
-        startingPos: { x: 15, y: 5, z: 0 },
-      },
-    ].map((car) => buildCar(car));
+      // {
+      //   AmmoJS,
+      //   color: "RedMaterial",
+      //   scene,
+      //   startingPos: { x: 10, y: 5, z: 0 },
+      // },
+      // {
+      //   AmmoJS,
+      //   color: "GreenMaterial",
+      //   scene,
+      //   startingPos: { x: -10, y: 5, z: 0 },
+      // },
+      // {
+      //   AmmoJS,
+      //   color: "YellowMaterial",
+      //   scene,
+      //   startingPos: { x: 15, y: 5, z: 0 },
+      // },
+    ].map((car) => buildCar(car, socket));
   })();
 
   // car.setAbsolutePosition(new Vector3(-1, 1, 1));
