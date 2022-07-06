@@ -1,4 +1,4 @@
-import { Color3, Scene, StandardMaterial } from "@babylonjs/core";
+import { Color3, Scene, StandardMaterial, Texture } from "@babylonjs/core";
 
 const COLOR_NAMES = {
   BLUE: "BlueMaterial",
@@ -34,4 +34,9 @@ const addColors = (scene: Scene) => {
   });
 };
 
-export { addColors };
+const addWheelMaterial = () => {
+  const wheelMat = new StandardMaterial("wheelMaterial");
+  wheelMat.diffuseTexture = new Texture("../../../assets/wheel.png");
+};
+
+export { addColors, addWheelMaterial };

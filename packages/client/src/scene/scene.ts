@@ -10,7 +10,7 @@ import Ammo from "ammojs-typed";
 import { Socket } from "socket.io-client";
 
 import { buildCar } from "../model/car/car";
-import { addColors } from "../utils/colors";
+import { addColors, addWheelMaterial } from "../utils";
 
 export const createScene = async (engine: Engine, socket: Socket) => {
   const scene: Scene = new Scene(engine);
@@ -26,6 +26,7 @@ export const createScene = async (engine: Engine, socket: Socket) => {
   );
 
   addColors(scene);
+  addWheelMaterial();
 
   // const box = MeshBuilder.CreateBox("box1");
   // box.setAbsolutePosition(new Vector3(1, 1, 1));

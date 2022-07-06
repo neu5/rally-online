@@ -42,7 +42,7 @@ const wheelAxisFrontPosition = 1.0;
 const wheelHalfTrackFront = 1;
 const wheelAxisHeightFront = 0.4;
 const wheelRadiusFront = 0.4;
-const wheelWidthFront = 0.3;
+// const wheelWidthFront = 0.3;
 
 const steeringIncrement = 0.01;
 const steeringClamp = 0.2;
@@ -172,7 +172,6 @@ const createVehicle = ({
     addWheel({
       ...wheel,
       radius: wheelRadiusFront,
-      width: wheelWidthFront,
       vehicle,
       scene,
       wheelDirectionCS0,
