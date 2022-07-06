@@ -8,8 +8,7 @@ const suspensionCompression = 4.4;
 const suspensionRestLength = 0.6;
 const rollInfluence = 0.0;
 
-function createWheelMesh(radius: number, width: number, scene: Scene) {
-  //const mesh = new BABYLON.MeshBuilder.CreateBox("wheel", {width:.82, height:.82, depth:.82}, scene);
+const createWheelMesh = (scene: Scene) => {
   // @ts-ignore
   const mesh = new MeshBuilder.CreateCylinder(
     "Wheel",
@@ -17,16 +16,14 @@ function createWheelMesh(radius: number, width: number, scene: Scene) {
     scene
   );
   mesh.rotationQuaternion = new Quaternion();
-  // mesh.material = blackMaterial;
 
   return mesh;
-}
+};
 
 type Wheel = {
   isFront?: boolean;
   position: Ammo.btVector3;
   radius: number;
-  width: number;
   index: number;
   vehicle: Ammo.btRaycastVehicle;
   scene: Scene;
@@ -39,7 +36,6 @@ export const addWheel = ({
   isFront = true,
   position,
   radius,
-  width,
   index,
   vehicle,
   scene,
@@ -65,5 +61,5 @@ export const addWheel = ({
   wheelInfo.set_m_frictionSlip(40);
   wheelInfo.set_m_rollInfluence(rollInfluence);
 
-  wheelMeshes[index] = createWheelMesh(radius, width, scene);
+  wheelMeshes[index] = createWheelMesh(scene);
 };
