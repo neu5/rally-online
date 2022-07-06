@@ -35,6 +35,29 @@ const io = new Server<ServerToClientEvents>(httpServer);
 
 const playersList = new Map();
 
+const ACCELERATE = "accelerate";
+const BRAKE = "brake";
+const LEFT = "left";
+const RIGHT = "right";
+
+type ActionTypes = "accelerate" | "brake" | "left" | "right";
+
+interface Actions {
+  [ACCELERATE]: boolean;
+  [BRAKE]: boolean;
+  [LEFT]: boolean;
+  [RIGHT]: boolean;
+}
+let actions: Actions = {
+  [ACCELERATE]: false,
+  [BRAKE]: false,
+  [LEFT]: false,
+  [RIGHT]: false,
+};
+
+let accelerateTimeMS = 0;
+let turnTimeMS = 0;
+
 (async () => {
   const engine = new NullEngine();
   const scene = await createScene(engine);
@@ -48,8 +71,22 @@ const playersList = new Map();
   );
 
   const createSocketHandlers = (socket: Socket) => {
-    socket.on("player:action", (data) => {
-      io.emit("server:action", data);
+    socket.on("player:action", ({ action }: { action: ActionTypes }) => {
+      actions[action] = true;
+
+      if (action === ACCELERATE) {
+        accelerateTimeMS = Date.now();
+        actions[BRAKE] = false;
+      } else if (action === BRAKE) {
+        accelerateTimeMS = Date.now();
+        actions[ACCELERATE] = false;
+      } else if (action === LEFT) {
+        turnTimeMS = Date.now();
+        actions[RIGHT] = false;
+      } else if (action === RIGHT) {
+        turnTimeMS = Date.now();
+        actions[LEFT] = false;
+      }
     });
 
     socket.on("disconnect", () => {
@@ -75,9 +112,28 @@ const playersList = new Map();
     socket.emit("playerID", socket.id);
   });
 
-  // setInterval(() => {
-  //   console.log(scene.meshes[1].position);
-  // }, 1000);
+  setInterval(() => {
+    const now = Date.now();
+    const dtAcceleration = now - accelerateTimeMS;
+    const dtTurning = now - turnTimeMS;
+
+    if (dtAcceleration > 200) {
+      actions = {
+        ...actions,
+        [ACCELERATE]: false,
+        [BRAKE]: false,
+      };
+    }
+    if (dtTurning > 200) {
+      actions = {
+        ...actions,
+        [LEFT]: false,
+        [RIGHT]: false,
+      };
+    }
+
+    io.emit("server:action", actions);
+  }, 50);
 
   engine.runRenderLoop(() => {
     scene.render();

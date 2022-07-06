@@ -33,7 +33,7 @@ const actions: Actions = {
   [RIGHT]: false,
 };
 
-const actionsFromServer = actions;
+let actionsFromServer: Actions = { ...actions };
 
 interface KeysActions {
   KeyW: string;
@@ -247,7 +247,8 @@ export const buildCar = (
   });
 
   socket.on("server:action", (data: { action: keyof ActionTypes }) => {
-    actionsFromServer[data.action] = true;
+    actionsFromServer = { ...data };
+    // actionsFromServer[data.action] = true;
   });
 
   let vehicleSteering = 0;
@@ -262,42 +263,53 @@ export const buildCar = (
       let engineForce = 0;
 
       if (isCurrentPlayer) {
-        if (actionsFromServer.accelerate) {
+        if (actionsFromServer[ACCELERATE]) {
           if (speed < -1) {
             breakingForce = maxBreakingForce;
           } else {
             engineForce = maxEngineForce;
           }
-        } else if (actionsFromServer.brake) {
+        } else if (actionsFromServer[BRAKE]) {
           if (speed > 1) {
             breakingForce = maxBreakingForce;
           } else {
             engineForce = -maxEngineForce;
           }
         }
+        if (actions[RIGHT]) {
+          if (vehicleSteering < steeringClamp) {
+            vehicleSteering += steeringIncrement;
+          }
+        } else if (actions[LEFT]) {
+          if (vehicleSteering > -steeringClamp) {
+            vehicleSteering -= steeringIncrement;
+          }
+        } else {
+          vehicleSteering = 0;
+        }
 
-        if (actions.accelerate) {
+        if (actions[ACCELERATE]) {
           socket.emit("player:action", {
             id: 0,
-            action: "accelerate",
+            action: ACCELERATE,
           });
-        } else if (actions.brake) {
+        } else if (actions[BRAKE]) {
           socket.emit("player:action", {
             id: 0,
-            action: "brake",
+            action: BRAKE,
+          });
+        } else if (actions[LEFT]) {
+          socket.emit("player:action", {
+            id: 0,
+            action: LEFT,
+          });
+        } else if (actions[RIGHT]) {
+          socket.emit("player:action", {
+            id: 0,
+            action: RIGHT,
           });
         }
-        // if (actions.right) {
-        //   if (vehicleSteering < steeringClamp) {
-        //     vehicleSteering += steeringIncrement;
-        //   }
-        // } else if (actions.left) {
-        //   if (vehicleSteering > -steeringClamp) {
-        //     vehicleSteering -= steeringIncrement;
-        //   }
-        // } else {
-        //   vehicleSteering = 0;
-        // }
+
         vehicle.applyEngineForce(engineForce, FRONT_LEFT);
         vehicle.applyEngineForce(engineForce, FRONT_RIGHT);
         vehicle.setBrake(breakingForce / 2, FRONT_LEFT);
