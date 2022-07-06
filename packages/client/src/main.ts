@@ -106,10 +106,6 @@ const setCurrentPlayer = (id: string) => {
     }
   });
 
-  // setInterval(() => {
-  //   console.log(scene.meshes[1].position);
-  // }, 1000);
-
   engine.runRenderLoop(() => {
     scene.render();
 

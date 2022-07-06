@@ -288,25 +288,14 @@ export const buildCar = (
           vehicleSteering = 0;
         }
 
-        if (actions[ACCELERATE]) {
+        const actionType = Object.entries(actions).find(
+          ([key, value]) => value === true // eslint-disable-line
+        );
+
+        if (actionType && actionType[0]) {
           socket.emit("player:action", {
             id: 0,
-            action: ACCELERATE,
-          });
-        } else if (actions[BRAKE]) {
-          socket.emit("player:action", {
-            id: 0,
-            action: BRAKE,
-          });
-        } else if (actions[LEFT]) {
-          socket.emit("player:action", {
-            id: 0,
-            action: LEFT,
-          });
-        } else if (actions[RIGHT]) {
-          socket.emit("player:action", {
-            id: 0,
-            action: RIGHT,
+            action: actionType[0],
           });
         }
 

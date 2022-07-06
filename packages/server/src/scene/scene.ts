@@ -31,21 +31,21 @@ export const createScene = async (engine: Engine) => {
         scene,
         startingPos: { x: 0, y: 5, z: 0 },
       },
-      // {
-      //   AmmoJS,
-      //   scene,
-      //   startingPos: { x: 10, y: 5, z: 0 },
-      // },
-      // {
-      //   AmmoJS,
-      //   scene,
-      //   startingPos: { x: -10, y: 5, z: 0 },
-      // },
-      // {
-      //   AmmoJS,
-      //   scene,
-      //   startingPos: { x: 15, y: 5, z: 0 },
-      // },
+      {
+        AmmoJS,
+        scene,
+        startingPos: { x: 10, y: 5, z: 0 },
+      },
+      {
+        AmmoJS,
+        scene,
+        startingPos: { x: -10, y: 5, z: 0 },
+      },
+      {
+        AmmoJS,
+        scene,
+        startingPos: { x: 15, y: 5, z: 0 },
+      },
     ].map((car) => buildCar(car));
   })();
 
