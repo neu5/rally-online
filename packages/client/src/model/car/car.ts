@@ -1,6 +1,5 @@
 import { Axis, Quaternion, Scene } from "@babylonjs/core";
 import Ammo from "ammojs-typed";
-import { Socket } from "socket.io-client";
 
 // @ts-ignore
 type AmmoType = Ammo;
@@ -235,7 +234,7 @@ export type BuilderCar = {
 
 export const buildCar = (
   { AmmoJS, color, scene, startingPos, isCurrentPlayer = false }: BuilderCar,
-  socket: Socket
+  sendAction: Function
 ) => {
   const { vehicle, chassisMesh, wheelMeshes } = createVehicle({
     AmmoJS,
@@ -245,10 +244,9 @@ export const buildCar = (
     startingPos,
   });
 
-  socket.on("server:action", (data: { action: keyof ActionTypes }) => {
+  vehicle.updateAction = (data: {}) => {
     actionsFromServer = { ...data };
-    // actionsFromServer[data.action] = true;
-  });
+  };
 
   let vehicleSteering = 0;
 
@@ -292,10 +290,7 @@ export const buildCar = (
         );
 
         if (actionType && actionType[0]) {
-          socket.emit("player:action", {
-            id: 0,
-            action: actionType[0],
-          });
+          sendAction(actionType[0]);
         }
 
         vehicle.applyEngineForce(engineForce, FRONT_LEFT);

@@ -12,7 +12,7 @@ import { Socket } from "socket.io-client";
 import { buildCar } from "../model/car/car";
 import { addColors, addWheelMaterial } from "../utils";
 
-export const createScene = async (engine: Engine, socket: Socket) => {
+const createScene = async (engine: Engine) => {
   const scene: Scene = new Scene(engine);
 
   const gravityVector = new Vector3(0, -9.81, 0);
@@ -36,35 +36,6 @@ export const createScene = async (engine: Engine, socket: Socket) => {
   //   { mass: 1, restitution: 0.2 },
   //   scene
   // );
-  (() => {
-    [
-      {
-        AmmoJS,
-        color: "BlueMaterial",
-        isCurrentPlayer: true,
-        scene,
-        startingPos: { x: 0, y: 5, z: 0 },
-      },
-      // {
-      //   AmmoJS,
-      //   color: "RedMaterial",
-      //   scene,
-      //   startingPos: { x: 10, y: 5, z: 0 },
-      // },
-      // {
-      //   AmmoJS,
-      //   color: "GreenMaterial",
-      //   scene,
-      //   startingPos: { x: -10, y: 5, z: 0 },
-      // },
-      // {
-      //   AmmoJS,
-      //   color: "YellowMaterial",
-      //   scene,
-      //   startingPos: { x: 15, y: 5, z: 0 },
-      // },
-    ].map((car) => buildCar(car, socket));
-  })();
 
   // car.setAbsolutePosition(new Vector3(-1, 1, 1));
   // car.rotate(new Vector3(-1, 0, 0), 1.5);
@@ -83,5 +54,59 @@ export const createScene = async (engine: Engine, socket: Socket) => {
     scene
   );
 
+  return { AmmoJS, scene };
+};
+
+const startRace = async ({
+  engine,
+  oldScene,
+  sendAction,
+  socket,
+}: {
+  engine: Engine;
+  oldScene: Scene;
+  sendAction: Function;
+  socket: Socket;
+}) => {
+  oldScene.dispose();
+  engine.stopRenderLoop();
+  socket.off("server:action");
+
+  const { AmmoJS, scene } = await createScene(engine);
+
+  const vehicles = [
+    {
+      AmmoJS,
+      color: "BlueMaterial",
+      isCurrentPlayer: true,
+      scene,
+      startingPos: { x: 0, y: 5, z: 0 },
+    },
+    {
+      AmmoJS,
+      color: "RedMaterial",
+      scene,
+      startingPos: { x: 10, y: 5, z: 0 },
+    },
+    {
+      AmmoJS,
+      color: "GreenMaterial",
+      scene,
+      startingPos: { x: -10, y: 5, z: 0 },
+    },
+    {
+      AmmoJS,
+      color: "YellowMaterial",
+      scene,
+      startingPos: { x: 15, y: 5, z: 0 },
+    },
+  ].map((car) => buildCar(car, sendAction));
+
+  socket.on("server:action", (data: {}) => {
+    vehicles.forEach((vehicle) => vehicle.updateAction(data));
+  });
+
   return scene;
 };
+
+export { createScene, startRace };
