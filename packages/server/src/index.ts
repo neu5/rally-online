@@ -168,7 +168,7 @@ const playersMapToArray = (list: PlayersMap) =>
     socket.on("disconnect", () => {
       const playerToDelete = playersMap.get(socket.id);
       const playerNumber = playerNumbers.find(
-        (playerNumber) => playerNumber.idx === playerToDelete.playerNumber
+        (pNumber) => pNumber.idx === playerToDelete.playerNumber
       );
       playerNumber?.isFree = true;
       playersMap.delete(socket.id);
