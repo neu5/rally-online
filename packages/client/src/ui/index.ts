@@ -1,17 +1,27 @@
-export const createList = (
-  el: HTMLElement,
-  list: Array<{ data: { name: string } }>
-) => {
+import { PlayersList } from "../main";
+
+export const UIcreatePlayersList = (el: HTMLElement, list: PlayersList) => {
   const fragment = new DocumentFragment();
 
-  list.forEach(({ data }) => {
+  list.forEach(({ name }) => {
     const li = document.createElement("li");
-    li.textContent = data.name;
-    li.dataset.id = data.name;
+    li.textContent = name;
+    li.dataset.id = name;
 
     fragment.appendChild(li);
   });
 
   el.textContent = "";
   el.appendChild(fragment);
+};
+
+export const UIsetCurrentPlayer = (playersListEl: HTMLElement, id: string) => {
+  [...playersListEl.children].find((el: HTMLElement) => {
+    if (el.dataset.id === id) {
+      el.classList.add("you");
+      return true;
+    }
+
+    return false;
+  });
 };

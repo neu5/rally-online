@@ -19,6 +19,48 @@ import { createScene } from "./scene/scene";
 //   { x: 15, y: 5, z: 0 },
 // ];
 
+type PlayerNumbers = Array<{
+  idx: number;
+  isFree: boolean;
+}>;
+const playerNumbers: PlayerNumbers = [
+  {
+    idx: 0,
+    isFree: true,
+  },
+  {
+    idx: 1,
+    isFree: true,
+  },
+  {
+    idx: 2,
+    isFree: true,
+  },
+  {
+    idx: 3,
+    isFree: true,
+  },
+];
+
+const vehicles = [
+  {
+    color: "BlueMaterial",
+    startingPos: { x: 0, y: 5, z: 0 },
+  },
+  {
+    color: "RedMaterial",
+    startingPos: { x: 10, y: 5, z: 0 },
+  },
+  {
+    color: "GreenMaterial",
+    startingPos: { x: -10, y: 5, z: 0 },
+  },
+  {
+    color: "YellowMaterial",
+    startingPos: { x: 15, y: 5, z: 0 },
+  },
+];
+
 const getDirname = (meta: { url: string }) => fileURLToPath(meta.url);
 const rootDir = getDirname(import.meta);
 const distDir = resolve(rootDir, "../../../", "client/dist");
@@ -30,10 +72,21 @@ interface ServerToClientEvents {
   playerListUpdate: (playersList: Object) => void;
   playerID: (id: string) => void;
   "server:action": (data: Object) => void;
+  "server:start-race": (data: Object) => void;
 }
 const io = new Server<ServerToClientEvents>(httpServer);
 
-const playersList = new Map();
+type PlayersMap = Map<
+  string,
+  {
+    accelerateTimeMS: number;
+    turnTimeMS: number;
+    actions: Actions;
+    name: string;
+    vehicle?: Object;
+  }
+>;
+const playersMap: PlayersMap = new Map();
 
 const ACCELERATE = "accelerate";
 const BRAKE = "brake";
@@ -48,15 +101,19 @@ interface Actions {
   [LEFT]: boolean;
   [RIGHT]: boolean;
 }
-let actions: Actions = {
+const actions: Actions = {
   [ACCELERATE]: false,
   [BRAKE]: false,
   [LEFT]: false,
   [RIGHT]: false,
-};
+} as const;
 
-let accelerateTimeMS = 0;
-let turnTimeMS = 0;
+const playersMapToArray = (list: PlayersMap) =>
+  Array.from(list).map(([id, { name, ...rest }]) => ({
+    id,
+    name,
+    ...rest,
+  }));
 
 (async () => {
   const engine = new NullEngine();
@@ -71,68 +128,109 @@ let turnTimeMS = 0;
   );
 
   const createSocketHandlers = (socket: Socket) => {
-    socket.on("player:action", ({ action }: { action: ActionTypes }) => {
-      actions[action] = true;
-
-      if (action === ACCELERATE) {
-        accelerateTimeMS = Date.now();
-        actions[BRAKE] = false;
-      } else if (action === BRAKE) {
-        accelerateTimeMS = Date.now();
-        actions[ACCELERATE] = false;
-      } else if (action === LEFT) {
-        turnTimeMS = Date.now();
-        actions[RIGHT] = false;
-      } else if (action === RIGHT) {
-        turnTimeMS = Date.now();
-        actions[LEFT] = false;
-      }
+    socket.on("getPlayerList", () => {
+      socket.emit("playerListUpdate", playersMapToArray(playersMap));
     });
 
-    socket.on("disconnect", () => {
-      playersList.delete(socket.id);
+    socket.on("player:start-race", () => {
+      io.emit("server:start-race", {
+        playersList: playersMapToArray(playersMap),
+      });
+    });
 
-      io.emit(
-        "playerListUpdate",
-        Array.from(playersList, ([id, data]) => ({ id, data }))
+    socket.on(
+      "player:action",
+      ({ action, id }: { action: ActionTypes; id: string }) => {
+        const player = playersMap.get(id);
+
+        if (!player) {
+          return;
+        }
+
+        player.actions[action] = true;
+
+        if (action === ACCELERATE) {
+          player.accelerateTimeMS = Date.now();
+          player.actions[BRAKE] = false;
+        } else if (action === BRAKE) {
+          player.accelerateTimeMS = Date.now();
+          player.actions[ACCELERATE] = false;
+        } else if (action === LEFT) {
+          player.turnTimeMS = Date.now();
+          player.actions[RIGHT] = false;
+        } else if (action === RIGHT) {
+          player.turnTimeMS = Date.now();
+          player.actions[LEFT] = false;
+        }
+      }
+    );
+
+    socket.on("disconnect", () => {
+      const playerToDelete = playersMap.get(socket.id);
+      const playerNumber = playerNumbers.find(
+        (playerNumber) => playerNumber.idx === playerToDelete.playerNumber
       );
+      playerNumber?.isFree = true;
+      playersMap.delete(socket.id);
+
+      io.emit("playerListUpdate", playersMapToArray(playersMap));
     });
   };
 
   io.on("connection", (socket) => {
-    playersList.set(socket.id, { name: socket.id });
+    const playerNumber = playerNumbers.find(({ isFree }) => isFree);
+    let vehicle = null;
+
+    if (playerNumber) {
+      vehicle = vehicles[playerNumber.idx];
+      playerNumber.isFree = false;
+    }
+
+    playersMap.set(socket.id, {
+      name: socket.id,
+      actions: { ...actions },
+      accelerateTimeMS: 0,
+      turnTimeMS: 0,
+      ...(vehicle ? { vehicle, playerNumber: playerNumber?.idx } : {}),
+    });
 
     createSocketHandlers(socket);
 
-    io.emit(
-      "playerListUpdate",
-      Array.from(playersList, ([id, data]) => ({ id, data }))
-    );
+    io.emit("playerListUpdate", playersMapToArray(playersMap));
 
     socket.emit("playerID", socket.id);
   });
 
   setInterval(() => {
     const now = Date.now();
-    const dtAcceleration = now - accelerateTimeMS;
-    const dtTurning = now - turnTimeMS;
 
-    if (dtAcceleration > 200) {
-      actions = {
-        ...actions,
-        [ACCELERATE]: false,
-        [BRAKE]: false,
-      };
-    }
-    if (dtTurning > 200) {
-      actions = {
-        ...actions,
-        [LEFT]: false,
-        [RIGHT]: false,
-      };
-    }
+    playersMap.forEach((player) => {
+      const dtAcceleration = now - player.accelerateTimeMS;
+      const dtTurning = now - player.turnTimeMS;
 
-    io.emit("server:action", actions);
+      let newActions = { ...player.actions };
+
+      if (dtAcceleration > 250) {
+        player.accelerateTimeMS = now;
+        newActions = {
+          ...player.actions,
+          [ACCELERATE]: false,
+          [BRAKE]: false,
+        };
+      }
+      if (dtTurning > 250) {
+        player.turnTimeMS = now;
+        newActions = {
+          ...player.actions,
+          [LEFT]: false,
+          [RIGHT]: false,
+        };
+      }
+
+      player.actions = { ...newActions };
+    });
+
+    io.emit("server:action", playersMapToArray(playersMap));
   }, 50);
 
   engine.runRenderLoop(() => {

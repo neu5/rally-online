@@ -60,11 +60,13 @@ const createScene = async (engine: Engine) => {
 const startRace = async ({
   engine,
   oldScene,
+  playersMap,
   sendAction,
   socket,
 }: {
   engine: Engine;
   oldScene: Scene;
+  playersMap: Map<string, { name: string }>;
   sendAction: Function;
   socket: Socket;
 }) => {
@@ -74,36 +76,29 @@ const startRace = async ({
 
   const { AmmoJS, scene } = await createScene(engine);
 
-  const vehicles = [
-    {
-      AmmoJS,
-      color: "BlueMaterial",
-      isCurrentPlayer: true,
-      scene,
-      startingPos: { x: 0, y: 5, z: 0 },
-    },
-    {
-      AmmoJS,
-      color: "RedMaterial",
-      scene,
-      startingPos: { x: 10, y: 5, z: 0 },
-    },
-    {
-      AmmoJS,
-      color: "GreenMaterial",
-      scene,
-      startingPos: { x: -10, y: 5, z: 0 },
-    },
-    {
-      AmmoJS,
-      color: "YellowMaterial",
-      scene,
-      startingPos: { x: 15, y: 5, z: 0 },
-    },
-  ].map((car) => buildCar(car, sendAction));
+  playersMap.forEach((player) => {
+    if (player.vehicle) {
+      player.car = buildCar(
+        {
+          AmmoJS,
+          color: player.vehicle.color,
+          scene,
+          startingPos: player.vehicle.startingPos,
+          isCurrentPlayer: player.isCurrentPlayer,
+        },
+        sendAction
+      );
+    }
+  });
 
-  socket.on("server:action", (data: {}) => {
-    vehicles.forEach((vehicle) => vehicle.updateAction(data));
+  socket.on("server:action", (playersList) => {
+    playersList.forEach((player) => {
+      const playerToUpdate = playersMap.get(player.id);
+
+      if (playerToUpdate?.car?.updateAction) {
+        playerToUpdate.car.updateAction(player.actions);
+      }
+    });
   });
 
   return scene;
