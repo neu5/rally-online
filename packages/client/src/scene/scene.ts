@@ -12,6 +12,18 @@ import { Socket } from "socket.io-client";
 import { buildCar } from "../model/car/car";
 import { addColors, addWheelMaterial } from "../utils";
 
+const ACCELERATE = "accelerate";
+const BRAKE = "brake";
+const LEFT = "left";
+const RIGHT = "right";
+
+interface Actions {
+  [ACCELERATE]: boolean;
+  [BRAKE]: boolean;
+  [LEFT]: boolean;
+  [RIGHT]: boolean;
+}
+
 const createScene = async (engine: Engine) => {
   const scene: Scene = new Scene(engine);
 
@@ -66,7 +78,24 @@ const startRace = async ({
 }: {
   engine: Engine;
   oldScene: Scene;
-  playersMap: Map<string, { name: string }>;
+  playersMap: Map<
+    string,
+    {
+      car?: {
+        updateAction?: (actions: Actions) => void;
+      };
+      name: string;
+      vehicle?: {
+        color: string;
+        startingPos: {
+          x: number;
+          y: number;
+          z: number;
+        };
+      };
+      isCurrentPlayer: boolean;
+    }
+  >;
   sendAction: Function;
   socket: Socket;
 }) => {
@@ -92,7 +121,7 @@ const startRace = async ({
   });
 
   socket.on("server:action", (playersList) => {
-    playersList.forEach((player) => {
+    playersList.forEach((player: { id: string; actions: Actions }) => {
       const playerToUpdate = playersMap.get(player.id);
 
       if (playerToUpdate?.car?.updateAction) {

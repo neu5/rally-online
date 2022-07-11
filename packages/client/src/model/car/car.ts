@@ -244,7 +244,7 @@ export const buildCar = (
     startingPos,
   });
 
-  vehicle.updateAction = (data: {}) => {
+  vehicle.updateAction = (data: Actions) => {
     actionsFromServer = { ...data };
   };
 

@@ -23,6 +23,7 @@
   "scripts": {
     "build": "NODE_ENV=production parcel build src/index.html --no-scope-hoist",
     "start": "parcel src/index.html",
-    "watch": "parcel watch src/index.html"
+    "watch": "parcel watch src/index.html",
+    "test": "tsc --noEmit"
   }
 }

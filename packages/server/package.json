@@ -30,6 +30,7 @@
     "build": "tsc",
     "serve": "node --experimental-specifier-resolution=node dist/index.js",
     "watch": "tsc --watch",
-    "watch:serve": "nodemon --experimental-specifier-resolution=node dist/index.js"
+    "watch:serve": "nodemon --experimental-specifier-resolution=node dist/index.js",
+    "test": "tsc --noEmit"
   }
 }

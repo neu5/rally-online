@@ -15,9 +15,22 @@ const FPSEl = document.getElementById("fps") as HTMLElement;
 const startBtn = document.getElementById("start-btn") as HTMLAnchorElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
 
+type Vehicle = {
+  color: string;
+  startingPos: {
+    x: number;
+    y: number;
+    z: number;
+  };
+};
+
 export type PlayersList = Map<
   string,
-  { name: string; vehicle: Object; isCurrentPlayer: boolean }
+  {
+    name: string;
+    vehicle: Vehicle;
+    isCurrentPlayer: boolean;
+  }
 >;
 
 type GameType = {
@@ -61,6 +74,16 @@ updateWindowSize();
 updateControls();
 
 let currentPlayerId: string | undefined = undefined;
+
+interface ServerToClientEvents {
+  playerListUpdate: (playersList: Array<PlayersList>) => void;
+  playerID: (id: string) => void;
+  "server:action": (data: Object) => void;
+  "server:start-race": (data: Object) => void;
+  "player:action": (data: Object) => void;
+  getPlayerList: () => void;
+  "player:start-race": () => void;
+}
 
 (async () => {
   const engine: Engine = new Engine(canvas);
@@ -107,18 +130,23 @@ let currentPlayerId: string | undefined = undefined;
 
   socket.on(
     "playerListUpdate",
-    (playersList: Array<{ name: string; vehicle: Object }>) => {
+    // @ts-ignore
+    (
+      playersList: Array<{
+        name: string;
+        vehicle: Vehicle;
+      }>
+    ) => {
       game.playersMap.clear();
 
-      console.log(playersList);
-
       playersList.forEach(
-        ({ name, vehicle }: { name: string; vehicle: Object }) =>
+        ({ name, vehicle }: { name: string; vehicle: Vehicle }) => {
           game.playersMap.set(name, {
             name,
             vehicle,
             isCurrentPlayer: name === currentPlayerId,
-          })
+          });
+        }
       );
 
       UIcreatePlayersList(playersListEl, game.playersMap);
@@ -148,9 +176,7 @@ let currentPlayerId: string | undefined = undefined;
   });
 
   startBtn.addEventListener("click", async () => {
-    socket.emit("player:start-race", {
-      id: 0,
-    });
+    socket.emit("player:start-race");
   });
 
   window.addEventListener("resize", () => {

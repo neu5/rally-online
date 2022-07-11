@@ -16,6 +16,7 @@ export const UIcreatePlayersList = (el: HTMLElement, list: PlayersList) => {
 };
 
 export const UIsetCurrentPlayer = (playersListEl: HTMLElement, id: string) => {
+  // @ts-ignore
   [...playersListEl.children].find((el: HTMLElement) => {
     if (el.dataset.id === id) {
       el.classList.add("you");

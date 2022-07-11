@@ -84,6 +84,7 @@ type PlayersMap = Map<
     actions: Actions;
     name: string;
     vehicle?: Object;
+    playerNumber?: number;
   }
 >;
 const playersMap: PlayersMap = new Map();
@@ -168,9 +169,13 @@ const playersMapToArray = (list: PlayersMap) =>
     socket.on("disconnect", () => {
       const playerToDelete = playersMap.get(socket.id);
       const playerNumber = playerNumbers.find(
-        (pNumber) => pNumber.idx === playerToDelete.playerNumber
+        (pNumber) => pNumber.idx === playerToDelete?.playerNumber
       );
-      playerNumber?.isFree = true;
+
+      if (playerNumber) {
+        playerNumber.isFree = true;
+      }
+
       playersMap.delete(socket.id);
 
       io.emit("playerListUpdate", playersMapToArray(playersMap));

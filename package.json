@@ -34,6 +34,7 @@
     "watch:server": "yarn workspace server watch",
     "watch:serve": "yarn workspace server watch:serve",
     "lint": "eslint 'packages/**/*.ts'",
-    "serve": "yarn workspace server serve"
+    "serve": "yarn workspace server serve",
+    "test": "yarn workspaces foreach -p run test"
   }
 }
