@@ -8,12 +8,37 @@ import {
 import { Socket, io } from "socket.io-client";
 
 import { startRace } from "./scene/scene";
-import { createList } from "./ui";
+import { UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
 const startBtn = document.getElementById("start-btn") as HTMLAnchorElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
+
+type Vehicle = {
+  color: string;
+  startingPos: {
+    x: number;
+    y: number;
+    z: number;
+  };
+};
+
+export type PlayersList = Map<
+  string,
+  {
+    name: string;
+    vehicle: Vehicle;
+    isCurrentPlayer: boolean;
+  }
+>;
+
+type GameType = {
+  playersMap: PlayersList;
+};
+const game: GameType = {
+  playersMap: new Map(),
+};
 
 const [...mobileControlsEls] = document.getElementsByClassName(
   "mobile-controls"
@@ -50,17 +75,15 @@ updateControls();
 
 let currentPlayerId: string | undefined = undefined;
 
-const setCurrentPlayer = (id: string) => {
-  [...playersListEl.children].find((el: HTMLElement) => {
-    if (el.dataset.id === id) {
-      el.classList.add("you");
-      currentPlayerId = id;
-      return true;
-    }
-
-    return false;
-  });
-};
+interface ServerToClientEvents {
+  playerListUpdate: (playersList: Array<PlayersList>) => void;
+  playerID: (id: string) => void;
+  "server:action": (data: Object) => void;
+  "server:start-race": (data: Object) => void;
+  "player:action": (data: Object) => void;
+  getPlayerList: () => void;
+  "player:start-race": () => void;
+}
 
 (async () => {
   const engine: Engine = new Engine(canvas);
@@ -98,43 +121,62 @@ const setCurrentPlayer = (id: string) => {
     });
   };
 
+  const sendAction = (action: string) => {
+    socket.emit("player:action", {
+      id: currentPlayerId,
+      action,
+    });
+  };
+
   socket.on(
     "playerListUpdate",
-    (playersList: Array<{ data: { name: string } }>) => {
-      createList(playersListEl, playersList);
+    // @ts-ignore
+    (
+      playersList: Array<{
+        name: string;
+        vehicle: Vehicle;
+      }>
+    ) => {
+      game.playersMap.clear();
 
-      if (currentPlayerId !== undefined) {
-        setCurrentPlayer(currentPlayerId);
+      playersList.forEach(
+        ({ name, vehicle }: { name: string; vehicle: Vehicle }) => {
+          game.playersMap.set(name, {
+            name,
+            vehicle,
+            isCurrentPlayer: name === currentPlayerId,
+          });
+        }
+      );
+
+      UIcreatePlayersList(playersListEl, game.playersMap);
+
+      if (currentPlayerId) {
+        UIsetCurrentPlayer(playersListEl, currentPlayerId);
       }
     }
   );
 
   socket.on("playerID", (id: string) => {
-    if (playersListEl.childElementCount > 0) {
-      setCurrentPlayer(id);
-    } else {
-      setTimeout(() => setCurrentPlayer(id), 1000);
-    }
+    currentPlayerId = id;
+    socket.emit("getPlayerList");
   });
 
-  const sendAction = (action: string) => {
-    socket.emit("player:action", {
-      id: 0,
-      action,
-    });
-  };
-
-  startBtn.addEventListener("click", async () => {
+  socket.on("server:start-race", async () => {
     const newScene = await startRace({
       engine,
       oldScene: scene,
+      playersMap: game.playersMap,
       sendAction,
       socket,
     });
 
     scene = newScene;
-
     startEngineLoop();
+  });
+
+  startBtn.addEventListener("click", async () => {
+    socket.emit("player:start-race");
   });
 
   window.addEventListener("resize", () => {
