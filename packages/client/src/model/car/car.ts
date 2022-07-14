@@ -1,4 +1,4 @@
-import { Axis, Quaternion, Scene } from "@babylonjs/core";
+import { Quaternion, Scene } from "@babylonjs/core";
 import Ammo from "ammojs-typed";
 
 // @ts-ignore
@@ -31,8 +31,6 @@ const actions: Actions = {
   [LEFT]: false,
   [RIGHT]: false,
 };
-
-let actionsFromServer: Actions = { ...actions };
 
 interface KeysActions {
   KeyW: string;
@@ -67,10 +65,6 @@ const wheelAxisHeightFront = 0.4;
 const wheelRadiusFront = 0.4;
 // const wheelWidthFront = 0.3;
 
-const steeringIncrement = 0.01;
-const steeringClamp = 0.2;
-const maxEngineForce = 500;
-const maxBreakingForce = 10;
 // const incEngine = 10.0;
 
 const FRONT_LEFT = 0;
@@ -222,8 +216,6 @@ const createVehicle = ({
   return { vehicle, chassisMesh, wheelMeshes };
 };
 
-const speedometerEl = document.getElementById("speedometer") as HTMLElement;
-
 export type BuilderCar = {
   AmmoJS: AmmoType;
   color: string;
@@ -232,10 +224,7 @@ export type BuilderCar = {
   startingPos: { x: number; y: number; z: number };
 };
 
-export const buildCar = (
-  { AmmoJS, color, scene, startingPos, isCurrentPlayer = false }: BuilderCar,
-  sendAction: Function
-) => {
+export const buildCar = ({ AmmoJS, color, scene, startingPos }: BuilderCar) => {
   const { vehicle, chassisMesh, wheelMeshes } = createVehicle({
     AmmoJS,
     color,
@@ -244,90 +233,7 @@ export const buildCar = (
     startingPos,
   });
 
-  vehicle.updateAction = (data: Actions) => {
-    actionsFromServer = { ...data };
-  };
-
-  let vehicleSteering = 0;
-
-  scene.registerBeforeRender(function () {
-    // const dt = engine.getDeltaTime().toFixed() / 1000;
-
-    if (vehicle !== undefined) {
-      const speed = vehicle.getCurrentSpeedKmHour();
-      // const maxSteerVal = 0.2;
-      let breakingForce = 0;
-      let engineForce = 0;
-
-      if (isCurrentPlayer) {
-        if (actionsFromServer[ACCELERATE]) {
-          if (speed < -1) {
-            breakingForce = maxBreakingForce;
-          } else {
-            engineForce = maxEngineForce;
-          }
-        } else if (actionsFromServer[BRAKE]) {
-          if (speed > 1) {
-            breakingForce = maxBreakingForce;
-          } else {
-            engineForce = -maxEngineForce;
-          }
-        }
-        if (actions[RIGHT]) {
-          if (vehicleSteering < steeringClamp) {
-            vehicleSteering += steeringIncrement;
-          }
-        } else if (actions[LEFT]) {
-          if (vehicleSteering > -steeringClamp) {
-            vehicleSteering -= steeringIncrement;
-          }
-        } else {
-          vehicleSteering = 0;
-        }
-
-        const actionType = Object.entries(actions).find(
-          ([key, value]) => value === true // eslint-disable-line
-        );
-
-        if (actionType && actionType[0]) {
-          sendAction(actionType[0]);
-        }
-
-        vehicle.applyEngineForce(engineForce, FRONT_LEFT);
-        vehicle.applyEngineForce(engineForce, FRONT_RIGHT);
-        vehicle.setBrake(breakingForce / 2, FRONT_LEFT);
-        vehicle.setBrake(breakingForce / 2, FRONT_RIGHT);
-        vehicle.setBrake(breakingForce, BACK_LEFT);
-        vehicle.setBrake(breakingForce, BACK_RIGHT);
-        vehicle.setSteeringValue(vehicleSteering, FRONT_LEFT);
-        vehicle.setSteeringValue(vehicleSteering, FRONT_RIGHT);
-        speedometerEl.textContent = `${vehicle
-          .getCurrentSpeedKmHour()
-          .toFixed()} km/h`;
-      }
-
-      let tm, p, q, i;
-      const n = vehicle.getNumWheels();
-      for (i = 0; i < n; i++) {
-        vehicle.updateWheelTransform(i, true);
-        tm = vehicle.getWheelTransformWS(i);
-        p = tm.getOrigin();
-        q = tm.getRotation();
-        wheelMeshes[i].position.set(p.x(), p.y(), p.z());
-        wheelMeshes[i].rotationQuaternion.set(q.x(), q.y(), q.z(), q.w());
-        wheelMeshes[i].rotate(Axis.Z, Math.PI / 2);
-      }
-
-      tm = vehicle.getChassisWorldTransform();
-      p = tm.getOrigin();
-      q = tm.getRotation();
-      chassisMesh.position.set(p.x(), p.y(), p.z());
-      chassisMesh.rotationQuaternion.set(q.x(), q.y(), q.z(), q.w());
-      chassisMesh.rotate(Axis.X, Math.PI);
-    }
-  });
-
-  return vehicle;
+  return { vehicle, chassisMesh, wheelMeshes };
 };
 
 const touchStart = (ev: TouchEvent) => {
