@@ -18,12 +18,33 @@ const BRAKE = "brake";
 const LEFT = "left";
 const RIGHT = "right";
 
+type ActionTypes = {
+  [ACCELERATE]: "accelerate";
+  [BRAKE]: "brake";
+  [LEFT]: "left";
+  [RIGHT]: "right";
+};
+
 interface Actions {
   [ACCELERATE]: boolean;
   [BRAKE]: boolean;
   [LEFT]: boolean;
   [RIGHT]: boolean;
 }
+
+interface KeysActions {
+  KeyW: string;
+  KeyS: string;
+  KeyA: string;
+  KeyD: string;
+}
+
+const keysActions: KeysActions = {
+  KeyW: ACCELERATE,
+  KeyS: BRAKE,
+  KeyA: LEFT,
+  KeyD: RIGHT,
+};
 
 const steeringIncrement = 0.01;
 const steeringClamp = 0.2;
@@ -42,7 +63,17 @@ const FRONT_RIGHT = 1;
 const BACK_LEFT = 2;
 const BACK_RIGHT = 3;
 
-let actionsFromServer: Actions = { ...actions };
+const keyup = (e: KeyboardEvent) => {
+  if (keysActions[e.code as keyof KeysActions]) {
+    actions[keysActions[e.code as keyof KeysActions] as keyof Actions] = false;
+  }
+};
+
+const keydown = (e: KeyboardEvent) => {
+  if (keysActions[e.code as keyof KeysActions]) {
+    actions[keysActions[e.code as keyof KeysActions] as keyof Actions] = true;
+  }
+};
 
 const speedometerEl = document.getElementById("speedometer") as HTMLElement;
 
@@ -103,9 +134,8 @@ const startRace = async ({
   playersMap: Map<
     string,
     {
-      car?: {
-        updateAction?: (actions: Actions) => void;
-      };
+      updateAction?: (actions: Actions) => void;
+      car?: { wheelMeshes: Object };
       name: string;
       vehicle?: {
         color: string;
@@ -142,14 +172,18 @@ const startRace = async ({
   let vehicleSteering = 0;
   // const maxSteerVal = 0.2;
 
-  // vehicle.updateAction = (data: Actions) => {
-  //   actionsFromServer = { ...data };
-  // };
+  playersMap.forEach((player) => {
+    player.updateAction = (data: Actions) => {
+      player.actionsFromServer = { ...data };
+    };
+  });
 
   scene.registerBeforeRender(() => {
-    playersMap.forEach(({ car, isCurrentPlayer }) => {
+    playersMap.forEach(({ actionsFromServer, car, isCurrentPlayer }) => {
       const { vehicle, wheelMeshes, chassisMesh } = car;
       const speed = vehicle.getCurrentSpeedKmHour();
+
+      // console.log(actionsFromServer);
 
       let breakingForce = 0;
       let engineForce = 0;
@@ -219,17 +253,68 @@ const startRace = async ({
     //   const speed = vehicle.getCurrentSpeedKmHour();
   });
 
-  // socket.on("server:action", (playersList) => {
-  //   playersList.forEach((player: { id: string; actions: Actions }) => {
-  //     const playerToUpdate = playersMap.get(player.id);
+  socket.on("server:action", (playersList) => {
+    playersList.forEach((player: { id: string; actions: Actions }) => {
+      const playerToUpdate = playersMap.get(player.id);
 
-  //     if (playerToUpdate?.car?.updateAction) {
-  //       playerToUpdate.car.updateAction(player.actions);
-  //     }
-  //   });
-  // });
+      if (playerToUpdate?.updateAction) {
+        playerToUpdate.updateAction(player.actions);
+      }
+    });
+  });
 
   return scene;
 };
 
 export { createScene, startRace };
+
+const touchStart = (ev: TouchEvent) => {
+  const target = ev.target as HTMLElement | null;
+
+  if (target === null) {
+    return;
+  }
+
+  const type: string | undefined = target.dataset.type;
+
+  if (type !== undefined && actions[type as keyof ActionTypes] !== undefined) {
+    actions[type as keyof ActionTypes] = true;
+  }
+};
+
+const touchEnd = (ev: TouchEvent) => {
+  const target = ev.target as HTMLElement | null;
+
+  if (target === null) {
+    return;
+  }
+
+  const type: string | undefined = target.dataset.type;
+
+  if (type !== undefined && actions[type as keyof ActionTypes] !== undefined) {
+    actions[type as keyof ActionTypes] = false;
+  }
+};
+
+const preventSelection = () => false;
+
+const preventContextMenu = (ev: Event) => {
+  ev.preventDefault();
+};
+
+window.addEventListener("keydown", keydown);
+window.addEventListener("keyup", keyup);
+
+const [...mobileControlsEls] = document.getElementsByClassName(
+  "mobile-controls"
+) as HTMLCollectionOf<HTMLElement>;
+
+if (mobileControlsEls.length) {
+  mobileControlsEls.forEach((el) => {
+    el.addEventListener("touchstart", touchStart);
+    el.addEventListener("touchend", touchEnd);
+    el.addEventListener("contextmenu", preventContextMenu);
+    el.addEventListener("selectionchange", preventSelection);
+    el.addEventListener("selectstart", preventSelection);
+  });
+}

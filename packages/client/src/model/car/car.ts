@@ -7,45 +7,6 @@ type AmmoType = Ammo;
 import { createChassisMesh } from "./chassis";
 import { addWheel } from "./wheel";
 
-const ACCELERATE = "accelerate";
-const BRAKE = "brake";
-const LEFT = "left";
-const RIGHT = "right";
-
-type ActionTypes = {
-  [ACCELERATE]: "accelerate";
-  [BRAKE]: "brake";
-  [LEFT]: "left";
-  [RIGHT]: "right";
-};
-
-interface Actions {
-  [ACCELERATE]: boolean;
-  [BRAKE]: boolean;
-  [LEFT]: boolean;
-  [RIGHT]: boolean;
-}
-const actions: Actions = {
-  [ACCELERATE]: false,
-  [BRAKE]: false,
-  [LEFT]: false,
-  [RIGHT]: false,
-};
-
-interface KeysActions {
-  KeyW: string;
-  KeyS: string;
-  KeyA: string;
-  KeyD: string;
-}
-
-const keysActions: KeysActions = {
-  KeyW: ACCELERATE,
-  KeyS: BRAKE,
-  KeyA: LEFT,
-  KeyD: RIGHT,
-};
-
 const ZERO_QUATERNION = new Quaternion();
 
 const chassisWidth = 1.8;
@@ -71,18 +32,6 @@ const FRONT_LEFT = 0;
 const FRONT_RIGHT = 1;
 const BACK_LEFT = 2;
 const BACK_RIGHT = 3;
-
-const keyup = (e: KeyboardEvent) => {
-  if (keysActions[e.code as keyof KeysActions]) {
-    actions[keysActions[e.code as keyof KeysActions] as keyof Actions] = false;
-  }
-};
-
-const keydown = (e: KeyboardEvent) => {
-  if (keysActions[e.code as keyof KeysActions]) {
-    actions[keysActions[e.code as keyof KeysActions] as keyof Actions] = true;
-  }
-};
 
 type Vehicle = {
   AmmoJS: AmmoType;
@@ -235,54 +184,3 @@ export const buildCar = ({ AmmoJS, color, scene, startingPos }: BuilderCar) => {
 
   return { vehicle, chassisMesh, wheelMeshes };
 };
-
-const touchStart = (ev: TouchEvent) => {
-  const target = ev.target as HTMLElement | null;
-
-  if (target === null) {
-    return;
-  }
-
-  const type: string | undefined = target.dataset.type;
-
-  if (type !== undefined && actions[type as keyof ActionTypes] !== undefined) {
-    actions[type as keyof ActionTypes] = true;
-  }
-};
-
-const touchEnd = (ev: TouchEvent) => {
-  const target = ev.target as HTMLElement | null;
-
-  if (target === null) {
-    return;
-  }
-
-  const type: string | undefined = target.dataset.type;
-
-  if (type !== undefined && actions[type as keyof ActionTypes] !== undefined) {
-    actions[type as keyof ActionTypes] = false;
-  }
-};
-
-const preventSelection = () => false;
-
-const preventContextMenu = (ev: Event) => {
-  ev.preventDefault();
-};
-
-window.addEventListener("keydown", keydown);
-window.addEventListener("keyup", keyup);
-
-const [...mobileControlsEls] = document.getElementsByClassName(
-  "mobile-controls"
-) as HTMLCollectionOf<HTMLElement>;
-
-if (mobileControlsEls.length) {
-  mobileControlsEls.forEach((el) => {
-    el.addEventListener("touchstart", touchStart);
-    el.addEventListener("touchend", touchEnd);
-    el.addEventListener("contextmenu", preventContextMenu);
-    el.addEventListener("selectionchange", preventSelection);
-    el.addEventListener("selectstart", preventSelection);
-  });
-}
