@@ -10,34 +10,23 @@ import {
 import Ammo from "ammojs-typed";
 import { Socket } from "socket.io-client";
 
+import {
+  ACCELERATE,
+  ActionTypes,
+  Actions,
+  BRAKE,
+  KeysActions,
+  LEFT,
+  RIGHT,
+} from "types/src";
+
 import { buildCar } from "../model/car/car";
 import { addColors, addWheelMaterial } from "../utils";
 
-const ACCELERATE = "accelerate";
-const BRAKE = "brake";
-const LEFT = "left";
-const RIGHT = "right";
-
-type ActionTypes = {
-  [ACCELERATE]: "accelerate";
-  [BRAKE]: "brake";
-  [LEFT]: "left";
-  [RIGHT]: "right";
-};
-
-interface Actions {
-  [ACCELERATE]: boolean;
-  [BRAKE]: boolean;
-  [LEFT]: boolean;
-  [RIGHT]: boolean;
-}
-
-interface KeysActions {
-  KeyW: string;
-  KeyS: string;
-  KeyA: string;
-  KeyD: string;
-}
+const steeringIncrement = 0.01;
+const steeringClamp = 0.2;
+const maxEngineForce = 500;
+const maxBreakingForce = 10;
 
 const keysActions: KeysActions = {
   KeyW: ACCELERATE,
@@ -45,11 +34,6 @@ const keysActions: KeysActions = {
   KeyA: LEFT,
   KeyD: RIGHT,
 };
-
-const steeringIncrement = 0.01;
-const steeringClamp = 0.2;
-const maxEngineForce = 500;
-const maxBreakingForce = 10;
 
 const actions: Actions = {
   [ACCELERATE]: false,
@@ -182,8 +166,6 @@ const startRace = async ({
     playersMap.forEach(({ actionsFromServer, car, isCurrentPlayer }) => {
       const { vehicle, wheelMeshes, chassisMesh } = car;
       const speed = vehicle.getCurrentSpeedKmHour();
-
-      // console.log(actionsFromServer);
 
       let breakingForce = 0;
       let engineForce = 0;
