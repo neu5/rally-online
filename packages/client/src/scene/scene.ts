@@ -19,6 +19,7 @@ import {
   LEFT,
   RIGHT,
 } from "types/src";
+import { PlayersMap } from "../main";
 
 import { buildCar } from "../model/car/car";
 import { addColors, addWheelMaterial } from "../utils";
@@ -115,23 +116,7 @@ const startRace = async ({
 }: {
   engine: Engine;
   oldScene: Scene;
-  playersMap: Map<
-    string,
-    {
-      updateAction?: (actions: Actions) => void;
-      car?: { wheelMeshes: Object };
-      name: string;
-      vehicle?: {
-        color: string;
-        startingPos: {
-          x: number;
-          y: number;
-          z: number;
-        };
-      };
-      isCurrentPlayer: boolean;
-    }
-  >;
+  playersMap: PlayersMap;
   sendAction: Function;
   socket: Socket;
 }) => {
@@ -163,73 +148,84 @@ const startRace = async ({
   });
 
   scene.registerBeforeRender(() => {
-    playersMap.forEach(({ actionsFromServer, car, isCurrentPlayer }) => {
-      const { vehicle, wheelMeshes, chassisMesh } = car;
-      const speed = vehicle.getCurrentSpeedKmHour();
+    playersMap.forEach(
+      ({
+        actionsFromServer,
+        car: { vehicle, wheelMeshes, chassisMesh },
+        isCurrentPlayer,
+      }) => {
+        // const { vehicle, wheelMeshes, chassisMesh } = car;
 
-      let breakingForce = 0;
-      let engineForce = 0;
-      if (isCurrentPlayer) {
-        if (actionsFromServer[ACCELERATE]) {
-          if (speed < -1) {
-            breakingForce = maxBreakingForce;
+        // if (!vehicle || !wheelMeshes || !chassisMesh) {
+        //   return;
+        // }
+
+        const speed = vehicle.getCurrentSpeedKmHour();
+
+        let breakingForce = 0;
+        let engineForce = 0;
+        if (isCurrentPlayer) {
+          if (actionsFromServer[ACCELERATE]) {
+            if (speed < -1) {
+              breakingForce = maxBreakingForce;
+            } else {
+              engineForce = maxEngineForce;
+            }
+          } else if (actionsFromServer[BRAKE]) {
+            if (speed > 1) {
+              breakingForce = maxBreakingForce;
+            } else {
+              engineForce = -maxEngineForce;
+            }
+          }
+          if (actions[RIGHT]) {
+            if (vehicleSteering < steeringClamp) {
+              vehicleSteering += steeringIncrement;
+            }
+          } else if (actions[LEFT]) {
+            if (vehicleSteering > -steeringClamp) {
+              vehicleSteering -= steeringIncrement;
+            }
           } else {
-            engineForce = maxEngineForce;
+            vehicleSteering = 0;
           }
-        } else if (actionsFromServer[BRAKE]) {
-          if (speed > 1) {
-            breakingForce = maxBreakingForce;
-          } else {
-            engineForce = -maxEngineForce;
+          const actionType = Object.entries(actions).find(
+            ([key, value]) => value === true // eslint-disable-line
+          );
+          if (actionType && actionType[0]) {
+            sendAction(actionType[0]);
           }
+          vehicle.applyEngineForce(engineForce, FRONT_LEFT);
+          vehicle.applyEngineForce(engineForce, FRONT_RIGHT);
+          vehicle.setBrake(breakingForce / 2, FRONT_LEFT);
+          vehicle.setBrake(breakingForce / 2, FRONT_RIGHT);
+          vehicle.setBrake(breakingForce, BACK_LEFT);
+          vehicle.setBrake(breakingForce, BACK_RIGHT);
+          vehicle.setSteeringValue(vehicleSteering, FRONT_LEFT);
+          vehicle.setSteeringValue(vehicleSteering, FRONT_RIGHT);
+          speedometerEl.textContent = `${vehicle
+            .getCurrentSpeedKmHour()
+            .toFixed()} km/h`;
         }
-        if (actions[RIGHT]) {
-          if (vehicleSteering < steeringClamp) {
-            vehicleSteering += steeringIncrement;
-          }
-        } else if (actions[LEFT]) {
-          if (vehicleSteering > -steeringClamp) {
-            vehicleSteering -= steeringIncrement;
-          }
-        } else {
-          vehicleSteering = 0;
+        let tm, p, q, i;
+        const n = vehicle.getNumWheels();
+        for (i = 0; i < n; i++) {
+          vehicle.updateWheelTransform(i, true);
+          tm = vehicle.getWheelTransformWS(i);
+          p = tm.getOrigin();
+          q = tm.getRotation();
+          wheelMeshes[i].position.set(p.x(), p.y(), p.z());
+          wheelMeshes[i].rotationQuaternion.set(q.x(), q.y(), q.z(), q.w());
+          wheelMeshes[i].rotate(Axis.Z, Math.PI / 2);
         }
-        const actionType = Object.entries(actions).find(
-          ([key, value]) => value === true // eslint-disable-line
-        );
-        if (actionType && actionType[0]) {
-          sendAction(actionType[0]);
-        }
-        vehicle.applyEngineForce(engineForce, FRONT_LEFT);
-        vehicle.applyEngineForce(engineForce, FRONT_RIGHT);
-        vehicle.setBrake(breakingForce / 2, FRONT_LEFT);
-        vehicle.setBrake(breakingForce / 2, FRONT_RIGHT);
-        vehicle.setBrake(breakingForce, BACK_LEFT);
-        vehicle.setBrake(breakingForce, BACK_RIGHT);
-        vehicle.setSteeringValue(vehicleSteering, FRONT_LEFT);
-        vehicle.setSteeringValue(vehicleSteering, FRONT_RIGHT);
-        speedometerEl.textContent = `${vehicle
-          .getCurrentSpeedKmHour()
-          .toFixed()} km/h`;
-      }
-      let tm, p, q, i;
-      const n = vehicle.getNumWheels();
-      for (i = 0; i < n; i++) {
-        vehicle.updateWheelTransform(i, true);
-        tm = vehicle.getWheelTransformWS(i);
+        tm = vehicle.getChassisWorldTransform();
         p = tm.getOrigin();
         q = tm.getRotation();
-        wheelMeshes[i].position.set(p.x(), p.y(), p.z());
-        wheelMeshes[i].rotationQuaternion.set(q.x(), q.y(), q.z(), q.w());
-        wheelMeshes[i].rotate(Axis.Z, Math.PI / 2);
+        chassisMesh.position.set(p.x(), p.y(), p.z());
+        chassisMesh.rotationQuaternion.set(q.x(), q.y(), q.z(), q.w());
+        chassisMesh.rotate(Axis.X, Math.PI);
       }
-      tm = vehicle.getChassisWorldTransform();
-      p = tm.getOrigin();
-      q = tm.getRotation();
-      chassisMesh.position.set(p.x(), p.y(), p.z());
-      chassisMesh.rotationQuaternion.set(q.x(), q.y(), q.z(), q.w());
-      chassisMesh.rotate(Axis.X, Math.PI);
-    });
+    );
     // const dt = engine.getDeltaTime().toFixed() / 1000;
     // if (vehicle !== undefined) {
     //   const speed = vehicle.getCurrentSpeedKmHour();
