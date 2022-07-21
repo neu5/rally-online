@@ -1,6 +1,6 @@
-import { PlayersList } from "../main";
+import { PlayersMap } from "../main";
 
-export const UIcreatePlayersList = (el: HTMLElement, list: PlayersList) => {
+export const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
   const fragment = new DocumentFragment();
 
   list.forEach(({ name }) => {

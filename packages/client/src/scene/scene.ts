@@ -10,34 +10,24 @@ import {
 import Ammo from "ammojs-typed";
 import { Socket } from "socket.io-client";
 
+import {
+  ACCELERATE,
+  ActionTypes,
+  Actions,
+  BRAKE,
+  KeysActions,
+  LEFT,
+  RIGHT,
+} from "types/src";
+import { PlayersMap } from "../main";
+
 import { buildCar } from "../model/car/car";
 import { addColors, addWheelMaterial } from "../utils";
 
-const ACCELERATE = "accelerate";
-const BRAKE = "brake";
-const LEFT = "left";
-const RIGHT = "right";
-
-type ActionTypes = {
-  [ACCELERATE]: "accelerate";
-  [BRAKE]: "brake";
-  [LEFT]: "left";
-  [RIGHT]: "right";
-};
-
-interface Actions {
-  [ACCELERATE]: boolean;
-  [BRAKE]: boolean;
-  [LEFT]: boolean;
-  [RIGHT]: boolean;
-}
-
-interface KeysActions {
-  KeyW: string;
-  KeyS: string;
-  KeyA: string;
-  KeyD: string;
-}
+const steeringIncrement = 0.01;
+const steeringClamp = 0.2;
+const maxEngineForce = 500;
+const maxBreakingForce = 10;
 
 const keysActions: KeysActions = {
   KeyW: ACCELERATE,
@@ -45,11 +35,6 @@ const keysActions: KeysActions = {
   KeyA: LEFT,
   KeyD: RIGHT,
 };
-
-const steeringIncrement = 0.01;
-const steeringClamp = 0.2;
-const maxEngineForce = 500;
-const maxBreakingForce = 10;
 
 const actions: Actions = {
   [ACCELERATE]: false,
@@ -131,23 +116,7 @@ const startRace = async ({
 }: {
   engine: Engine;
   oldScene: Scene;
-  playersMap: Map<
-    string,
-    {
-      updateAction?: (actions: Actions) => void;
-      car?: { wheelMeshes: Object };
-      name: string;
-      vehicle?: {
-        color: string;
-        startingPos: {
-          x: number;
-          y: number;
-          z: number;
-        };
-      };
-      isCurrentPlayer: boolean;
-    }
-  >;
+  playersMap: PlayersMap;
   sendAction: Function;
   socket: Socket;
 }) => {
@@ -180,10 +149,18 @@ const startRace = async ({
 
   scene.registerBeforeRender(() => {
     playersMap.forEach(({ actionsFromServer, car, isCurrentPlayer }) => {
-      const { vehicle, wheelMeshes, chassisMesh } = car;
-      const speed = vehicle.getCurrentSpeedKmHour();
+      if (
+        !car?.vehicle ||
+        !car.wheelMeshes ||
+        !car.chassisMesh ||
+        !actionsFromServer
+      ) {
+        return;
+      }
 
-      // console.log(actionsFromServer);
+      const { vehicle, wheelMeshes, chassisMesh } = car;
+
+      const speed = vehicle.getCurrentSpeedKmHour();
 
       let breakingForce = 0;
       let engineForce = 0;
@@ -245,7 +222,7 @@ const startRace = async ({
       p = tm.getOrigin();
       q = tm.getRotation();
       chassisMesh.position.set(p.x(), p.y(), p.z());
-      chassisMesh.rotationQuaternion.set(q.x(), q.y(), q.z(), q.w());
+      chassisMesh.rotationQuaternion?.set(q.x(), q.y(), q.z(), q.w());
       chassisMesh.rotate(Axis.X, Math.PI);
     });
     // const dt = engine.getDeltaTime().toFixed() / 1000;

@@ -2,6 +2,7 @@ import {
   ArcRotateCamera,
   Engine,
   HemisphericLight,
+  Mesh,
   Scene,
   Vector3,
 } from "@babylonjs/core";
@@ -9,6 +10,9 @@ import { Socket, io } from "socket.io-client";
 
 import { startRace } from "./scene/scene";
 import { UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
+
+import { Actions } from "types/src";
+import Ammo from "ammojs-typed";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
@@ -24,17 +28,31 @@ type Vehicle = {
   };
 };
 
-export type PlayersList = Map<
+export type PlayersMap = Map<
   string,
   {
+    updateAction?: (actions: Actions) => void;
+    car?: {
+      chassisMesh: Mesh;
+      wheelMeshes: Array<any>;
+      vehicle: Ammo.btRaycastVehicle;
+    };
+    actionsFromServer?: Actions;
     name: string;
-    vehicle: Vehicle;
+    vehicle?: {
+      color: string;
+      startingPos: {
+        x: number;
+        y: number;
+        z: number;
+      };
+    };
     isCurrentPlayer: boolean;
   }
 >;
 
 type GameType = {
-  playersMap: PlayersList;
+  playersMap: PlayersMap;
 };
 const game: GameType = {
   playersMap: new Map(),
@@ -76,7 +94,7 @@ updateControls();
 let currentPlayerId: string | undefined = undefined;
 
 interface ServerToClientEvents {
-  playerListUpdate: (playersList: Array<PlayersList>) => void;
+  playerListUpdate: (playersList: Array<PlayersMap>) => void;
   playerID: (id: string) => void;
   "server:action": (data: Object) => void;
   "server:start-race": (data: Object) => void;
