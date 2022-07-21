@@ -32,12 +32,12 @@ export type PlayersMap = Map<
   string,
   {
     updateAction?: (actions: Actions) => void;
-    car: {
+    car?: {
       chassisMesh: Mesh;
       wheelMeshes: Array<any>;
       vehicle: Ammo.btRaycastVehicle;
     };
-    actionsFromServer: Actions;
+    actionsFromServer?: Actions;
     name: string;
     vehicle?: {
       color: string;
