@@ -11,7 +11,7 @@ import { Socket, io } from "socket.io-client";
 import { startRace } from "./scene/scene";
 import { UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 
-import { Actions } from "types/src";
+import { Actions } from "@neu5/types/src";
 import Ammo from "ammojs-typed";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;

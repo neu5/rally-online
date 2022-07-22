@@ -1,9 +1,9 @@
 {
   "private": true,
   "workspaces": [
-    "packages/client",
-    "packages/server",
-    "packages/types"
+    "packages/@neu5/client",
+    "packages/@neu5/server",
+    "packages/@neu5/types"
   ],
   "packageManager": "yarn@3.1.1",
   "devDependencies": {
@@ -29,13 +29,13 @@
   },
   "scripts": {
     "build": "yarn workspaces foreach -p run build",
-    "clean": "rm -Rf packages/client/dist && rm -Rf packages/server/dist && cd packages/client && mkdir dist && cd ../server && mkdir dist && echo 'done'",
+    "clean": "rm -Rf packages/@neu5/client/dist && rm -Rf packages/@neu5/server/dist && cd packages/@neu5/client && mkdir dist && cd ../server && mkdir dist && echo 'done'",
     "watch": "concurrently -k \"yarn:watch:*\"",
-    "watch:client": "yarn workspace client watch",
-    "watch:server": "yarn workspace server watch",
-    "watch:serve": "yarn workspace server watch:serve",
+    "watch:client": "yarn workspace @neu5/client watch",
+    "watch:server": "yarn workspace @neu5/server watch",
+    "watch:serve": "yarn workspace @neu5/server watch:serve",
     "lint": "eslint 'packages/**/*.ts'",
-    "serve": "yarn workspace server serve",
+    "serve": "yarn workspace @neu5/server serve",
     "test": "yarn workspaces foreach -p run test"
   }
 }

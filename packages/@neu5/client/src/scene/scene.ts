@@ -18,7 +18,7 @@ import {
   KeysActions,
   LEFT,
   RIGHT,
-} from "types/src";
+} from "@neu5/types/src";
 import { PlayersMap } from "../main";
 
 import { buildCar } from "../model/car/car";
