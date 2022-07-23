@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "@neu5/server",
   "private": true,
   "version": "0.0.1",
   "repository": "https://github.com/neu5/rally-online",
