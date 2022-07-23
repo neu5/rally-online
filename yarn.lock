@@ -446,9 +446,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@neu5/client@workspace:packages/@neu5/client":
+"@neu5/client@workspace:packages/client":
   version: 0.0.0-use.local
-  resolution: "@neu5/client@workspace:packages/@neu5/client"
+  resolution: "@neu5/client@workspace:packages/client"
   dependencies:
     "@babylonjs/core": ^5.8.0
     "@neu5/types": 0.0.1
@@ -466,9 +466,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@neu5/server@workspace:packages/@neu5/server":
+"@neu5/server@workspace:packages/server":
   version: 0.0.0-use.local
-  resolution: "@neu5/server@workspace:packages/@neu5/server"
+  resolution: "@neu5/server@workspace:packages/server"
   dependencies:
     "@babylonjs/core": ^5.12.1
     "@types/express": ^4.17.13
@@ -482,9 +482,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@neu5/types@0.0.1, @neu5/types@workspace:packages/@neu5/types":
+"@neu5/types@0.0.1, @neu5/types@workspace:packages/types":
   version: 0.0.0-use.local
-  resolution: "@neu5/types@workspace:packages/@neu5/types"
+  resolution: "@neu5/types@workspace:packages/types"
   dependencies:
     typescript: ^4.7.4
   languageName: unknown
