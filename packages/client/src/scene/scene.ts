@@ -10,15 +10,9 @@ import {
 import Ammo from "ammojs-typed";
 import { Socket } from "socket.io-client";
 
-import {
-  ACCELERATE,
-  ActionTypes,
-  Actions,
-  BRAKE,
-  KeysActions,
-  LEFT,
-  RIGHT,
-} from "@neu5/types/src";
+import { ACCELERATE, BRAKE, LEFT, RIGHT } from "@neu5/types/src";
+import type { ActionTypes, Actions, KeysActions } from "@neu5/types/src";
+
 import { PlayersMap } from "../main";
 
 import { buildCar } from "../model/car/car";
