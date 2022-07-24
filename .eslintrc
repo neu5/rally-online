@@ -33,6 +33,10 @@
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/quotes": "off",
     "@typescript-eslint/comma-dangle": "off",
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      { "prefer": "type-imports", "disallowTypeAnnotations": true }
+    ],
     "react/jsx-filename-extension": "off"
   }
 }

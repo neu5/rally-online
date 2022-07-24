@@ -1,19 +1,19 @@
 import {
   AmmoJSPlugin,
   Axis,
-  Engine,
   MeshBuilder,
   PhysicsImpostor,
   Scene,
   Vector3,
 } from "@babylonjs/core";
 import Ammo from "ammojs-typed";
-import { Socket } from "socket.io-client";
-
 import { ACCELERATE, BRAKE, LEFT, RIGHT } from "@neu5/types/src";
+
+import type { Socket } from "socket.io-client";
+import type { Engine } from "@babylonjs/core";
 import type { ActionTypes, Actions, KeysActions } from "@neu5/types/src";
 
-import { PlayersMap } from "../main";
+import type { PlayersMap } from "../main";
 
 import { buildCar } from "../model/car/car";
 import { addColors, addWheelMaterial } from "../utils";

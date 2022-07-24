@@ -2,8 +2,10 @@ import { fileURLToPath } from "url";
 import { resolve } from "path";
 import express from "express";
 import { createServer } from "http";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { ArcRotateCamera, NullEngine, Vector3 } from "@babylonjs/core";
+
+import type { Socket } from "socket.io";
 
 import { createScene } from "./scene/scene";
 
