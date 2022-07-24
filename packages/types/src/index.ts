@@ -24,4 +24,5 @@ interface KeysActions {
   KeyD: string;
 }
 
-export { ACCELERATE, BRAKE, LEFT, RIGHT, ActionTypes, Actions, KeysActions };
+export { ACCELERATE, BRAKE, LEFT, RIGHT };
+export type { ActionTypes, Actions, KeysActions };

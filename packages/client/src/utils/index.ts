@@ -1,4 +1,5 @@
-import { Color3, Scene, StandardMaterial, Texture } from "@babylonjs/core";
+import { Color3, StandardMaterial, Texture } from "@babylonjs/core";
+import type { Scene } from "@babylonjs/core";
 
 const COLOR_NAMES = {
   BLUE: "BlueMaterial",

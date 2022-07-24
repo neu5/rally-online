@@ -13,6 +13,7 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "skipLibCheck": true,
+    "isolatedModules": true,
     "types": ["node"],
     "paths": {
       "~/*": ["./*"]

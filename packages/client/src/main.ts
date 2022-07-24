@@ -2,17 +2,18 @@ import {
   ArcRotateCamera,
   Engine,
   HemisphericLight,
-  Mesh,
   Scene,
   Vector3,
 } from "@babylonjs/core";
-import { Socket, io } from "socket.io-client";
+import { io } from "socket.io-client";
 
 import { startRace } from "./scene/scene";
 import { UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 
-import { Actions } from "@neu5/types/src";
-import Ammo from "ammojs-typed";
+import type Ammo from "ammojs-typed";
+import type { Mesh } from "@babylonjs/core";
+import type { Socket } from "socket.io-client";
+import type { Actions } from "@neu5/types/src";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;

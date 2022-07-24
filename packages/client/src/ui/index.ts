@@ -1,4 +1,4 @@
-import { PlayersMap } from "../main";
+import type { PlayersMap } from "../main";
 
 export const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
   const fragment = new DocumentFragment();
