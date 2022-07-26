@@ -1,25 +1,19 @@
 import {
   AmmoJSPlugin,
   Axis,
-  Engine,
   MeshBuilder,
   PhysicsImpostor,
   Scene,
   Vector3,
 } from "@babylonjs/core";
 import Ammo from "ammojs-typed";
-import { Socket } from "socket.io-client";
+import { ACCELERATE, BRAKE, LEFT, RIGHT } from "@neu5/types/src";
 
-import {
-  ACCELERATE,
-  ActionTypes,
-  Actions,
-  BRAKE,
-  KeysActions,
-  LEFT,
-  RIGHT,
-} from "@neu5/types/src";
-import { PlayersMap } from "../main";
+import type { Socket } from "socket.io-client";
+import type { Engine } from "@babylonjs/core";
+import type { ActionTypes, Actions, KeysActions } from "@neu5/types/src";
+
+import type { PlayersMap } from "../main";
 
 import { buildCar } from "../model/car/car";
 import { addColors, addWheelMaterial } from "../utils";
@@ -127,12 +121,12 @@ const startRace = async ({
   const { AmmoJS, scene } = await createScene(engine);
 
   playersMap.forEach((player) => {
-    if (player.vehicle) {
+    if (player.vehicleTemplate) {
       player.car = buildCar({
         AmmoJS,
-        color: player.vehicle.color,
+        color: player.vehicleTemplate.color,
         scene,
-        startingPos: player.vehicle.startingPos,
+        startingPos: player.vehicleTemplate.startingPos,
         isCurrentPlayer: player.isCurrentPlayer,
       });
     }

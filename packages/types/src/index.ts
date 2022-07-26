@@ -24,4 +24,22 @@ interface KeysActions {
   KeyD: string;
 }
 
-export { ACCELERATE, BRAKE, LEFT, RIGHT, ActionTypes, Actions, KeysActions };
+type VehicleTemplate = {
+  color: string;
+  startingPos: {
+    x: number;
+    y: number;
+    z: number;
+  };
+};
+
+type Player = {
+  updateAction?: (actions: Actions) => void;
+  actionsFromServer?: Actions;
+  name: string;
+  vehicleTemplate?: VehicleTemplate;
+  isCurrentPlayer: boolean;
+};
+
+export { ACCELERATE, BRAKE, LEFT, RIGHT };
+export type { ActionTypes, Actions, KeysActions, Player, VehicleTemplate };

@@ -1,5 +1,6 @@
-import { Quaternion, Scene } from "@babylonjs/core";
-import Ammo from "ammojs-typed";
+import { Quaternion } from "@babylonjs/core";
+import type { Scene } from "@babylonjs/core";
+import type Ammo from "ammojs-typed";
 
 // @ts-ignore
 type AmmoType = Ammo;

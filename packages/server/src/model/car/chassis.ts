@@ -1,4 +1,5 @@
-import { MeshBuilder, Quaternion, Scene } from "@babylonjs/core";
+import { MeshBuilder, Quaternion } from "@babylonjs/core";
+import type { Scene } from "@babylonjs/core";
 
 export const createChassisMesh = (
   w: number,
