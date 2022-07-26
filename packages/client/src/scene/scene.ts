@@ -121,12 +121,12 @@ const startRace = async ({
   const { AmmoJS, scene } = await createScene(engine);
 
   playersMap.forEach((player) => {
-    if (player.vehicle) {
+    if (player.vehicleTemplate) {
       player.car = buildCar({
         AmmoJS,
-        color: player.vehicle.color,
+        color: player.vehicleTemplate.color,
         scene,
-        startingPos: player.vehicle.startingPos,
+        startingPos: player.vehicleTemplate.startingPos,
         isCurrentPlayer: player.isCurrentPlayer,
       });
     }

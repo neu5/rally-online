@@ -13,42 +13,23 @@ import { UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 import type Ammo from "ammojs-typed";
 import type { Mesh } from "@babylonjs/core";
 import type { Socket } from "socket.io-client";
-import type { Actions } from "@neu5/types/src";
+import type { Player, VehicleTemplate } from "@neu5/types/src";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
 const startBtn = document.getElementById("start-btn") as HTMLAnchorElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
 
-type Vehicle = {
-  color: string;
-  startingPos: {
-    x: number;
-    y: number;
-    z: number;
-  };
+type Car = {
+  chassisMesh: Mesh;
+  wheelMeshes: Array<any>;
+  vehicle: Ammo.btRaycastVehicle;
 };
 
 export type PlayersMap = Map<
   string,
-  {
-    updateAction?: (actions: Actions) => void;
-    car?: {
-      chassisMesh: Mesh;
-      wheelMeshes: Array<any>;
-      vehicle: Ammo.btRaycastVehicle;
-    };
-    actionsFromServer?: Actions;
-    name: string;
-    vehicle?: {
-      color: string;
-      startingPos: {
-        x: number;
-        y: number;
-        z: number;
-      };
-    };
-    isCurrentPlayer: boolean;
+  Player & {
+    car?: Car;
   }
 >;
 
@@ -153,16 +134,16 @@ interface ServerToClientEvents {
     (
       playersList: Array<{
         name: string;
-        vehicle: Vehicle;
+        vehicle: VehicleTemplate;
       }>
     ) => {
       game.playersMap.clear();
 
       playersList.forEach(
-        ({ name, vehicle }: { name: string; vehicle: Vehicle }) => {
+        ({ name, vehicle }: { name: string; vehicle: VehicleTemplate }) => {
           game.playersMap.set(name, {
             name,
-            vehicle,
+            vehicleTemplate: vehicle,
             isCurrentPlayer: name === currentPlayerId,
           });
         }
