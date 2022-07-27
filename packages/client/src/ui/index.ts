@@ -1,6 +1,6 @@
 import type { PlayersMap } from "../main";
 
-export const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
+const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
   const fragment = new DocumentFragment();
 
   list.forEach(({ name }) => {
@@ -15,7 +15,18 @@ export const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
   el.appendChild(fragment);
 };
 
-export const UIsetCurrentPlayer = (playersListEl: HTMLElement, id: string) => {
+type Dialog = {
+  message: string;
+  isClosable?: boolean;
+};
+
+const UIDialog = ({ message, isClosable = true }: Dialog) => {
+  const fragment = new DocumentFragment();
+
+  const div = document.createElement("div");
+};
+
+const UIsetCurrentPlayer = (playersListEl: HTMLElement, id: string) => {
   // @ts-ignore
   [...playersListEl.children].find((el: HTMLElement) => {
     if (el.dataset.id === id) {
@@ -26,3 +37,5 @@ export const UIsetCurrentPlayer = (playersListEl: HTMLElement, id: string) => {
     return false;
   });
 };
+
+export { UIcreatePlayersList, UIDialog, UIsetCurrentPlayer };

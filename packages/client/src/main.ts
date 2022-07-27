@@ -8,7 +8,7 @@ import {
 import { io } from "socket.io-client";
 
 import { startRace } from "./scene/scene";
-import { UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
+import { UIDialog, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 
 import type Ammo from "ammojs-typed";
 import type { Mesh } from "@babylonjs/core";
@@ -65,8 +65,12 @@ const updateControls = () => {
   } else {
     mobileControlsEls.forEach((el) => el.classList.add("hide"));
   }
+
   if (isTouchDevice() && windowSize.width / windowSize.height < 1) {
-    // show alert to turn device horizontally
+    UIDialog({
+      message:
+        "The game may be more playable if you rotate the screen horizontally",
+    });
   }
 };
 
