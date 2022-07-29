@@ -8,7 +8,7 @@ import {
 import { io } from "socket.io-client";
 
 import { startRace } from "./scene/scene";
-import { UIDialog, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
+import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 
 import type Ammo from "ammojs-typed";
 import type { Mesh } from "@babylonjs/core";
@@ -59,6 +59,12 @@ const updateWindowSize = () => {
   };
 };
 
+const verticalMobileDialog = new UIDialogWrapper();
+
+const pEl = document.createElement("p");
+pEl.textContent =
+  "The game may be more playable if you rotate the screen horizontally";
+
 const updateControls = () => {
   if (isTouchDevice()) {
     mobileControlsEls.forEach((el) => el.classList.remove("hide"));
@@ -67,9 +73,8 @@ const updateControls = () => {
   }
 
   if (isTouchDevice() && windowSize.width / windowSize.height < 1) {
-    UIDialog({
-      message:
-        "The game may be more playable if you rotate the screen horizontally",
+    verticalMobileDialog.show({
+      content: pEl,
     });
   }
 };

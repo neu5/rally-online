@@ -1,3 +1,4 @@
+import { UIDialogWrapper } from "./dialog";
 import type { PlayersMap } from "../main";
 
 const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
@@ -15,17 +16,6 @@ const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
   el.appendChild(fragment);
 };
 
-type Dialog = {
-  message: string;
-  isClosable?: boolean;
-};
-
-const UIDialog = ({ message, isClosable = true }: Dialog) => {
-  const fragment = new DocumentFragment();
-
-  const div = document.createElement("div");
-};
-
 const UIsetCurrentPlayer = (playersListEl: HTMLElement, id: string) => {
   // @ts-ignore
   [...playersListEl.children].find((el: HTMLElement) => {
@@ -38,4 +28,4 @@ const UIsetCurrentPlayer = (playersListEl: HTMLElement, id: string) => {
   });
 };
 
-export { UIcreatePlayersList, UIDialog, UIsetCurrentPlayer };
+export { UIcreatePlayersList, UIDialogWrapper, UIsetCurrentPlayer };
