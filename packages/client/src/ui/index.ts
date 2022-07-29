@@ -1,6 +1,7 @@
+import { UIDialogWrapper } from "./dialog";
 import type { PlayersMap } from "../main";
 
-export const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
+const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
   const fragment = new DocumentFragment();
 
   list.forEach(({ name }) => {
@@ -15,7 +16,7 @@ export const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
   el.appendChild(fragment);
 };
 
-export const UIsetCurrentPlayer = (playersListEl: HTMLElement, id: string) => {
+const UIsetCurrentPlayer = (playersListEl: HTMLElement, id: string) => {
   // @ts-ignore
   [...playersListEl.children].find((el: HTMLElement) => {
     if (el.dataset.id === id) {
@@ -26,3 +27,5 @@ export const UIsetCurrentPlayer = (playersListEl: HTMLElement, id: string) => {
     return false;
   });
 };
+
+export { UIcreatePlayersList, UIDialogWrapper, UIsetCurrentPlayer };
