@@ -8,7 +8,12 @@ import {
 import { io } from "socket.io-client";
 
 import { startRace } from "./scene/scene";
-import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
+import {
+  UIDialogWrapper,
+  UIPlayersIndicators,
+  UIcreatePlayersList,
+  UIsetCurrentPlayer,
+} from "./ui";
 
 import type Ammo from "ammojs-typed";
 import type { Mesh } from "@babylonjs/core";
@@ -19,6 +24,9 @@ const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
 const startBtn = document.getElementById("start-btn") as HTMLAnchorElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
+const playersIndicatorsEl = document.getElementById(
+  "players-indicators"
+) as HTMLElement;
 
 type Car = {
   chassisMesh: Mesh;
@@ -159,6 +167,7 @@ interface ServerToClientEvents {
       );
 
       UIcreatePlayersList(playersListEl, game.playersMap);
+      UIPlayersIndicators(playersIndicatorsEl, game.playersMap);
 
       if (currentPlayerId) {
         UIsetCurrentPlayer(playersListEl, currentPlayerId);

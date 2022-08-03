@@ -4,8 +4,9 @@ body {
 #canvas {
   width: 80%;
   height: 80%;
-  margin: 5% auto;
+  margin: 1% auto 0 auto;
   display: block;
+  border: 1px solid #333;
 }
 #fps {
   position: absolute;
@@ -43,6 +44,18 @@ body {
 
   .you {
     color: green;
+  }
+}
+#players-indicators {
+  width: 80%;
+  height: 80px;
+  margin: 0 auto;
+  display: block;
+  border: 1px solid #333;
+  display: flex;
+
+  .players-indicator {
+    width: 100%;
   }
 }
 .mobile-controls {
