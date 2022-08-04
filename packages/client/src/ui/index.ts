@@ -16,12 +16,12 @@ const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
   el.appendChild(fragment);
 };
 
-const UIPlayersIndicators = (el: HTMLElement, list: PlayersMap) => {
+const UIPlayersIndicators = (el: HTMLElement, playersMap: PlayersMap) => {
   el.textContent = "";
 
   const fragment = new DocumentFragment();
 
-  const els = [];
+  let indicators: HTMLElement[] = [];
 
   for (let i = 0; i < 8; i++) {
     const div = document.createElement("div");
@@ -36,16 +36,20 @@ const UIPlayersIndicators = (el: HTMLElement, list: PlayersMap) => {
     div.appendChild(divName);
     div.appendChild(divIndicator);
 
-    els.push(div);
-
+    indicators.push(div);
     fragment.appendChild(div);
   }
 
   let idx = 0;
-  list.forEach((value) => {
-    console.log(value, els[idx]);
+  playersMap.forEach((player) => {
+    const playerIndicator = indicators[idx];
 
-    idx++;
+    const nameEl = playerIndicator.children[0];
+    nameEl.textContent = player.name;
+
+    player.UIindicator = playerIndicator;
+
+    idx = idx + 1;
   });
 
   el.appendChild(fragment);
