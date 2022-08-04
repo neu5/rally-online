@@ -14,6 +14,7 @@ import type { Engine } from "@babylonjs/core";
 import type { ActionTypes, Actions, KeysActions } from "@neu5/types/src";
 
 import type { PlayersMap } from "../main";
+import { UIPlayersIndicators } from "../ui";
 
 import { buildCar } from "../model/car/car";
 import { addColors, addWheelMaterial } from "../utils";
@@ -101,6 +102,10 @@ const createScene = async (engine: Engine) => {
   return { AmmoJS, scene };
 };
 
+const playersIndicatorsEl = document.getElementById(
+  "players-indicators"
+) as HTMLElement;
+
 const startRace = async ({
   engine,
   oldScene,
@@ -130,16 +135,25 @@ const startRace = async ({
         isCurrentPlayer: player.isCurrentPlayer,
       });
     }
+
+    player.updateAction = (data: Actions) => {
+      player.actionsFromServer = { ...data };
+
+      if (player.UIindicator) {
+        const indicatorEl = player.UIindicator.children[1];
+        const action = Object.entries(data)
+          .filter(([key, value]) => value) // eslint-disable-line
+          .reduce((previousValue, [actionName]) => actionName, "");
+
+        indicatorEl.textContent = action;
+      }
+    };
   });
+
+  UIPlayersIndicators(playersIndicatorsEl, playersMap);
 
   let vehicleSteering = 0;
   // const maxSteerVal = 0.2;
-
-  playersMap.forEach((player) => {
-    player.updateAction = (data: Actions) => {
-      player.actionsFromServer = { ...data };
-    };
-  });
 
   scene.registerBeforeRender(() => {
     playersMap.forEach(({ actionsFromServer, car, isCurrentPlayer }) => {
