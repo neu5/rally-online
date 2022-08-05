@@ -39,6 +39,7 @@ type Player = {
   name: string;
   vehicleTemplate?: VehicleTemplate;
   isCurrentPlayer: boolean;
+  vehicleSteering: number;
   UIindicator?: HTMLElement;
 };
 

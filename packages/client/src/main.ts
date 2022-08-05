@@ -154,6 +154,7 @@ interface ServerToClientEvents {
             name,
             vehicleTemplate: vehicle,
             isCurrentPlayer: name === currentPlayerId,
+            vehicleSteering: 0,
           });
         }
       );
