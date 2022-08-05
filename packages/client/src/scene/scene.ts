@@ -152,11 +152,11 @@ const startRace = async ({
 
   UIPlayersIndicators(playersIndicatorsEl, playersMap);
 
-  let vehicleSteering = 0;
   // const maxSteerVal = 0.2;
 
   scene.registerBeforeRender(() => {
-    playersMap.forEach(({ actionsFromServer, car, isCurrentPlayer }) => {
+    playersMap.forEach((player) => {
+      const { actionsFromServer, car, isCurrentPlayer } = player;
       if (
         !car?.vehicle ||
         !car.wheelMeshes ||
@@ -172,7 +172,7 @@ const startRace = async ({
 
       let breakingForce = 0;
       let engineForce = 0;
-      // if (isCurrentPlayer) {
+
       if (actionsFromServer[ACCELERATE]) {
         if (speed < -1) {
           breakingForce = maxBreakingForce;
@@ -186,16 +186,16 @@ const startRace = async ({
           engineForce = -maxEngineForce;
         }
       }
-      if (actions[RIGHT]) {
-        if (vehicleSteering < steeringClamp) {
-          vehicleSteering += steeringIncrement;
+      if (actionsFromServer[RIGHT]) {
+        if (player.vehicleSteering < steeringClamp) {
+          player.vehicleSteering += steeringIncrement;
         }
-      } else if (actions[LEFT]) {
-        if (vehicleSteering > -steeringClamp) {
-          vehicleSteering -= steeringIncrement;
+      } else if (actionsFromServer[LEFT]) {
+        if (player.vehicleSteering > -steeringClamp) {
+          player.vehicleSteering -= steeringIncrement;
         }
       } else {
-        vehicleSteering = 0;
+        player.vehicleSteering = 0;
       }
       const actionType = Object.entries(actions).find(
         ([key, value]) => value === true // eslint-disable-line
@@ -209,12 +209,15 @@ const startRace = async ({
       vehicle.setBrake(breakingForce / 2, FRONT_RIGHT);
       vehicle.setBrake(breakingForce, BACK_LEFT);
       vehicle.setBrake(breakingForce, BACK_RIGHT);
-      vehicle.setSteeringValue(vehicleSteering, FRONT_LEFT);
-      vehicle.setSteeringValue(vehicleSteering, FRONT_RIGHT);
-      // speedometerEl.textContent = `${vehicle
-      //   .getCurrentSpeedKmHour()
-      //   .toFixed()} km/h`;
-      // }
+      vehicle.setSteeringValue(player.vehicleSteering, FRONT_LEFT);
+      vehicle.setSteeringValue(player.vehicleSteering, FRONT_RIGHT);
+
+      if (isCurrentPlayer) {
+        speedometerEl.textContent = `${vehicle
+          .getCurrentSpeedKmHour()
+          .toFixed()} km/h`;
+      }
+
       let tm, p, q, i;
       const n = vehicle.getNumWheels();
       for (i = 0; i < n; i++) {

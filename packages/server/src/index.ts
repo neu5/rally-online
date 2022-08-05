@@ -158,7 +158,8 @@ const playersMapToArray = (list: PlayersMap) =>
         } else if (action === BRAKE) {
           player.accelerateTimeMS = Date.now();
           player.actions[ACCELERATE] = false;
-        } else if (action === LEFT) {
+        }
+        if (action === LEFT) {
           player.turnTimeMS = Date.now();
           player.actions[RIGHT] = false;
         } else if (action === RIGHT) {
@@ -220,7 +221,7 @@ const playersMapToArray = (list: PlayersMap) =>
       if (dtAcceleration > 250) {
         player.accelerateTimeMS = now;
         newActions = {
-          ...player.actions,
+          ...newActions,
           [ACCELERATE]: false,
           [BRAKE]: false,
         };
@@ -228,7 +229,7 @@ const playersMapToArray = (list: PlayersMap) =>
       if (dtTurning > 250) {
         player.turnTimeMS = now;
         newActions = {
-          ...player.actions,
+          ...newActions,
           [LEFT]: false,
           [RIGHT]: false,
         };
