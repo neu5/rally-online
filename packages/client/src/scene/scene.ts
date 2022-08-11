@@ -143,7 +143,8 @@ const startRace = async ({
         const indicatorEl = player.UIindicator.children[1];
         const action = Object.entries(data)
           .filter(([key, value]) => value) // eslint-disable-line
-          .reduce((previousValue, [actionName]) => actionName, "");
+          .map(([name]) => name)
+          .toString();
 
         indicatorEl.textContent = action;
       }
@@ -197,11 +198,13 @@ const startRace = async ({
       } else {
         player.vehicleSteering = 0;
       }
-      const actionType = Object.entries(actions).find(
-        ([key, value]) => value === true // eslint-disable-line
-      );
-      if (actionType && actionType[0]) {
-        sendAction(actionType[0]);
+      const actionType = Object.entries(actions)
+        .filter(
+          ([key, value]) => value === true // eslint-disable-line
+        )
+        .map(([name]) => name);
+      if (actionType && actionType.length > 0) {
+        sendAction(actionType);
       }
       vehicle.applyEngineForce(engineForce, FRONT_LEFT);
       vehicle.applyEngineForce(engineForce, FRONT_RIGHT);
