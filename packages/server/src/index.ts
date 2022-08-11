@@ -143,29 +143,31 @@ const playersMapToArray = (list: PlayersMap) =>
 
     socket.on(
       "player:action",
-      ({ action, id }: { action: ActionTypes; id: string }) => {
+      ({ playerActions, id }: { playerActions: ActionTypes[]; id: string }) => {
         const player = playersMap.get(id);
 
-        if (!player) {
+        if (!player || playerActions.length === 0) {
           return;
         }
 
-        player.actions[action] = true;
+        playerActions.forEach((playerAction) => {
+          player.actions[playerAction] = true;
 
-        if (action === ACCELERATE) {
-          player.accelerateTimeMS = Date.now();
-          player.actions[BRAKE] = false;
-        } else if (action === BRAKE) {
-          player.accelerateTimeMS = Date.now();
-          player.actions[ACCELERATE] = false;
-        }
-        if (action === LEFT) {
-          player.turnTimeMS = Date.now();
-          player.actions[RIGHT] = false;
-        } else if (action === RIGHT) {
-          player.turnTimeMS = Date.now();
-          player.actions[LEFT] = false;
-        }
+          if (playerAction === ACCELERATE) {
+            player.accelerateTimeMS = Date.now();
+            player.actions[BRAKE] = false;
+          } else if (playerAction === BRAKE) {
+            player.accelerateTimeMS = Date.now();
+            player.actions[ACCELERATE] = false;
+          }
+          if (playerAction === LEFT) {
+            player.turnTimeMS = Date.now();
+            player.actions[RIGHT] = false;
+          } else if (playerAction === RIGHT) {
+            player.turnTimeMS = Date.now();
+            player.actions[LEFT] = false;
+          }
+        });
       }
     );
 

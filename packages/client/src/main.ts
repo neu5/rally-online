@@ -130,10 +130,10 @@ interface ServerToClientEvents {
     });
   };
 
-  const sendAction = (action: string) => {
+  const sendAction = (playerActions: string[]) => {
     socket.emit("player:action", {
       id: currentPlayerId,
-      action,
+      playerActions,
     });
   };
 
