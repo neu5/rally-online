@@ -118,6 +118,14 @@ const playersMapToArray = (list: PlayersMap) =>
     ...rest,
   }));
 
+type Race = {
+  isStarted: boolean;
+};
+
+const race: Race = {
+  isStarted: false,
+};
+
 (async () => {
   const engine = new NullEngine();
   const scene = await createScene(engine);
@@ -136,6 +144,8 @@ const playersMapToArray = (list: PlayersMap) =>
     });
 
     socket.on("player:start-race", () => {
+      race.isStarted = true;
+
       io.emit("server:start-race", {
         playersList: playersMapToArray(playersMap),
       });
