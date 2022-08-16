@@ -471,7 +471,6 @@ __metadata:
   resolution: "@neu5/server@workspace:packages/server"
   dependencies:
     "@babylonjs/core": ^5.12.1
-    "@neu5/types": 0.0.1
     "@types/express": ^4.17.13
     ammo.js: ^0.0.10
     ammojs-typed: ^1.0.6
