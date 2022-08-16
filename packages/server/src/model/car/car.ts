@@ -1,30 +1,12 @@
-import { Axis, Quaternion } from "@babylonjs/core";
-import type Ammo from "ammojs-typed";
+import { Quaternion } from "@babylonjs/core";
 import type { Scene } from "@babylonjs/core";
+import type Ammo from "ammojs-typed";
 
 // @ts-ignore
 type AmmoType = Ammo;
 
 import { createChassisMesh } from "./chassis";
 import { addWheel } from "./wheel";
-
-const ACCELERATE = "accelerate";
-const BRAKE = "brake";
-const LEFT = "left";
-const RIGHT = "right";
-
-interface Actions {
-  [ACCELERATE]: boolean;
-  [BRAKE]: boolean;
-  [LEFT]: boolean;
-  [RIGHT]: boolean;
-}
-const actions: Actions = {
-  [ACCELERATE]: false,
-  [BRAKE]: false,
-  [LEFT]: false,
-  [RIGHT]: false,
-};
 
 const ZERO_QUATERNION = new Quaternion();
 
@@ -45,10 +27,6 @@ const wheelAxisHeightFront = 0.4;
 const wheelRadiusFront = 0.4;
 // const wheelWidthFront = 0.3;
 
-const steeringIncrement = 0.01;
-const steeringClamp = 0.2;
-const maxEngineForce = 500;
-const maxBreakingForce = 10;
 // const incEngine = 10.0;
 
 const FRONT_LEFT = 0;
@@ -58,12 +36,14 @@ const BACK_RIGHT = 3;
 
 type Vehicle = {
   AmmoJS: AmmoType;
+  color: string;
   quat: Quaternion;
   scene: Scene;
   startingPos: { x: number; y: number; z: number };
 };
 const createVehicle = ({
   AmmoJS,
+  color,
   quat,
   scene,
   startingPos: { x, y, z },
@@ -98,12 +78,13 @@ const createVehicle = ({
   const localInertia = new AmmoJS.btVector3(0, 0, 0);
   geometry.calculateLocalInertia(massVehicle, localInertia);
 
-  const chassisMesh = createChassisMesh(
-    chassisWidth,
-    chassisHeight,
-    chassisLength,
-    scene
-  );
+  const chassisMesh = createChassisMesh({
+    color,
+    w: chassisWidth,
+    l: chassisHeight,
+    h: chassisLength,
+    scene,
+  });
 
   const massOffset = new AmmoJS.btVector3(0, 0.4, 0);
   const transform2 = new AmmoJS.btTransform();
@@ -187,93 +168,20 @@ const createVehicle = ({
 
 export type BuilderCar = {
   AmmoJS: AmmoType;
+  color: string;
   isCurrentPlayer?: boolean;
   scene: Scene;
   startingPos: { x: number; y: number; z: number };
 };
-export const buildCar = ({
-  AmmoJS,
-  scene,
-  startingPos,
-  isCurrentPlayer = false,
-}: BuilderCar) => {
+
+export const buildCar = ({ AmmoJS, color, scene, startingPos }: BuilderCar) => {
   const { vehicle, chassisMesh, wheelMeshes } = createVehicle({
     AmmoJS,
+    color,
     quat: ZERO_QUATERNION,
     scene,
     startingPos,
   });
 
-  let vehicleSteering = 0;
-
-  scene.registerBeforeRender(function () {
-    // const dt = engine.getDeltaTime().toFixed() / 1000;
-
-    if (vehicle !== undefined) {
-      const speed = vehicle.getCurrentSpeedKmHour();
-      // const maxSteerVal = 0.2;
-      let breakingForce = 0;
-      let engineForce = 0;
-
-      if (isCurrentPlayer) {
-        if (actions.accelerate) {
-          if (speed < -1) {
-            breakingForce = maxBreakingForce;
-          } else {
-            engineForce = maxEngineForce;
-          }
-        } else if (actions.brake) {
-          if (speed > 1) {
-            breakingForce = maxBreakingForce;
-          } else {
-            engineForce = -maxEngineForce;
-          }
-        }
-
-        if (actions.right) {
-          if (vehicleSteering < steeringClamp) {
-            vehicleSteering += steeringIncrement;
-          }
-        } else if (actions.left) {
-          if (vehicleSteering > -steeringClamp) {
-            vehicleSteering -= steeringIncrement;
-          }
-        } else {
-          vehicleSteering = 0;
-        }
-
-        vehicle.applyEngineForce(engineForce, FRONT_LEFT);
-        vehicle.applyEngineForce(engineForce, FRONT_RIGHT);
-
-        vehicle.setBrake(breakingForce / 2, FRONT_LEFT);
-        vehicle.setBrake(breakingForce / 2, FRONT_RIGHT);
-        vehicle.setBrake(breakingForce, BACK_LEFT);
-        vehicle.setBrake(breakingForce, BACK_RIGHT);
-
-        vehicle.setSteeringValue(vehicleSteering, FRONT_LEFT);
-        vehicle.setSteeringValue(vehicleSteering, FRONT_RIGHT);
-      }
-
-      let tm, p, q, i;
-      const n = vehicle.getNumWheels();
-      for (i = 0; i < n; i++) {
-        vehicle.updateWheelTransform(i, true);
-        tm = vehicle.getWheelTransformWS(i);
-        p = tm.getOrigin();
-        q = tm.getRotation();
-        wheelMeshes[i].position.set(p.x(), p.y(), p.z());
-        wheelMeshes[i].rotationQuaternion.set(q.x(), q.y(), q.z(), q.w());
-        wheelMeshes[i].rotate(Axis.Z, Math.PI / 2);
-      }
-
-      tm = vehicle.getChassisWorldTransform();
-      p = tm.getOrigin();
-      q = tm.getRotation();
-      chassisMesh.position.set(p.x(), p.y(), p.z());
-      chassisMesh.rotationQuaternion.set(q.x(), q.y(), q.z(), q.w());
-      chassisMesh.rotate(Axis.X, Math.PI);
-    }
-  });
-
-  return vehicle;
+  return { vehicle, chassisMesh, wheelMeshes };
 };

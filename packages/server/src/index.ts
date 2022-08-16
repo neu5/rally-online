@@ -3,23 +3,29 @@ import { resolve } from "path";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { ArcRotateCamera, NullEngine, Vector3 } from "@babylonjs/core";
+import {
+  ArcRotateCamera,
+  HemisphericLight,
+  NullEngine,
+  Scene,
+  Vector3,
+} from "@babylonjs/core";
 
+import type Ammo from "ammojs-typed";
+import type { Mesh } from "@babylonjs/core";
 import type { Socket } from "socket.io";
+// import type { VehicleTemplate } from "@neu5/types/src";
 
-import { createScene } from "./scene/scene";
+type VehicleTemplate = {
+  color: string;
+  startingPos: {
+    x: number;
+    y: number;
+    z: number;
+  };
+};
 
-// type CarPosition = {
-//   x: number;
-//   y: number;
-//   z: number;
-// };
-// const carsStartingPositions: Array<CarPosition> = [
-//   { x: 0, y: 5, z: 0 },
-//   { x: 10, y: 5, z: 0 },
-//   { x: -10, y: 5, z: 0 },
-//   { x: 15, y: 5, z: 0 },
-// ];
+import { startRace } from "./scene/scene";
 
 type PlayerNumbers = Array<{
   idx: number;
@@ -78,7 +84,13 @@ interface ServerToClientEvents {
 }
 const io = new Server<ServerToClientEvents>(httpServer);
 
-type PlayersMap = Map<
+type Car = {
+  chassisMesh: Mesh;
+  wheelMeshes: Array<any>;
+  vehicle: Ammo.btRaycastVehicle;
+};
+
+export type PlayersMap = Map<
   string,
   {
     accelerateTimeMS: number;
@@ -87,6 +99,9 @@ type PlayersMap = Map<
     name: string;
     vehicle?: Object;
     playerNumber?: number;
+    vehicleSteering: number;
+    vehicleTemplate?: VehicleTemplate;
+    car?: Car;
   }
 >;
 const playersMap: PlayersMap = new Map();
@@ -118,24 +133,54 @@ const playersMapToArray = (list: PlayersMap) =>
     ...rest,
   }));
 
+type Race = {
+  isStarted: boolean;
+};
+
+const race: Race = {
+  isStarted: false,
+};
+
 (async () => {
   const engine = new NullEngine();
-  const scene = await createScene(engine);
 
-  const camera = new ArcRotateCamera( // eslint-disable-line
-    "camera",
-    -Math.PI / 2,
-    Math.PI / 3.5,
-    130,
-    Vector3.Zero()
-  );
+  let scene: Scene = new Scene(engine);
+
+  const startEngineLoop = () => {
+    const camera = new ArcRotateCamera( // eslint-disable-line
+      "camera",
+      -Math.PI / 2,
+      Math.PI / 3.5,
+      130,
+      Vector3.Zero()
+    );
+    const light = new HemisphericLight("light", new Vector3(1, 1, 0), scene);
+
+    // Default intensity is 1. Let's dim the light a small amount
+    light.intensity = 0.7;
+
+    engine.runRenderLoop(() => {
+      scene.render();
+    });
+  };
 
   const createSocketHandlers = (socket: Socket) => {
     socket.on("getPlayerList", () => {
       socket.emit("playerListUpdate", playersMapToArray(playersMap));
     });
 
-    socket.on("player:start-race", () => {
+    socket.on("player:start-race", async () => {
+      race.isStarted = true;
+
+      const newScene = await startRace({
+        engine,
+        oldScene: scene,
+        playersMap,
+      });
+
+      scene = newScene;
+      startEngineLoop();
+
       io.emit("server:start-race", {
         playersList: playersMapToArray(playersMap),
       });
@@ -201,6 +246,7 @@ const playersMapToArray = (list: PlayersMap) =>
       actions: { ...actions },
       accelerateTimeMS: 0,
       turnTimeMS: 0,
+      vehicleSteering: 0,
       ...(vehicle ? { vehicle, playerNumber: playerNumber?.idx } : {}),
     });
 
@@ -242,10 +288,6 @@ const playersMapToArray = (list: PlayersMap) =>
 
     io.emit("server:action", playersMapToArray(playersMap));
   }, 50);
-
-  engine.runRenderLoop(() => {
-    scene.render();
-  });
 })();
 
 app.use(express.static(distDir));
