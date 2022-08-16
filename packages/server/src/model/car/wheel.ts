@@ -1,4 +1,4 @@
-import { MeshBuilder, Quaternion } from "@babylonjs/core";
+import { MeshBuilder, Quaternion, Vector4 } from "@babylonjs/core";
 import type Ammo from "ammojs-typed";
 import type { Scene } from "@babylonjs/core";
 
@@ -9,14 +9,22 @@ const suspensionCompression = 4.4;
 const suspensionRestLength = 0.6;
 const rollInfluence = 0.0;
 
+const faceUV = [
+  new Vector4(0, 0, 1, 1),
+  new Vector4(0, 0.5, 0, 0.5),
+  new Vector4(0, 0, 1, 1),
+];
+
 const createWheelMesh = (scene: Scene) => {
   // @ts-ignore
   const mesh = new MeshBuilder.CreateCylinder(
     "Wheel",
-    { diameter: 1, height: 0.5, tessellation: 18 },
+    { diameter: 1, height: 0.5, tessellation: 18, faceUV },
     scene
   );
   mesh.rotationQuaternion = new Quaternion();
+
+  mesh.material = scene.getMaterialByName("wheelMaterial");
 
   return mesh;
 };

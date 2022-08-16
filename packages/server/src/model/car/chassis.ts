@@ -1,12 +1,19 @@
 import { MeshBuilder, Quaternion } from "@babylonjs/core";
 import type { Scene } from "@babylonjs/core";
 
-export const createChassisMesh = (
-  w: number,
-  l: number,
-  h: number,
-  scene: Scene
-) => {
+export const createChassisMesh = ({
+  color,
+  w,
+  l,
+  h,
+  scene,
+}: {
+  color: string;
+  w: number;
+  l: number;
+  h: number;
+  scene: Scene;
+}) => {
   // @ts-ignore
   const mesh = new MeshBuilder.CreateBox(
     "box",
@@ -14,6 +21,7 @@ export const createChassisMesh = (
     scene
   );
   mesh.rotationQuaternion = new Quaternion();
+  mesh.material = scene.getMaterialByName(color);
 
   return mesh;
 };

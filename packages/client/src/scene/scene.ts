@@ -254,7 +254,7 @@ const startRace = async ({
   return scene;
 };
 
-export { createScene, startRace };
+export { startRace };
 
 const touchStart = (ev: TouchEvent) => {
   const target = ev.target as HTMLElement | null;
