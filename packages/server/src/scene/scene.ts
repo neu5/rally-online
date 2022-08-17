@@ -11,8 +11,13 @@ import Ammo from "ammojs-typed";
 import { buildCar } from "../model/car/car";
 
 import type { Engine } from "@babylonjs/core";
-import { ACCELERATE, BRAKE, LEFT, RIGHT } from "@neu5/types/src";
 import type { PlayersMap } from "../index";
+
+// @todo: Create package with shared code #77
+const ACCELERATE = "accelerate";
+const BRAKE = "brake";
+const LEFT = "left";
+const RIGHT = "right";
 
 const steeringIncrement = 0.01;
 const steeringClamp = 0.2;
