@@ -7,17 +7,17 @@ import {
   Vector3,
 } from "@babylonjs/core";
 import Ammo from "ammojs-typed";
-import type { Engine } from "@babylonjs/core";
-// import { ACCELERATE, BRAKE, LEFT, RIGHT } from "@neu5/types/src";
 
+import { buildCar } from "../model/car/car";
+
+import type { Engine } from "@babylonjs/core";
+import type { PlayersMap } from "../index";
+
+// @todo: Create package with shared code #77
 const ACCELERATE = "accelerate";
 const BRAKE = "brake";
 const LEFT = "left";
 const RIGHT = "right";
-
-import type { PlayersMap } from "../index";
-
-import { buildCar } from "../model/car/car";
 
 const steeringIncrement = 0.01;
 const steeringClamp = 0.2;

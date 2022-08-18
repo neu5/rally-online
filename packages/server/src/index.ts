@@ -14,16 +14,7 @@ import {
 import type Ammo from "ammojs-typed";
 import type { Mesh } from "@babylonjs/core";
 import type { Socket } from "socket.io";
-// import type { VehicleTemplate } from "@neu5/types/src";
-
-type VehicleTemplate = {
-  color: string;
-  startingPos: {
-    x: number;
-    y: number;
-    z: number;
-  };
-};
+import type { VehicleTemplate } from "@neu5/types/src";
 
 import { startRace } from "./scene/scene";
 

@@ -1,3 +1,4 @@
+// @todo: Create package with shared code #77
 const ACCELERATE = "accelerate";
 const BRAKE = "brake";
 const LEFT = "left";
