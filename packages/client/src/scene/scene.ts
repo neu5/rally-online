@@ -71,70 +71,75 @@ const startRace = async ({
 
   playersMap.forEach((player) => {
     // Build the car chassis
-    const chassisShape = new CANNON.Box(new CANNON.Vec3(5, 0.5, 2));
-    const chassisBody = new CANNON.Body({ mass: 1 });
-    const centerOfMassAdjust = new CANNON.Vec3(0, -1, 0);
-    chassisBody.addShape(chassisShape, centerOfMassAdjust);
-
-    // physicsWorld.addRigidBody(chassisBody);
-    //  demo.addVisual(chassisBody)
+    const chassisShape = new CANNON.Box(new CANNON.Vec3(2, 0.5, 1));
+    const chassisBody = new CANNON.Body({ mass: 150 });
+    chassisBody.addShape(chassisShape);
+    chassisBody.position.set(0, 4, 0);
+    chassisBody.angularVelocity.set(0, 0.5, 0);
+    // demo.addVisual(chassisBody);
 
     // Create the vehicle
-    const vehicle = new CANNON.RigidVehicle({
+    const vehicle = new CANNON.RaycastVehicle({
       chassisBody,
     });
 
-    const mass = 1;
-    const axisWidth = 7;
-    const wheelShape = new CANNON.Sphere(1.5);
-    const wheelMaterial = new CANNON.Material("wheel");
-    const down = new CANNON.Vec3(0, -1, 0);
+    const wheelOptions = {
+      radius: 0.5,
+      directionLocal: new CANNON.Vec3(0, -1, 0),
+      suspensionStiffness: 30,
+      suspensionRestLength: 0.3,
+      frictionSlip: 1.4,
+      dampingRelaxation: 2.3,
+      dampingCompression: 4.4,
+      maxSuspensionForce: 100000,
+      rollInfluence: 0.01,
+      axleLocal: new CANNON.Vec3(0, 0, 1),
+      chassisConnectionPointLocal: new CANNON.Vec3(-1, 0, 1),
+      maxSuspensionTravel: 0.3,
+      customSlidingRotationalSpeed: -30,
+      useCustomSlidingRotationalSpeed: true,
+    };
 
-    const wheelBody1 = new CANNON.Body({ mass, material: wheelMaterial });
-    wheelBody1.addShape(wheelShape);
-    vehicle.addWheel({
-      body: wheelBody1,
-      position: new CANNON.Vec3(-5, 0, axisWidth / 2).vadd(centerOfMassAdjust),
-      axis: new CANNON.Vec3(0, 0, 1),
-      direction: down,
-    });
+    wheelOptions.chassisConnectionPointLocal.set(-1, 0, 1);
+    vehicle.addWheel(wheelOptions);
 
-    const wheelBody2 = new CANNON.Body({ mass, material: wheelMaterial });
-    wheelBody2.addShape(wheelShape);
-    vehicle.addWheel({
-      body: wheelBody2,
-      position: new CANNON.Vec3(-5, 0, -axisWidth / 2).vadd(centerOfMassAdjust),
-      axis: new CANNON.Vec3(0, 0, -1),
-      direction: down,
-    });
+    wheelOptions.chassisConnectionPointLocal.set(-1, 0, -1);
+    vehicle.addWheel(wheelOptions);
 
-    const wheelBody3 = new CANNON.Body({ mass, material: wheelMaterial });
-    wheelBody3.addShape(wheelShape);
-    vehicle.addWheel({
-      body: wheelBody3,
-      position: new CANNON.Vec3(5, 0, axisWidth / 2).vadd(centerOfMassAdjust),
-      axis: new CANNON.Vec3(0, 0, 1),
-      direction: down,
-    });
+    wheelOptions.chassisConnectionPointLocal.set(1, 0, 1);
+    vehicle.addWheel(wheelOptions);
 
-    const wheelBody4 = new CANNON.Body({ mass, material: wheelMaterial });
-    wheelBody4.addShape(wheelShape);
-    vehicle.addWheel({
-      body: wheelBody4,
-      position: new CANNON.Vec3(5, 0, -axisWidth / 2).vadd(centerOfMassAdjust),
-      axis: new CANNON.Vec3(0, 0, -1),
-      direction: down,
-    });
-
-    vehicle.wheelBodies.forEach((wheelBody) => {
-      // Some damping to not spin wheels too fast
-      wheelBody.angularDamping = 0.4;
-
-      // Add visuals
-      // demo.addVisual(wheelBody);
-    });
+    wheelOptions.chassisConnectionPointLocal.set(1, 0, -1);
+    vehicle.addWheel(wheelOptions);
 
     // vehicle.addToWorld(world);
+
+    // Add the wheel bodies
+    const wheelBodies = [];
+    const wheelMaterial = new CANNON.Material("wheel");
+    vehicle.wheelInfos.forEach((wheel) => {
+      const cylinderShape = new CANNON.Cylinder(
+        wheel.radius,
+        wheel.radius,
+        wheel.radius / 2,
+        20
+      );
+      const wheelBody = new CANNON.Body({
+        mass: 0,
+        material: wheelMaterial,
+      });
+      wheelBody.type = CANNON.Body.KINEMATIC;
+      wheelBody.collisionFilterGroup = 0; // turn off collisions
+      const quaternion = new CANNON.Quaternion().setFromEuler(
+        -Math.PI / 2,
+        0,
+        0
+      );
+      wheelBody.addShape(cylinderShape, new CANNON.Vec3(), quaternion);
+      wheelBodies.push(wheelBody);
+      // demo.addVisual(wheelBody);
+      // world.addBody(wheelBody);
+    });
 
     player.car = vehicle;
 
