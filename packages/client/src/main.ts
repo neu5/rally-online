@@ -152,7 +152,7 @@ interface ServerToClientEvents {
         ({ name, vehicle }: { name: string; vehicle: VehicleTemplate }) => {
           game.playersMap.set(name, {
             name,
-            vehicleTemplate: vehicle,
+            vehicle,
             isCurrentPlayer: name === currentPlayerId,
             vehicleSteering: 0,
           });

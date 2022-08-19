@@ -88,7 +88,7 @@ export type PlayersMap = Map<
     turnTimeMS: number;
     actions: Actions;
     name: string;
-    vehicle?: Object;
+    vehicle?: VehicleTemplate;
     playerNumber?: number;
     vehicleSteering: number;
     vehicleTemplate?: VehicleTemplate;

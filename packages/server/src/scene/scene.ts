@@ -86,12 +86,12 @@ const startRace = async ({
   const { AmmoJS, scene } = await createScene(engine);
 
   playersMap.forEach((player) => {
-    if (player.vehicleTemplate) {
+    if (player.vehicle) {
       player.car = buildCar({
         AmmoJS,
-        color: player.vehicleTemplate.color,
+        color: player.vehicle.color,
         scene,
-        startingPos: player.vehicleTemplate.startingPos,
+        startingPos: player.vehicle.startingPos,
       });
     }
   });
@@ -157,6 +157,13 @@ const startRace = async ({
       chassisMesh.position.set(p.x(), p.y(), p.z());
       chassisMesh.rotationQuaternion?.set(q.x(), q.y(), q.z(), q.w());
       chassisMesh.rotate(Axis.X, Math.PI);
+
+      // const { _x, _y, _z } = player.car?.chassisMesh.position;
+      // console.log({
+      //   _x: _x.toFixed(),
+      //   _y: _y.toFixed(),
+      //   _z: _z.toFixed(),
+      // });
     });
   });
 
