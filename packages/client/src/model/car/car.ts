@@ -1,9 +1,5 @@
 import { Quaternion } from "@babylonjs/core";
 import type { Scene } from "@babylonjs/core";
-import type Ammo from "ammojs-typed";
-
-// @ts-ignore
-type AmmoType = Ammo;
 
 import { createChassisMesh } from "./chassis";
 import { addWheel } from "./wheel";
@@ -35,14 +31,12 @@ const BACK_LEFT = 2;
 const BACK_RIGHT = 3;
 
 type Vehicle = {
-  AmmoJS: AmmoType;
   color: string;
   quat: Quaternion;
   scene: Scene;
   startingPos: { x: number; y: number; z: number };
 };
 const createVehicle = ({
-  AmmoJS,
   color,
   quat,
   scene,

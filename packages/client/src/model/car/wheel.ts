@@ -1,5 +1,4 @@
 import { MeshBuilder, Quaternion, Vector4 } from "@babylonjs/core";
-import type Ammo from "ammojs-typed";
 import type { Scene } from "@babylonjs/core";
 
 // const friction = 5;

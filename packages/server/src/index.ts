@@ -11,7 +11,6 @@ import {
   Vector3,
 } from "@babylonjs/core";
 
-import type Ammo from "ammojs-typed";
 import type { Mesh } from "@babylonjs/core";
 import type { Socket } from "socket.io";
 import type { VehicleTemplate } from "@neu5/types/src";
@@ -78,7 +77,6 @@ const io = new Server<ServerToClientEvents>(httpServer);
 type Car = {
   chassisMesh: Mesh;
   wheelMeshes: Array<any>;
-  vehicle: Ammo.btRaycastVehicle;
 };
 
 export type PlayersMap = Map<
@@ -163,13 +161,13 @@ const race: Race = {
     socket.on("player:start-race", async () => {
       race.isStarted = true;
 
-      const newScene = await startRace({
-        engine,
-        oldScene: scene,
-        playersMap,
-      });
+      // const newScene = await startRace({
+      //   engine,
+      //   oldScene: scene,
+      //   playersMap,
+      // });
 
-      scene = newScene;
+      // scene = newScene;
       startEngineLoop();
 
       io.emit("server:start-race", {
