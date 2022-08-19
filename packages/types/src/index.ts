@@ -38,7 +38,7 @@ type Player = {
   updateAction?: (actions: Actions) => void;
   actionsFromServer?: Actions;
   name: string;
-  vehicleTemplate?: VehicleTemplate;
+  vehicle?: VehicleTemplate;
   isCurrentPlayer: boolean;
   vehicleSteering: number;
   UIindicator?: HTMLElement;
