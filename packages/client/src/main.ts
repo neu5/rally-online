@@ -10,7 +10,6 @@ import { io } from "socket.io-client";
 import { startRace } from "./scene/scene";
 import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 
-import type Ammo from "ammojs-typed";
 import type { Mesh } from "@babylonjs/core";
 import type { Socket } from "socket.io-client";
 import type { Player, VehicleTemplate } from "@neu5/types/src";
@@ -23,7 +22,6 @@ const playersListEl = document.getElementById("players-list") as HTMLElement;
 type Car = {
   chassisMesh: Mesh;
   wheelMeshes: Array<any>;
-  vehicle: Ammo.btRaycastVehicle;
 };
 
 export type PlayersMap = Map<
@@ -107,7 +105,8 @@ interface ServerToClientEvents {
       "camera",
       -Math.PI / 2,
       Math.PI / 3.5,
-      130,
+      // 130,
+      20,
       Vector3.Zero()
     );
 

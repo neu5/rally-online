@@ -1,14 +1,12 @@
 import {
-  AmmoJSPlugin,
   Axis,
   MeshBuilder,
   PhysicsImpostor,
   Scene,
   Vector3,
 } from "@babylonjs/core";
-import Ammo from "ammojs-typed";
 
-import { buildCar } from "../model/car/car";
+// import { buildCar } from "../model/car/car";
 
 import type { Engine } from "@babylonjs/core";
 import type { PlayersMap } from "../index";
@@ -33,8 +31,8 @@ const createScene = async (engine: Engine) => {
   const scene: Scene = new Scene(engine);
 
   const gravityVector = new Vector3(0, -9.81, 0);
-  const AmmoJS = await Ammo();
-  scene.enablePhysics(gravityVector, new AmmoJSPlugin());
+  // const AmmoJS = await Ammo();
+  // scene.enablePhysics(gravityVector, new AmmoJSPlugin());
 
   const ground = MeshBuilder.CreateGround(
     "ground1",
@@ -68,7 +66,7 @@ const createScene = async (engine: Engine) => {
     scene
   );
 
-  return { AmmoJS, scene };
+  return { scene };
 };
 
 const startRace = async ({
@@ -83,17 +81,17 @@ const startRace = async ({
   oldScene.dispose();
   engine.stopRenderLoop();
 
-  const { AmmoJS, scene } = await createScene(engine);
+  const { scene } = await createScene(engine);
 
   playersMap.forEach((player) => {
-    if (player.vehicle) {
-      player.car = buildCar({
-        AmmoJS,
-        color: player.vehicle.color,
-        scene,
-        startingPos: player.vehicle.startingPos,
-      });
-    }
+    // if (player.vehicle) {
+    //   player.car = buildCar({
+    //     AmmoJS,
+    //     color: player.vehicle.color,
+    //     scene,
+    //     startingPos: player.vehicle.startingPos,
+    //   });
+    // }
   });
 
   // const maxSteerVal = 0.2;
