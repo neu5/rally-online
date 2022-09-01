@@ -105,7 +105,8 @@ interface ServerToClientEvents {
       "camera",
       -Math.PI / 2,
       Math.PI / 3.5,
-      130,
+      // 130,
+      20,
       Vector3.Zero()
     );
 

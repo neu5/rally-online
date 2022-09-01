@@ -6,7 +6,7 @@ import {
   Vector3,
 } from "@babylonjs/core";
 
-import { buildCar } from "../model/car/car";
+// import { buildCar } from "../model/car/car";
 
 import type { Engine } from "@babylonjs/core";
 import type { PlayersMap } from "../index";
