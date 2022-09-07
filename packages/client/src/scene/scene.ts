@@ -137,14 +137,7 @@ const startRace = async ({
       scene,
     });
 
-    visualBody.physicsImpostor = new PhysicsImpostor(
-      visualBody,
-      PhysicsImpostor.BoxImpostor,
-      { mass: massVehicle, restitution: 0.2 },
-      scene
-    );
-
-    visualBody.position.set(...carPosition);
+    visualBody.position.set(0, 4, 0);
 
     const wheelFR = createWheelMesh({ scene });
     wheelFR.position = new Vector3(0.5, 4 - 0.25, 0.6);
@@ -158,49 +151,21 @@ const startRace = async ({
     const wheelBL = createWheelMesh({ scene });
     wheelBL.position = new Vector3(-0.5, 4 - 0.25, -0.6);
 
-    wheelFR.physicsImpostor = new PhysicsImpostor(
-      wheelFR,
-      PhysicsImpostor.SphereImpostor,
-      { mass: massWheel, restitution: 0.9 },
-      scene
-    );
-
-    wheelFL.physicsImpostor = new PhysicsImpostor(
-      wheelFL,
-      PhysicsImpostor.SphereImpostor,
-      { mass: massWheel, restitution: 0.9 },
-      scene
-    );
-
-    wheelBR.physicsImpostor = new PhysicsImpostor(
-      wheelBR,
-      PhysicsImpostor.SphereImpostor,
-      { mass: massWheel, restitution: 0.9 },
-      scene
-    );
-
-    wheelBL.physicsImpostor = new PhysicsImpostor(
-      wheelBL,
-      PhysicsImpostor.SphereImpostor,
-      { mass: massWheel, restitution: 0.9 },
-      scene
-    );
-
     const wheelMeshes = [wheelFR, wheelFL, wheelBR, wheelBL];
 
-    // physics engine part
     const chassisShape = new CANNON.Box(
       new CANNON.Vec3(chassisDepth, chassisHeight, chassisWidth)
     );
     const chassisBody = new CANNON.Body({ mass: massVehicle });
     chassisBody.addShape(chassisShape);
-    chassisBody.position.set(...carPosition);
+    chassisBody.position.set(0, 4, 0);
     chassisBody.angularVelocity.set(0, 0.5, 0);
 
     // Create the vehicle
     const vehicle = new CANNON.RaycastVehicle({
       chassisBody,
     });
+    vehicle.addToWorld(physicsWorld);
 
     const wheelOptions = {
       radius: 0.5,
@@ -261,16 +226,33 @@ const startRace = async ({
 
     // Update the wheel bodies
     physicsWorld.addEventListener("postStep", () => {
+      const { x, y, z } = vehicle.chassisBody.position;
+      visualBody.position.set(x, y, z);
+      visualBody.quaternion = new Quaternion(
+        vehicle.chassisBody.quaternion.x,
+        vehicle.chassisBody.quaternion.y,
+        vehicle.chassisBody.quaternion.z,
+        vehicle.chassisBody.quaternion.w
+      );
+
       for (let i = 0; i < vehicle.wheelInfos.length; i++) {
         vehicle.updateWheelTransform(i);
         const transform = vehicle.wheelInfos[i].worldTransform;
         const wheelBody = wheelBodies[i];
+        const wheelMesh = wheelMeshes[i];
         wheelBody.position.copy(transform.position);
         wheelBody.quaternion.copy(transform.quaternion);
-
-        const wheelMesh = wheelMeshes[i];
-        wheelMesh.position = transform.position;
-        wheelMesh.quaternion = transform.quaternion;
+        wheelMesh.position.set(
+          wheelBody.position.x,
+          wheelBody.position.y,
+          wheelBody.position.z
+        );
+        wheelMesh.quaternion = new Quaternion(
+          wheelBody.quaternion.x,
+          wheelBody.quaternion.y,
+          wheelBody.quaternion.z,
+          wheelBody.quaternion.w
+        );
       }
     });
 
