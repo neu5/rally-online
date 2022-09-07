@@ -25,19 +25,6 @@ const massVehicle = 50;
 
 const massWheel = 30;
 
-const wheelAxisPositionBack = -1;
-const wheelHalfTrackBack = 1;
-const wheelAxisHeightBack = 0.4;
-
-const wheelAxisFrontPosition = 1.0;
-const wheelHalfTrackFront = 1;
-const wheelAxisHeightFront = 0.4;
-
-const FRONT_LEFT = 0;
-const FRONT_RIGHT = 1;
-const BACK_LEFT = 2;
-const BACK_RIGHT = 3;
-
 const createChassisMesh = ({
   depth,
   height,
@@ -66,7 +53,7 @@ const wheelUV = [
   new Vector4(0, 0, 1, 1),
 ];
 
-const createWheelMesh = ({ scene }) => {
+const createWheelMesh = ({ scene }: { scene: Scene }) => {
   // @ts-ignore
   const mesh = new MeshBuilder.CreateCylinder(
     "Wheel",
@@ -140,18 +127,8 @@ const startRace = async ({
   const physicsWorld = physicsEngine.getPhysicsPlugin().world;
 
   playersMap.forEach((player) => {
-    // Build the car chassis
-    // const chassisShape = new CANNON.Box(
-    //   new CANNON.Vec3(chassisWidth, chassisDepth, chassisHeight)
-    // );
-
+    // babylon meshes part
     const carPosition = [0, 4, 0];
-
-    // const chassisBody = new CANNON.Body({ mass: massVehicle });
-    // chassisBody.addShape(chassisShape);
-    // chassisBody.position.set(...carPosition);
-    // chassisBody.angularVelocity.set(0, 0.5, 0);
-    // demo.addVisual(chassisBody)
 
     const visualBody = createChassisMesh({
       depth: chassisDepth,
@@ -160,130 +137,126 @@ const startRace = async ({
       scene,
     });
 
-    visualBody.physicsImpostor = new PhysicsImpostor(
-      visualBody,
-      PhysicsImpostor.BoxImpostor,
-      { mass: massVehicle, restitution: 0.2 },
-      scene
-    );
-
-    visualBody.position.set(...carPosition);
+    visualBody.position.set(0, 4, 0);
 
     const wheelFR = createWheelMesh({ scene });
-    wheelFR.parent = visualBody;
-    wheelFR.position = new Vector3(0.5, -0.25, 0.6);
+    // wheelFR.position = new Vector3(0.5, 4 - 0.25, 0.6);
 
     const wheelFL = createWheelMesh({ scene });
-    wheelFL.parent = visualBody;
-    wheelFL.position = new Vector3(-0.5, -0.25, 0.6);
+    // wheelFL.position = new Vector3(-0.5, 4 - 0.25, 0.6);
 
     const wheelBR = createWheelMesh({ scene });
-    wheelBR.parent = visualBody;
-    wheelBR.position = new Vector3(0.5, -0.25, -0.6);
+    // wheelBR.position = new Vector3(0.5, 4 - 0.25, -0.6);
 
     const wheelBL = createWheelMesh({ scene });
-    wheelBL.parent = visualBody;
-    wheelBL.position = new Vector3(-0.5, -0.25, -0.6);
+    // wheelBL.position = new Vector3(-0.5, 4 - 0.25, -0.6);
 
-    wheelFR.physicsImpostor = new PhysicsImpostor(
-      wheelFR,
-      PhysicsImpostor.SphereImpostor,
-      { mass: massWheel, restitution: 0.9 },
-      scene
-    );
+    const wheelMeshes = [wheelFR, wheelFL, wheelBR, wheelBL];
 
-    wheelFL.physicsImpostor = new PhysicsImpostor(
-      wheelFL,
-      PhysicsImpostor.SphereImpostor,
-      { mass: massWheel, restitution: 0.9 },
-      scene
+    const chassisShape = new CANNON.Box(
+      new CANNON.Vec3(chassisDepth, chassisHeight, chassisWidth)
     );
-
-    wheelBR.physicsImpostor = new PhysicsImpostor(
-      wheelBR,
-      PhysicsImpostor.SphereImpostor,
-      { mass: massWheel, restitution: 0.9 },
-      scene
-    );
-
-    wheelBL.physicsImpostor = new PhysicsImpostor(
-      wheelBL,
-      PhysicsImpostor.SphereImpostor,
-      { mass: massWheel, restitution: 0.9 },
-      scene
-    );
+    const chassisBody = new CANNON.Body({ mass: massVehicle });
+    chassisBody.addShape(chassisShape);
+    chassisBody.position.set(0, 4, 0);
 
     // Create the vehicle
-    // const vehicle = new CANNON.RaycastVehicle({
-    //   chassisBody,
-    // });
+    const vehicle = new CANNON.RaycastVehicle({
+      chassisBody,
+    });
+    vehicle.addToWorld(physicsWorld);
 
-    // const wheelOptions = {
-    //   radius: 0.5,
-    //   directionLocal: new CANNON.Vec3(0, -1, 0),
-    //   suspensionStiffness: 30,
-    //   suspensionRestLength: 0.3,
-    //   frictionSlip: 1.4,
-    //   dampingRelaxation: 2.3,
-    //   isFrontWheel: true,
-    //   dampingCompression: 4.4,
-    //   maxSuspensionForce: 100000,
-    //   rollInfluence: 0.01,
-    //   axleLocal: new CANNON.Vec3(0, 0, 1),
-    //   chassisConnectionPointLocal: new CANNON.Vec3(-1, 0, 1),
-    //   maxSuspensionTravel: 0.3,
-    //   customSlidingRotationalSpeed: -30,
-    //   useCustomSlidingRotationalSpeed: true,
-    // };
+    const wheelOptions = {
+      radius: 0.5,
+      directionLocal: new CANNON.Vec3(0, -1, 0),
+      suspensionStiffness: 30,
+      suspensionRestLength: 0.3,
+      frictionSlip: 1.4,
+      dampingRelaxation: 2.3,
+      dampingCompression: 4.4,
+      maxSuspensionForce: 100000,
+      isFrontWheel: true,
+      rollInfluence: 0.01,
+      axleLocal: new CANNON.Vec3(0, 0, 1),
+      chassisConnectionPointLocal: new CANNON.Vec3(-1, 0, 1),
+      maxSuspensionTravel: 0.3,
+      customSlidingRotationalSpeed: -30,
+      useCustomSlidingRotationalSpeed: true,
+    };
 
-    // wheelOptions.chassisConnectionPointLocal.set(-1, 0, 1);
-    // vehicle.addWheel(wheelOptions);
+    wheelOptions.chassisConnectionPointLocal.set(-0.5, 0, 0.6);
+    vehicle.addWheel(wheelOptions);
 
-    // wheelOptions.chassisConnectionPointLocal.set(-1, 0, -1);
-    // vehicle.addWheel(wheelOptions);
+    wheelOptions.chassisConnectionPointLocal.set(-0.5, 0, -0.6);
+    vehicle.addWheel(wheelOptions);
 
-    // wheelOptions.chassisConnectionPointLocal.set(1, 0, 1);
-    // vehicle.addWheel(wheelOptions);
+    wheelOptions.chassisConnectionPointLocal.set(0.5, 0, 0.6);
+    wheelOptions.isFrontWheel = false;
+    vehicle.addWheel(wheelOptions);
 
-    // wheelOptions.chassisConnectionPointLocal.set(1, 0, -1);
-    // vehicle.addWheel(wheelOptions);
+    wheelOptions.chassisConnectionPointLocal.set(0.5, 0, -0.6);
+    wheelOptions.isFrontWheel = false;
+    vehicle.addWheel(wheelOptions);
 
-    // const wheelBodies = [];
-    // const wheelMaterial = new CANNON.Material("wheel");
-    // vehicle.wheelInfos.forEach((wheel) => {
-    //   const cylinderShape = new CANNON.Cylinder(
-    //     wheel.radius,
-    //     wheel.radius,
-    //     wheel.radius / 2,
-    //     20
-    //   );
-    //   const wheelBody = new CANNON.Body({
-    //     mass: 0,
-    //     material: wheelMaterial,
-    //   });
-    //   wheelBody.type = CANNON.Body.KINEMATIC;
-    //   wheelBody.collisionFilterGroup = 0; // turn off collisions
-    //   const quaternion = new CANNON.Quaternion().setFromEuler(
-    //     -Math.PI / 2,
-    //     0,
-    //     0
-    //   );
-    //   wheelBody.addShape(cylinderShape, new CANNON.Vec3(), quaternion);
-    //   wheelBodies.push(wheelBody);
+    // Add the wheel bodies
+    const wheelBodies = [];
+    const wheelMaterial = new CANNON.Material("wheel");
+    vehicle.wheelInfos.forEach((wheel) => {
+      const cylinderShape = new CANNON.Cylinder(
+        wheel.radius,
+        wheel.radius,
+        wheel.radius / 2,
+        20
+      );
+      const wheelBody = new CANNON.Body({
+        mass: 0,
+        material: wheelMaterial,
+      });
+      wheelBody.type = CANNON.Body.KINEMATIC;
+      wheelBody.collisionFilterGroup = 0; // turn off collisions
+      const quaternion = new CANNON.Quaternion().setFromEuler(
+        -Math.PI / 2,
+        0,
+        0
+      );
+      wheelBody.addShape(cylinderShape, new CANNON.Vec3(), quaternion);
+      wheelBodies.push(wheelBody);
+    });
 
-    //   console.log(wheelBody.position);
+    // Update the wheel bodies
+    physicsWorld.addEventListener("postStep", () => {
+      const { x, y, z } = vehicle.chassisBody.position;
+      visualBody.position.set(x, y, z);
+      visualBody.quaternion = new Quaternion(
+        vehicle.chassisBody.quaternion.x,
+        vehicle.chassisBody.quaternion.y,
+        vehicle.chassisBody.quaternion.z,
+        vehicle.chassisBody.quaternion.w
+      );
 
-    //   const wheelMesh = createWheelMesh(scene);
-    // });
+      for (let i = 0; i < vehicle.wheelInfos.length; i++) {
+        vehicle.updateWheelTransform(i);
+        const transform = vehicle.wheelInfos[i].worldTransform;
+        const wheelBody = wheelBodies[i];
+        const wheelMesh = wheelMeshes[i];
+        wheelBody.position.copy(transform.position);
+        wheelBody.quaternion.copy(transform.quaternion);
+        wheelMesh.position.set(
+          wheelBody.position.x,
+          wheelBody.position.y,
+          wheelBody.position.z
+        );
+        wheelMesh.quaternion = new Quaternion(
+          wheelBody.quaternion.x,
+          wheelBody.quaternion.y,
+          wheelBody.quaternion.z,
+          wheelBody.quaternion.w
+        );
+      }
+    });
 
     // player.car = vehicle;
-
-    console.log(player);
   });
-
-  scene.registerBeforeRender(() => {});
-
-  physicsWorld.addEventListener("postStep", () => {});
 
   return scene;
 };
