@@ -140,16 +140,16 @@ const startRace = async ({
     visualBody.position.set(0, 4, 0);
 
     const wheelFR = createWheelMesh({ scene });
-    wheelFR.position = new Vector3(0.5, 4 - 0.25, 0.6);
+    // wheelFR.position = new Vector3(0.5, 4 - 0.25, 0.6);
 
     const wheelFL = createWheelMesh({ scene });
-    wheelFL.position = new Vector3(-0.5, 4 - 0.25, 0.6);
+    // wheelFL.position = new Vector3(-0.5, 4 - 0.25, 0.6);
 
     const wheelBR = createWheelMesh({ scene });
-    wheelBR.position = new Vector3(0.5, 4 - 0.25, -0.6);
+    // wheelBR.position = new Vector3(0.5, 4 - 0.25, -0.6);
 
     const wheelBL = createWheelMesh({ scene });
-    wheelBL.position = new Vector3(-0.5, 4 - 0.25, -0.6);
+    // wheelBL.position = new Vector3(-0.5, 4 - 0.25, -0.6);
 
     const wheelMeshes = [wheelFR, wheelFL, wheelBR, wheelBL];
 
@@ -159,7 +159,6 @@ const startRace = async ({
     const chassisBody = new CANNON.Body({ mass: massVehicle });
     chassisBody.addShape(chassisShape);
     chassisBody.position.set(0, 4, 0);
-    chassisBody.angularVelocity.set(0, 0.5, 0);
 
     // Create the vehicle
     const vehicle = new CANNON.RaycastVehicle({
@@ -185,17 +184,17 @@ const startRace = async ({
       useCustomSlidingRotationalSpeed: true,
     };
 
-    wheelOptions.chassisConnectionPointLocal.set(-1, 0, 1);
+    wheelOptions.chassisConnectionPointLocal.set(-0.5, 0, 0.6);
     vehicle.addWheel(wheelOptions);
 
-    wheelOptions.chassisConnectionPointLocal.set(-1, 0, -1);
+    wheelOptions.chassisConnectionPointLocal.set(-0.5, 0, -0.6);
     vehicle.addWheel(wheelOptions);
 
-    wheelOptions.chassisConnectionPointLocal.set(1, 0, 1);
+    wheelOptions.chassisConnectionPointLocal.set(0.5, 0, 0.6);
     wheelOptions.isFrontWheel = false;
     vehicle.addWheel(wheelOptions);
 
-    wheelOptions.chassisConnectionPointLocal.set(1, 0, -1);
+    wheelOptions.chassisConnectionPointLocal.set(0.5, 0, -0.6);
     wheelOptions.isFrontWheel = false;
     vehicle.addWheel(wheelOptions);
 
@@ -257,8 +256,6 @@ const startRace = async ({
     });
 
     // player.car = vehicle;
-
-    console.log(player);
   });
 
   return scene;
