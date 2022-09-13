@@ -1,102 +1,61 @@
-import {
-  Axis,
-  MeshBuilder,
-  PhysicsImpostor,
-  Scene,
-  Vector3,
-} from "@babylonjs/core";
+// import {
+//   Axis,
+//   CannonJSPlugin,
+//   MeshBuilder,
+//   PhysicsImpostor,
+//   Scene,
+//   Vector3,
+// } from "@babylonjs/core";
+import * as CANNON from "cannon-es";
 
 // import { buildCar } from "../model/car/car";
 
-import type { Engine } from "@babylonjs/core";
 import type { PlayersMap } from "../index";
 
-// @todo: Create package with shared code #77
-const ACCELERATE = "accelerate";
-const BRAKE = "brake";
-const LEFT = "left";
-const RIGHT = "right";
+const chassisWidth = 1;
+const chassisHeight = 0.5;
+const chassisDepth = 2;
+const massVehicle = 50;
 
-const steeringIncrement = 0.01;
-const steeringClamp = 0.2;
-const maxEngineForce = 500;
-const maxBreakingForce = 10;
+const massWheel = 30;
 
-const FRONT_LEFT = 0;
-const FRONT_RIGHT = 1;
-const BACK_LEFT = 2;
-const BACK_RIGHT = 3;
+const FRAME_IN_MS = 1000 / 30; // 30 FPS
+let loop = setInterval(() => {}, FRAME_IN_MS);
 
-const createScene = async (engine: Engine) => {
-  const scene: Scene = new Scene(engine);
+const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
+  clearInterval(loop);
 
-  const gravityVector = new Vector3(0, -9.81, 0);
-  // const AmmoJS = await Ammo();
-  // scene.enablePhysics(gravityVector, new AmmoJSPlugin());
-
-  const ground = MeshBuilder.CreateGround(
-    "ground1",
-    { width: 100, height: 100, subdivisions: 2 },
-    scene
-  );
-
-  // const box = MeshBuilder.CreateBox("box1");
-  // box.setAbsolutePosition(new Vector3(1, 1, 1));
-  // box.physicsImpostor = new PhysicsImpostor(
-  //   box,
-  //   PhysicsImpostor.BoxImpostor,
-  //   { mass: 1, restitution: 0.2 },
-  //   scene
-  // );
-
-  // car.setAbsolutePosition(new Vector3(-1, 1, 1));
-  // car.rotate(new Vector3(-1, 0, 0), 1.5);
-
-  // car.physicsImpostor = new PhysicsImpostor(
-  //   car,
-  //   PhysicsImpostor.BoxImpostor,
-  //   { mass: 1, restitution: 0.4 },
-  //   scene
-  // );
-
-  ground.physicsImpostor = new PhysicsImpostor(
-    ground,
-    PhysicsImpostor.BoxImpostor,
-    { mass: 0, restitution: 0.9 },
-    scene
-  );
-
-  return { scene };
-};
-
-const startRace = async ({
-  engine,
-  oldScene,
-  playersMap,
-}: {
-  engine: Engine;
-  oldScene: Scene;
-  playersMap: PlayersMap;
-}) => {
-  oldScene.dispose();
-  engine.stopRenderLoop();
-
-  const { scene } = await createScene(engine);
-
-  playersMap.forEach((player) => {
-    // if (player.vehicle) {
-    //   player.car = buildCar({
-    //     AmmoJS,
-    //     color: player.vehicle.color,
-    //     scene,
-    //     startingPos: player.vehicle.startingPos,
-    //   });
-    // }
+  const world = new CANNON.World({
+    gravity: new CANNON.Vec3(0, -9.82, 0),
   });
 
-  // const maxSteerVal = 0.2;
+  // Create a sphere body
+  const radius = 1; // m
+  const sphereBody = new CANNON.Body({
+    mass: 5, // kg
+    shape: new CANNON.Sphere(radius),
+  });
+  sphereBody.position.set(0, 10, 0); // m
+  world.addBody(sphereBody);
 
-  return scene;
+  // Create a static plane for the ground
+  const groundBody = new CANNON.Body({
+    type: CANNON.Body.STATIC, // can also be achieved by setting the mass to 0
+    shape: new CANNON.Plane(),
+  });
+  groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // make it face up
+  world.addBody(groundBody);
+
+  playersMap.forEach((player) => {
+    player.spherePos = sphereBody.position;
+  });
+
+  // Start the simulation loop
+  loop = setInterval(() => {
+    world.fixedStep();
+
+    // the sphere y position shows the sphere falling
+  }, FRAME_IN_MS);
 };
 
 export { startRace };
