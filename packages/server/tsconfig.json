@@ -10,8 +10,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "types": ["node", "express"],
-    "typeRoots": ["babylonjs", "node_modules/ammojs-typed/ammo/ambient"]
+    "types": ["node", "express"]
   },
   "include": ["src/**/*.ts"]
 }

@@ -3,15 +3,8 @@ import { resolve } from "path";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import {
-  ArcRotateCamera,
-  HemisphericLight,
-  NullEngine,
-  Scene,
-  Vector3,
-} from "@babylonjs/core";
 
-import type { Mesh } from "@babylonjs/core";
+import type { Vec3 } from "cannon-es";
 import type { Socket } from "socket.io";
 import type { VehicleTemplate } from "@neu5/types/src";
 
@@ -75,7 +68,6 @@ interface ServerToClientEvents {
 const io = new Server<ServerToClientEvents>(httpServer);
 
 type Car = {
-  chassisMesh: Mesh;
   wheelMeshes: Array<any>;
 };
 
@@ -91,6 +83,7 @@ export type PlayersMap = Map<
     vehicleSteering: number;
     vehicleTemplate?: VehicleTemplate;
     car?: Car;
+    spherePos?: Vec3;
   }
 >;
 const playersMap: PlayersMap = new Map();
@@ -131,28 +124,6 @@ const race: Race = {
 };
 
 (async () => {
-  const engine = new NullEngine();
-
-  let scene: Scene = new Scene(engine);
-
-  const startEngineLoop = () => {
-    const camera = new ArcRotateCamera( // eslint-disable-line
-      "camera",
-      -Math.PI / 2,
-      Math.PI / 3.5,
-      130,
-      Vector3.Zero()
-    );
-    const light = new HemisphericLight("light", new Vector3(1, 1, 0), scene);
-
-    // Default intensity is 1. Let's dim the light a small amount
-    light.intensity = 0.7;
-
-    engine.runRenderLoop(() => {
-      scene.render();
-    });
-  };
-
   const createSocketHandlers = (socket: Socket) => {
     socket.on("getPlayerList", () => {
       socket.emit("playerListUpdate", playersMapToArray(playersMap));
@@ -161,14 +132,7 @@ const race: Race = {
     socket.on("player:start-race", async () => {
       race.isStarted = true;
 
-      // const newScene = await startRace({
-      //   engine,
-      //   oldScene: scene,
-      //   playersMap,
-      // });
-
-      // scene = newScene;
-      startEngineLoop();
+      await startRace({ playersMap });
 
       io.emit("server:start-race", {
         playersList: playersMapToArray(playersMap),
@@ -247,33 +211,33 @@ const race: Race = {
   });
 
   setInterval(() => {
-    const now = Date.now();
+    // const now = Date.now();
 
-    playersMap.forEach((player) => {
-      const dtAcceleration = now - player.accelerateTimeMS;
-      const dtTurning = now - player.turnTimeMS;
+    // playersMap.forEach((player) => {
+    //   const dtAcceleration = now - player.accelerateTimeMS;
+    //   const dtTurning = now - player.turnTimeMS;
 
-      let newActions = { ...player.actions };
+    //   let newActions = { ...player.actions };
 
-      if (dtAcceleration > 250) {
-        player.accelerateTimeMS = now;
-        newActions = {
-          ...newActions,
-          [ACCELERATE]: false,
-          [BRAKE]: false,
-        };
-      }
-      if (dtTurning > 250) {
-        player.turnTimeMS = now;
-        newActions = {
-          ...newActions,
-          [LEFT]: false,
-          [RIGHT]: false,
-        };
-      }
+    //   if (dtAcceleration > 250) {
+    //     player.accelerateTimeMS = now;
+    //     newActions = {
+    //       ...newActions,
+    //       [ACCELERATE]: false,
+    //       [BRAKE]: false,
+    //     };
+    //   }
+    //   if (dtTurning > 250) {
+    //     player.turnTimeMS = now;
+    //     newActions = {
+    //       ...newActions,
+    //       [LEFT]: false,
+    //       [RIGHT]: false,
+    //     };
+    //   }
 
-      player.actions = { ...newActions };
-    });
+    //   player.actions = { ...newActions };
+    // });
 
     io.emit("server:action", playersMapToArray(playersMap));
   }, 50);
