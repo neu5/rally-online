@@ -6,7 +6,7 @@
 //   Scene,
 //   Vector3,
 // } from "@babylonjs/core";
-import * as CANNON from "cannon-es";
+import { Body, Plane, Sphere, Vec3, World } from "cannon-es";
 
 // import { buildCar } from "../model/car/car";
 
@@ -25,23 +25,23 @@ let loop = setInterval(() => {}, FRAME_IN_MS);
 const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
   clearInterval(loop);
 
-  const world = new CANNON.World({
-    gravity: new CANNON.Vec3(0, -9.82, 0),
+  const world = new World({
+    gravity: new Vec3(0, -9.82, 0),
   });
 
   // Create a sphere body
   const radius = 1; // m
-  const sphereBody = new CANNON.Body({
+  const sphereBody = new Body({
     mass: 5, // kg
-    shape: new CANNON.Sphere(radius),
+    shape: new Sphere(radius),
   });
   sphereBody.position.set(0, 10, 0); // m
   world.addBody(sphereBody);
 
   // Create a static plane for the ground
-  const groundBody = new CANNON.Body({
-    type: CANNON.Body.STATIC, // can also be achieved by setting the mass to 0
-    shape: new CANNON.Plane(),
+  const groundBody = new Body({
+    type: Body.STATIC, // can also be achieved by setting the mass to 0
+    shape: new Plane(),
   });
   groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // make it face up
   world.addBody(groundBody);

@@ -4,6 +4,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
+import type { Vec3 } from "cannon-es";
 import type { Socket } from "socket.io";
 import type { VehicleTemplate } from "@neu5/types/src";
 
@@ -82,6 +83,7 @@ export type PlayersMap = Map<
     vehicleSteering: number;
     vehicleTemplate?: VehicleTemplate;
     car?: Car;
+    spherePos?: Vec3;
   }
 >;
 const playersMap: PlayersMap = new Map();
