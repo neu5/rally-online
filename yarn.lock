@@ -246,15 +246,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babylonjs/core@npm:^5.12.1":
-  version: 5.12.1
-  resolution: "@babylonjs/core@npm:5.12.1"
-  dependencies:
-    tslib: ^2.4.0
-  checksum: 092887f42f4f031522a9425252714cc724575c584aa27588c0bff9255867f1125ac136296ee163b0b2296fc593498676702d35e3cd1c53973f916edf7dd28ae6
-  languageName: node
-  linkType: hard
-
 "@babylonjs/core@npm:^5.8.0":
   version: 5.8.0
   resolution: "@babylonjs/core@npm:5.8.0"
@@ -469,7 +460,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@neu5/server@workspace:packages/server"
   dependencies:
-    "@babylonjs/core": ^5.12.1
     "@neu5/types": 0.0.1
     "@types/express": ^4.17.13
     cannon-es: ^0.20.0

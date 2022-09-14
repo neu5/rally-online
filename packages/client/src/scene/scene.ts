@@ -1,12 +1,9 @@
 import {
-  Axis,
   CannonJSPlugin,
   MeshBuilder,
   PhysicsImpostor,
-  Quaternion,
   Scene,
   Vector3,
-  Vector4,
 } from "@babylonjs/core";
 import * as CANNON from "cannon-es";
 
@@ -14,9 +11,10 @@ import type { Socket } from "socket.io-client";
 import type { Engine } from "@babylonjs/core";
 
 import type { PlayersMap } from "../main";
-import { UIPlayersIndicators } from "../ui";
+import type { Player } from "~/../types/src";
+// import { UIPlayersIndicators } from "../ui";
 
-const speedometerEl = document.getElementById("speedometer") as HTMLElement;
+// const speedometerEl = document.getElementById("speedometer") as HTMLElement;
 
 const createScene = async (engine: Engine) => {
   const scene: Scene = new Scene(engine);
@@ -41,15 +39,13 @@ const createScene = async (engine: Engine) => {
   return { scene };
 };
 
-const playersIndicatorsEl = document.getElementById(
-  "players-indicators"
-) as HTMLElement;
+// const playersIndicatorsEl = document.getElementById(
+//   "players-indicators"
+// ) as HTMLElement;
 
 const startRace = async ({
   engine,
   oldScene,
-  playersMap,
-  sendAction,
   socket,
 }: {
   engine: Engine;
@@ -73,7 +69,7 @@ const startRace = async ({
   const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 1 });
 
   socket.on("server:action", (playersFromServer) => {
-    playersFromServer.forEach((player) => {
+    playersFromServer.forEach((player: Player) => {
       sphere.position.set(
         player.spherePos.x,
         player.spherePos.y,

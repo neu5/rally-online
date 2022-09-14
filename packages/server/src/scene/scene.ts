@@ -1,23 +1,8 @@
-// import {
-//   Axis,
-//   CannonJSPlugin,
-//   MeshBuilder,
-//   PhysicsImpostor,
-//   Scene,
-//   Vector3,
-// } from "@babylonjs/core";
 import { Body, Plane, Sphere, Vec3, World } from "cannon-es";
 
 // import { buildCar } from "../model/car/car";
 
 import type { PlayersMap } from "../index";
-
-const chassisWidth = 1;
-const chassisHeight = 0.5;
-const chassisDepth = 2;
-const massVehicle = 50;
-
-const massWheel = 30;
 
 const FRAME_IN_MS = 1000 / 30; // 30 FPS
 let loop = setInterval(() => {}, FRAME_IN_MS);
