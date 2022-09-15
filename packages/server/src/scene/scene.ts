@@ -10,7 +10,7 @@ let loop = setInterval(() => {}, FRAME_IN_MS);
 const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
   clearInterval(loop);
 
-  const world = new World({
+  const physicsWorld = new World({
     gravity: new Vec3(0, -9.82, 0),
   });
 
@@ -21,7 +21,7 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
     shape: new Sphere(radius),
   });
   sphereBody.position.set(0, 10, 0); // m
-  world.addBody(sphereBody);
+  physicsWorld.addBody(sphereBody);
 
   // Create a static plane for the ground
   const groundBody = new Body({
@@ -29,7 +29,7 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
     shape: new Plane(),
   });
   groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // make it face up
-  world.addBody(groundBody);
+  physicsWorld.addBody(groundBody);
 
   playersMap.forEach((player) => {
     player.spherePos = sphereBody.position;
@@ -37,9 +37,7 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
 
   // Start the simulation loop
   loop = setInterval(() => {
-    world.fixedStep();
-
-    // the sphere y position shows the sphere falling
+    physicsWorld.fixedStep();
   }, FRAME_IN_MS);
 };
 
