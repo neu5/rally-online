@@ -17,8 +17,7 @@
     "types": ["node"],
     "paths": {
       "~/*": ["./*"]
-    },
-    "typeRoots": ["babylonjs", "node_modules/ammojs-typed/ammo/ambient"]
+    }
   },
   "include": ["src/**/*.ts"]
 }

@@ -17,8 +17,7 @@
     "types": ["node"],
     "paths": {
       "~/*": ["./*"]
-    },
-    "typeRoots": ["babylonjs"]
+    }
   },
   "include": ["src/**/*.ts"]
 }

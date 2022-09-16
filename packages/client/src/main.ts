@@ -1,26 +1,19 @@
-import {
-  ArcRotateCamera,
-  Engine,
-  HemisphericLight,
-  Scene,
-  Vector3,
-} from "@babylonjs/core";
 import { io } from "socket.io-client";
+import { PerspectiveCamera, Scene, WebGLRenderer } from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 import { startRace } from "./scene/scene";
 import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 
-import type { Mesh } from "@babylonjs/core";
 import type { Socket } from "socket.io-client";
 import type { Player, VehicleTemplate } from "@neu5/types/src";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-const FPSEl = document.getElementById("fps") as HTMLElement;
+// const FPSEl = document.getElementById("fps") as HTMLElement;
 const startBtn = document.getElementById("start-btn") as HTMLAnchorElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
 
 type Car = {
-  chassisMesh: Mesh;
   wheelMeshes: Array<any>;
 };
 
@@ -93,41 +86,8 @@ interface ServerToClientEvents {
 }
 
 (async () => {
-  const engine: Engine = new Engine(canvas);
-
-  let scene: Scene = new Scene(engine);
-
   // share sockets interfaces?
   const socket: Socket<ServerToClientEvents> = io();
-
-  const startEngineLoop = () => {
-    const camera = new ArcRotateCamera(
-      "camera",
-      -Math.PI / 2,
-      Math.PI / 3.5,
-      // 130,
-      20,
-      Vector3.Zero()
-    );
-
-    camera.lowerBetaLimit = -Math.PI / 2.5;
-    camera.upperBetaLimit = Math.PI / 2.5;
-    camera.lowerRadiusLimit = 10;
-    camera.upperRadiusLimit = 200;
-
-    camera.attachControl(canvas, true);
-
-    const light = new HemisphericLight("light", new Vector3(1, 1, 0), scene);
-
-    // Default intensity is 1. Let's dim the light a small amount
-    light.intensity = 0.7;
-
-    engine.runRenderLoop(() => {
-      scene.render();
-
-      FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
-    });
-  };
 
   const sendAction = (playerActions: string[]) => {
     socket.emit("player:action", {
@@ -154,7 +114,6 @@ interface ServerToClientEvents {
             vehicle,
             isCurrentPlayer: name === currentPlayerId,
             vehicleSteering: 0,
-            spherePos: { x: 0, y: 0, z: 0 },
           });
         }
       );
@@ -173,16 +132,29 @@ interface ServerToClientEvents {
   });
 
   socket.on("server:start-race", async () => {
-    const newScene = await startRace({
-      engine,
-      oldScene: scene,
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.set(7, 15, 15);
+
+    const renderer = new WebGLRenderer({ canvas });
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+    await startRace({
+      camera,
+      controls,
       playersMap: game.playersMap,
+      renderer,
+      scene,
       sendAction,
       socket,
     });
-
-    scene = newScene;
-    startEngineLoop();
   });
 
   startBtn.addEventListener("click", async () => {
@@ -190,7 +162,7 @@ interface ServerToClientEvents {
   });
 
   window.addEventListener("resize", () => {
-    engine.resize();
+    // renderer.resize();
 
     updateWindowSize();
     updateControls();
