@@ -9,7 +9,7 @@ import type { Socket } from "socket.io-client";
 import type { Player, VehicleTemplate } from "@neu5/types/src";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-const FPSEl = document.getElementById("fps") as HTMLElement;
+// const FPSEl = document.getElementById("fps") as HTMLElement;
 const startBtn = document.getElementById("start-btn") as HTMLAnchorElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
 
@@ -114,7 +114,6 @@ interface ServerToClientEvents {
             vehicle,
             isCurrentPlayer: name === currentPlayerId,
             vehicleSteering: 0,
-            spherePos: { x: 0, y: 0, z: 0 },
           });
         }
       );
@@ -147,7 +146,7 @@ interface ServerToClientEvents {
 
     const controls = new OrbitControls(camera, renderer.domElement);
 
-    const newScene = await startRace({
+    await startRace({
       camera,
       controls,
       playersMap: game.playersMap,

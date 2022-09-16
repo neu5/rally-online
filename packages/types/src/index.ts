@@ -26,12 +26,14 @@ interface KeysActions {
 }
 
 type VehicleTemplate = {
-  color: string;
-  startingPos: {
+  color?: string;
+  startingPos?: {
     x: number;
     y: number;
     z: number;
   };
+  wheels: Array<{ index: number; position: any; quaternion: any }>;
+  chassis?: any;
 };
 
 type Player = {

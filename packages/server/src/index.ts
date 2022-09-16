@@ -200,7 +200,9 @@ const race: Race = {
       accelerateTimeMS: 0,
       turnTimeMS: 0,
       vehicleSteering: 0,
-      ...(vehicle ? { vehicle, playerNumber: playerNumber?.idx } : {}),
+      ...vehicle,
+      playerNumber: playerNumber?.idx,
+      // ...(vehicle ? { vehicle, playerNumber: playerNumber?.idx } : {}),
     });
 
     createSocketHandlers(socket);
