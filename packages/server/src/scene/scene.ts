@@ -128,6 +128,8 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
   loop = setInterval(() => {
     physicsWorld.fixedStep();
 
+    // console.log(vehicle);
+
     playersMap.forEach(({ actions }) => {
       if (actions.accelerate) {
         vehicle.setWheelForce(maxForce, 0);

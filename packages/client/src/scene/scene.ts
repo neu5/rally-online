@@ -30,6 +30,7 @@ import type {
   WebGLRenderer,
 } from "three";
 import type { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import type { Player } from "~/../types/src";
 // import { UIPlayersIndicators } from "../ui";
 
 // const speedometerEl = document.getElementById("speedometer") as HTMLElement;
@@ -52,7 +53,7 @@ let dataFromServer: null | Array<{
   };
 }> = null;
 
-const addListeners = (player) => {
+const addListeners = (player: Player) => {
   document.addEventListener("keydown", (event) => {
     switch (event.key) {
       case "w":

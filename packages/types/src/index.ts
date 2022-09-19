@@ -38,7 +38,7 @@ type VehicleTemplate = {
 
 type Player = {
   updateAction?: (actions: Actions) => void;
-  actions?: Actions;
+  actions: Actions;
   actionsFromServer?: Actions;
   name: string;
   vehicle?: VehicleTemplate;
