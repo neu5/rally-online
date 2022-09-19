@@ -52,11 +52,63 @@ let dataFromServer: null | Array<{
   };
 }> = null;
 
+const addListeners = (player) => {
+  document.addEventListener("keydown", (event) => {
+    switch (event.key) {
+      case "w":
+      case "ArrowUp":
+        player.actions.accelerate = true;
+        break;
+
+      case "s":
+      case "ArrowDown":
+        player.actions.brake = true;
+        break;
+
+      case "a":
+      case "ArrowLeft":
+        player.actions.left = true;
+        break;
+
+      case "d":
+      case "ArrowRight":
+        player.actions.right = true;
+        break;
+    }
+  });
+
+  // reset car force to zero when key is released
+  document.addEventListener("keyup", (event) => {
+    switch (event.key) {
+      case "w":
+      case "ArrowUp":
+        player.actions.accelerate = false;
+        break;
+
+      case "s":
+      case "ArrowDown":
+        player.actions.brake = false;
+        break;
+
+      case "a":
+      case "ArrowLeft":
+        player.actions.left = false;
+        break;
+
+      case "d":
+      case "ArrowRight":
+        player.actions.right = false;
+        break;
+    }
+  });
+};
+
 const startRace = async ({
   camera,
   controls,
-  // playersMap,
+  playersMap,
   renderer,
+  sendAction,
   scene,
   socket,
 }: {
@@ -167,7 +219,11 @@ const startRace = async ({
 
   // vehicle.addToWorld(physicsWorld);
 
-  // addListeners(vehicle);
+  playersMap.forEach((player) => {
+    if (player.isCurrentPlayer) {
+      addListeners(player);
+    }
+  });
 
   // ============
   // || rendering engine part
@@ -249,69 +305,21 @@ const startRace = async ({
     dataFromServer = playersFromServer;
   });
 
+  setInterval(() => {
+    playersMap.forEach((player) => {
+      if (player.isCurrentPlayer && player.actions) {
+        const actions = Object.entries(player.actions)
+          .filter(
+            ([key, value]) => value === true // eslint-disable-line
+          )
+          .map(([name]) => name);
+
+        sendAction(actions);
+      }
+    });
+  }, 50);
+
   return scene;
 };
-
-// const addListeners = (vehicle) => {
-//   document.addEventListener("keydown", (event) => {
-//     const maxSteerVal = Math.PI / 8;
-//     const maxForce = 20;
-
-//     switch (event.key) {
-//       case "w":
-//       case "ArrowUp":
-//         vehicle.setWheelForce(maxForce, 0);
-//         vehicle.setWheelForce(maxForce, 1);
-//         break;
-
-//       case "s":
-//       case "ArrowDown":
-//         vehicle.setWheelForce(-maxForce / 2, 0);
-//         vehicle.setWheelForce(-maxForce / 2, 1);
-//         break;
-
-//       case "a":
-//       case "ArrowLeft":
-//         vehicle.setSteeringValue(maxSteerVal, 0);
-//         vehicle.setSteeringValue(maxSteerVal, 1);
-//         break;
-
-//       case "d":
-//       case "ArrowRight":
-//         vehicle.setSteeringValue(-maxSteerVal, 0);
-//         vehicle.setSteeringValue(-maxSteerVal, 1);
-//         break;
-//     }
-//   });
-
-//   // reset car force to zero when key is released
-//   document.addEventListener("keyup", (event) => {
-//     switch (event.key) {
-//       case "w":
-//       case "ArrowUp":
-//         vehicle.setWheelForce(0, 0);
-//         vehicle.setWheelForce(0, 1);
-//         break;
-
-//       case "s":
-//       case "ArrowDown":
-//         vehicle.setWheelForce(0, 0);
-//         vehicle.setWheelForce(0, 1);
-//         break;
-
-//       case "a":
-//       case "ArrowLeft":
-//         vehicle.setSteeringValue(0, 0);
-//         vehicle.setSteeringValue(0, 1);
-//         break;
-
-//       case "d":
-//       case "ArrowRight":
-//         vehicle.setSteeringValue(0, 0);
-//         vehicle.setSteeringValue(0, 1);
-//         break;
-//     }
-//   });
-// };
 
 export { startRace };
