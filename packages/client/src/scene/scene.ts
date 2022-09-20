@@ -315,8 +315,6 @@ const startRace = async ({
           )
           .map(([name]) => name);
 
-        // console.log(actions);
-
         sendAction(actions);
       }
     });
