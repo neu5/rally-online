@@ -105,8 +105,6 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
 
   vehicle.addToWorld(physicsWorld);
 
-  // console.log(vehicle);
-
   playersMap.forEach((player) => {
     player.vehicle = {
       wheels: vehicle.wheelBodies.map((wheel) => ({
@@ -122,30 +120,33 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
   });
 
   const maxSteerVal = Math.PI / 8;
-  const maxForce = 20;
+  const maxForce = 10;
 
   // Start the simulation loop
   loop = setInterval(() => {
     physicsWorld.fixedStep();
 
-    // console.log(vehicle);
-
     playersMap.forEach(({ actions }) => {
       if (actions.accelerate) {
         vehicle.setWheelForce(maxForce, 0);
         vehicle.setWheelForce(maxForce, 1);
-      }
-      if (actions.brake) {
+      } else if (actions.brake) {
         vehicle.setWheelForce(-maxForce / 2, 0);
         vehicle.setWheelForce(-maxForce / 2, 1);
+      } else {
+        vehicle.setWheelForce(0, 0);
+        vehicle.setWheelForce(0, 1);
       }
+
       if (actions.left) {
         vehicle.setSteeringValue(maxSteerVal, 0);
         vehicle.setSteeringValue(maxSteerVal, 1);
-      }
-      if (actions.right) {
+      } else if (actions.right) {
         vehicle.setSteeringValue(-maxSteerVal, 0);
         vehicle.setSteeringValue(-maxSteerVal, 1);
+      } else {
+        vehicle.setSteeringValue(0, 0);
+        vehicle.setSteeringValue(0, 1);
       }
 
       // switch (player) {
