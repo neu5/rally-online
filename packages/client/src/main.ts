@@ -114,6 +114,12 @@ interface ServerToClientEvents {
             vehicle,
             isCurrentPlayer: name === currentPlayerId,
             vehicleSteering: 0,
+            actions: {
+              accelerate: false,
+              brake: false,
+              left: false,
+              right: false,
+            },
           });
         }
       );

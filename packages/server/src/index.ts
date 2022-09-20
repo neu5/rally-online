@@ -213,33 +213,33 @@ const race: Race = {
   });
 
   setInterval(() => {
-    // const now = Date.now();
+    const now = Date.now();
 
-    // playersMap.forEach((player) => {
-    //   const dtAcceleration = now - player.accelerateTimeMS;
-    //   const dtTurning = now - player.turnTimeMS;
+    playersMap.forEach((player) => {
+      const dtAcceleration = now - player.accelerateTimeMS;
+      const dtTurning = now - player.turnTimeMS;
 
-    //   let newActions = { ...player.actions };
+      let newActions = { ...player.actions };
 
-    //   if (dtAcceleration > 250) {
-    //     player.accelerateTimeMS = now;
-    //     newActions = {
-    //       ...newActions,
-    //       [ACCELERATE]: false,
-    //       [BRAKE]: false,
-    //     };
-    //   }
-    //   if (dtTurning > 250) {
-    //     player.turnTimeMS = now;
-    //     newActions = {
-    //       ...newActions,
-    //       [LEFT]: false,
-    //       [RIGHT]: false,
-    //     };
-    //   }
+      if (dtAcceleration > 250) {
+        player.accelerateTimeMS = now;
+        newActions = {
+          ...newActions,
+          [ACCELERATE]: false,
+          [BRAKE]: false,
+        };
+      }
+      if (dtTurning > 250) {
+        player.turnTimeMS = now;
+        newActions = {
+          ...newActions,
+          [LEFT]: false,
+          [RIGHT]: false,
+        };
+      }
 
-    //   player.actions = { ...newActions };
-    // });
+      player.actions = { ...newActions };
+    });
 
     io.emit("server:action", playersMapToArray(playersMap));
   }, 50);

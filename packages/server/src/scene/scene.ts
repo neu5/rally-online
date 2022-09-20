@@ -105,8 +105,6 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
 
   vehicle.addToWorld(physicsWorld);
 
-  // console.log(vehicle);
-
   playersMap.forEach((player) => {
     player.vehicle = {
       wheels: vehicle.wheelBodies.map((wheel) => ({
@@ -121,9 +119,88 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
     };
   });
 
+  const maxSteerVal = Math.PI / 8;
+  const maxForce = 10;
+
   // Start the simulation loop
   loop = setInterval(() => {
     physicsWorld.fixedStep();
+
+    playersMap.forEach(({ actions }) => {
+      if (actions.accelerate) {
+        vehicle.setWheelForce(maxForce, 0);
+        vehicle.setWheelForce(maxForce, 1);
+      } else if (actions.brake) {
+        vehicle.setWheelForce(-maxForce / 2, 0);
+        vehicle.setWheelForce(-maxForce / 2, 1);
+      } else {
+        vehicle.setWheelForce(0, 0);
+        vehicle.setWheelForce(0, 1);
+      }
+
+      if (actions.left) {
+        vehicle.setSteeringValue(maxSteerVal, 0);
+        vehicle.setSteeringValue(maxSteerVal, 1);
+      } else if (actions.right) {
+        vehicle.setSteeringValue(-maxSteerVal, 0);
+        vehicle.setSteeringValue(-maxSteerVal, 1);
+      } else {
+        vehicle.setSteeringValue(0, 0);
+        vehicle.setSteeringValue(0, 1);
+      }
+
+      // switch (player) {
+      //   case "w":
+      //   case "ArrowUp":
+      //     vehicle.setWheelForce(maxForce, 0);
+      //     vehicle.setWheelForce(maxForce, 1);
+      //     break;
+
+      //   case "s":
+      //   case "ArrowDown":
+      //     vehicle.setWheelForce(-maxForce / 2, 0);
+      //     vehicle.setWheelForce(-maxForce / 2, 1);
+      //     break;
+
+      //   case "a":
+      //   case "ArrowLeft":
+      //     vehicle.setSteeringValue(maxSteerVal, 0);
+      //     vehicle.setSteeringValue(maxSteerVal, 1);
+      //     break;
+
+      //   case "d":
+      //   case "ArrowRight":
+      //     vehicle.setSteeringValue(-maxSteerVal, 0);
+      //     vehicle.setSteeringValue(-maxSteerVal, 1);
+      //     break;
+      // }
+
+      // switch (event.key) {
+      //   case "w":
+      //   case "ArrowUp":
+      //     vehicle.setWheelForce(0, 0);
+      //     vehicle.setWheelForce(0, 1);
+      //     break;
+
+      //   case "s":
+      //   case "ArrowDown":
+      //     vehicle.setWheelForce(0, 0);
+      //     vehicle.setWheelForce(0, 1);
+      //     break;
+
+      //   case "a":
+      //   case "ArrowLeft":
+      //     vehicle.setSteeringValue(0, 0);
+      //     vehicle.setSteeringValue(0, 1);
+      //     break;
+
+      //   case "d":
+      //   case "ArrowRight":
+      //     vehicle.setSteeringValue(0, 0);
+      //     vehicle.setSteeringValue(0, 1);
+      //     break;
+      // }
+    });
   }, FRAME_IN_MS);
 };
 
