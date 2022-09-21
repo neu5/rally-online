@@ -30,7 +30,7 @@ import type {
   WebGLRenderer,
 } from "three";
 import type { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import type { Player } from "~/../types/src";
+import type { ActionTypes } from "@neu5/types/src";
 // import { UIPlayersIndicators } from "../ui";
 
 // const speedometerEl = document.getElementById("speedometer") as HTMLElement;
@@ -53,55 +53,59 @@ let dataFromServer: null | Array<{
   };
 }> = null;
 
-const addListeners = (player: Player) => {
-  document.addEventListener("keydown", (event) => {
-    switch (event.key) {
-      case "w":
-      case "ArrowUp":
-        player.actions.accelerate = true;
-        break;
+let actions = {
+  accelerate: false,
+  brake: false,
+  left: false,
+  right: false,
+};
 
-      case "s":
-      case "ArrowDown":
-        player.actions.brake = true;
-        break;
+const keydown = (event: KeyboardEvent) => {
+  switch (event.key) {
+    case "w":
+    case "ArrowUp":
+      actions.accelerate = true;
+      break;
 
-      case "a":
-      case "ArrowLeft":
-        player.actions.left = true;
-        break;
+    case "s":
+    case "ArrowDown":
+      actions.brake = true;
+      break;
 
-      case "d":
-      case "ArrowRight":
-        player.actions.right = true;
-        break;
-    }
-  });
+    case "a":
+    case "ArrowLeft":
+      actions.left = true;
+      break;
 
-  // reset car force to zero when key is released
-  document.addEventListener("keyup", (event) => {
-    switch (event.key) {
-      case "w":
-      case "ArrowUp":
-        player.actions.accelerate = false;
-        break;
+    case "d":
+    case "ArrowRight":
+      actions.right = true;
+      break;
+  }
+};
 
-      case "s":
-      case "ArrowDown":
-        player.actions.brake = false;
-        break;
+const keyup = (event: KeyboardEvent) => {
+  switch (event.key) {
+    case "w":
+    case "ArrowUp":
+      actions.accelerate = false;
+      break;
 
-      case "a":
-      case "ArrowLeft":
-        player.actions.left = false;
-        break;
+    case "s":
+    case "ArrowDown":
+      actions.brake = false;
+      break;
 
-      case "d":
-      case "ArrowRight":
-        player.actions.right = false;
-        break;
-    }
-  });
+    case "a":
+    case "ArrowLeft":
+      actions.left = false;
+      break;
+
+    case "d":
+    case "ArrowRight":
+      actions.right = false;
+      break;
+  }
 };
 
 const startRace = async ({
@@ -136,6 +140,13 @@ const startRace = async ({
   // debugging helpers
   const axesHelper = new AxesHelper(100);
   scene.add(axesHelper);
+
+  actions = {
+    accelerate: false,
+    brake: false,
+    left: false,
+    right: false,
+  };
 
   // physics world
   // physicsWorld = new World({
@@ -220,12 +231,6 @@ const startRace = async ({
 
   // vehicle.addToWorld(physicsWorld);
 
-  playersMap.forEach((player) => {
-    if (player.isCurrentPlayer) {
-      addListeners(player);
-    }
-  });
-
   // ============
   // || rendering engine part
   // ============
@@ -308,19 +313,70 @@ const startRace = async ({
 
   setInterval(() => {
     playersMap.forEach((player) => {
-      if (player.isCurrentPlayer && player.actions) {
-        const actions = Object.entries(player.actions)
-          .filter(
-            ([key, value]) => value === true // eslint-disable-line
-          )
-          .map(([name]) => name);
-
-        sendAction(actions);
+      if (player.isCurrentPlayer) {
+        sendAction(
+          Object.entries(actions)
+            .filter(
+              ([key, value]) => value === true // eslint-disable-line
+            )
+            .map(([name]) => name)
+        );
       }
     });
   }, 50);
 
   return scene;
 };
+
+const touchStart = (ev: TouchEvent) => {
+  const target = ev.target as HTMLElement | null;
+
+  if (target === null) {
+    return;
+  }
+
+  const type: string | undefined = target.dataset.type;
+
+  if (type !== undefined && actions[type as keyof ActionTypes] !== undefined) {
+    actions[type as keyof ActionTypes] = true;
+  }
+};
+
+const touchEnd = (ev: TouchEvent) => {
+  const target = ev.target as HTMLElement | null;
+
+  if (target === null) {
+    return;
+  }
+
+  const type: string | undefined = target.dataset.type;
+
+  if (type !== undefined && actions[type as keyof ActionTypes] !== undefined) {
+    actions[type as keyof ActionTypes] = false;
+  }
+};
+
+const preventSelection = () => false;
+
+const preventContextMenu = (ev: Event) => {
+  ev.preventDefault();
+};
+
+window.addEventListener("keydown", keydown);
+window.addEventListener("keyup", keyup);
+
+const [...mobileControlsEls] = document.getElementsByClassName(
+  "mobile-controls"
+) as HTMLCollectionOf<HTMLElement>;
+
+if (mobileControlsEls.length) {
+  mobileControlsEls.forEach((el) => {
+    el.addEventListener("touchstart", touchStart);
+    el.addEventListener("touchend", touchEnd);
+    el.addEventListener("contextmenu", preventContextMenu);
+    el.addEventListener("selectionchange", preventSelection);
+    el.addEventListener("selectstart", preventSelection);
+  });
+}
 
 export { startRace };
