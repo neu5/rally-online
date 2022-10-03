@@ -1,15 +1,22 @@
 import { io } from "socket.io-client";
-import { PerspectiveCamera, Scene, WebGLRenderer } from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import {
+  ArcRotateCamera,
+  Engine,
+  HemisphericLight,
+  Scene,
+  Vector3,
+} from "@babylonjs/core";
+import * as CANNON from "cannon-es";
 
 import { startRace } from "./scene/scene";
 import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 
+// import type { Mesh } from "@babylonjs/core";
 import type { Socket } from "socket.io-client";
 import type { Player, VehicleTemplate } from "@neu5/types/src";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-// const FPSEl = document.getElementById("fps") as HTMLElement;
+const FPSEl = document.getElementById("fps") as HTMLElement;
 const startBtn = document.getElementById("start-btn") as HTMLAnchorElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
 
@@ -89,6 +96,74 @@ interface ServerToClientEvents {
   // share sockets interfaces?
   const socket: Socket<ServerToClientEvents> = io();
 
+  const shapeWorldPosition = new CANNON.Vec3();
+  const shapeWorldQuaternion = new CANNON.Quaternion();
+
+  const updateMeshPositions = ({ world, bodies, meshes }) => {
+    let meshIndex = 0;
+    for (const body of world.bodies) {
+      for (let i = 0; i !== body.shapes.length; i++) {
+        const mesh = meshes[meshIndex];
+
+        if (mesh) {
+          // Get world position
+          body.quaternion.vmult(body.shapeOffsets[i], shapeWorldPosition);
+          body.position.vadd(shapeWorldPosition, shapeWorldPosition);
+          // Get world quaternion
+          body.quaternion.mult(body.shapeOrientations[i], shapeWorldQuaternion);
+          mesh.position.set(
+            shapeWorldPosition.x,
+            shapeWorldPosition.y,
+            shapeWorldPosition.z
+          );
+
+          if (mesh.rotationQuaternion) {
+            mesh.rotationQuaternion.set(
+              shapeWorldQuaternion.x,
+              shapeWorldQuaternion.y,
+              shapeWorldQuaternion.z,
+              shapeWorldQuaternion.w
+            );
+          }
+        }
+        meshIndex++;
+      }
+    }
+  };
+
+  const startEngineLoop = ({ bodies, meshes, world }) => {
+    const camera = new ArcRotateCamera(
+      "camera",
+      -Math.PI / 2,
+      Math.PI / 3.5,
+      // 130,
+      20,
+      Vector3.Zero()
+    );
+
+    camera.lowerBetaLimit = -Math.PI / 2.5;
+    camera.upperBetaLimit = Math.PI / 2.5;
+    camera.lowerRadiusLimit = 10;
+    camera.upperRadiusLimit = 200;
+
+    camera.attachControl(canvas, true);
+
+    const light = new HemisphericLight("light", new Vector3(1, 1, 0), scene);
+
+    // Default intensity is 1. Let's dim the light a small amount
+    light.intensity = 0.7;
+
+    engine.runRenderLoop(() => {
+      world.fixedStep();
+
+      scene.render();
+
+      updateMeshPositions({ bodies, meshes, world });
+
+      FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
+    });
+  };
+
   const sendAction = (playerActions: string[]) => {
     socket.emit("player:action", {
       id: currentPlayerId,
@@ -138,29 +213,12 @@ interface ServerToClientEvents {
   });
 
   socket.on("server:start-race", async () => {
-    const scene = new Scene();
-    const camera = new PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    camera.position.set(7, 15, 15);
-
-    const renderer = new WebGLRenderer({ canvas });
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-
     await startRace({
-      camera,
-      controls,
-      playersMap: game.playersMap,
-      renderer,
-      scene,
-      sendAction,
-      socket,
+      canvas,
     });
+
+    // scene = newScene;
+    // startEngineLoop({ bodies, meshes, world });
   });
 
   startBtn.addEventListener("click", async () => {
@@ -168,7 +226,7 @@ interface ServerToClientEvents {
   });
 
   window.addEventListener("resize", () => {
-    // renderer.resize();
+    engine.resize();
 
     updateWindowSize();
     updateControls();
