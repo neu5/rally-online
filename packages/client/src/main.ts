@@ -93,9 +93,6 @@ interface ServerToClientEvents {
 }
 
 (async () => {
-  let engine: Engine = new Engine(canvas);
-
-  let scene: Scene = new Scene(engine);
   // share sockets interfaces?
   const socket: Socket<ServerToClientEvents> = io();
 
@@ -216,16 +213,12 @@ interface ServerToClientEvents {
   });
 
   socket.on("server:start-race", async () => {
-    const { newScene, bodies, meshes, world } = await startRace({
-      engine,
-      oldScene: scene,
-      playersMap: game.playersMap,
-      sendAction,
-      socket,
+    await startRace({
+      canvas,
     });
 
-    scene = newScene;
-    startEngineLoop({ bodies, meshes, world });
+    // scene = newScene;
+    // startEngineLoop({ bodies, meshes, world });
   });
 
   startBtn.addEventListener("click", async () => {
