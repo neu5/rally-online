@@ -32,8 +32,22 @@ type VehicleTemplate = {
     y: number;
     z: number;
   };
-  wheels: Array<{ index: number; position: any; quaternion: any }>;
-  chassis?: any;
+  wheels: Array<{
+    position: any;
+    quaternion: any;
+    rotationQuaternion?: any;
+  }>;
+  body: {
+    position: any;
+    quaternion?: any;
+    rotationQuaternion?: any;
+  };
+};
+
+type Position = {
+  x: number;
+  y: number;
+  z: number;
 };
 
 type Player = {
@@ -48,4 +62,11 @@ type Player = {
 };
 
 export { ACCELERATE, BRAKE, LEFT, RIGHT };
-export type { ActionTypes, Actions, KeysActions, Player, VehicleTemplate };
+export type {
+  ActionTypes,
+  Actions,
+  KeysActions,
+  Player,
+  Position,
+  VehicleTemplate,
+};

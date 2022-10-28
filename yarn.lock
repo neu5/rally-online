@@ -444,6 +444,7 @@ __metadata:
     "@parcel/config-default": ^2.6.0
     "@parcel/transformer-sass": ^2.6.0
     cannon-es: ^0.20.0
+    cannon-es-debugger-babylonjs: ^1.0.0
     parcel: ^2.6.0
     parcel-reporter-clean-dist: ^1.0.4
     parcel-reporter-static-files-copy: ^1.3.4
@@ -2050,6 +2051,16 @@ __metadata:
   version: 1.0.30001342
   resolution: "caniuse-lite@npm:1.0.30001342"
   checksum: 9ad47aec82e85017c59aaa0acee8027d910a715c7481cf66c9b4e296f3d10cc5d96df86d3c3033326b0110f5792b3f117a1dc935e3299abf2139fa345bb326f1
+  languageName: node
+  linkType: hard
+
+"cannon-es-debugger-babylonjs@npm:^1.0.0":
+  version: 1.0.3
+  resolution: "cannon-es-debugger-babylonjs@npm:1.0.3"
+  peerDependencies:
+    "@babylonjs/core": ^5.24.0
+    cannon-es: ^0.20.0
+  checksum: c7d5de4c43aa8d6eaa3b7f6e496c9a1247f380b043c00a5c0ca69cab264c8e39eb837942e016c9c916da8fefab8ed500311399a370d30885a5b4ae54b87b9562
   languageName: node
   linkType: hard
 
