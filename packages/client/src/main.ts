@@ -1,19 +1,11 @@
 import { io } from "socket.io-client";
-import {
-  ArcRotateCamera,
-  Engine,
-  HemisphericLight,
-  Scene,
-  Vector3,
-} from "@babylonjs/core";
-import * as CANNON from "cannon-es";
+import { Engine } from "@babylonjs/core";
 
 import { startRace } from "./scene/scene";
 import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 
-// import type { Mesh } from "@babylonjs/core";
 import type { Socket } from "socket.io-client";
-import type { Player, VehicleTemplate } from "@neu5/types/src";
+import type { Player } from "@neu5/types/src";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
@@ -93,76 +85,9 @@ interface ServerToClientEvents {
 }
 
 (async () => {
+  const engine = new Engine(canvas, true);
   // share sockets interfaces?
   const socket: Socket<ServerToClientEvents> = io();
-
-  const shapeWorldPosition = new CANNON.Vec3();
-  const shapeWorldQuaternion = new CANNON.Quaternion();
-
-  const updateMeshPositions = ({ world, bodies, meshes }) => {
-    let meshIndex = 0;
-    for (const body of world.bodies) {
-      for (let i = 0; i !== body.shapes.length; i++) {
-        const mesh = meshes[meshIndex];
-
-        if (mesh) {
-          // Get world position
-          body.quaternion.vmult(body.shapeOffsets[i], shapeWorldPosition);
-          body.position.vadd(shapeWorldPosition, shapeWorldPosition);
-          // Get world quaternion
-          body.quaternion.mult(body.shapeOrientations[i], shapeWorldQuaternion);
-          mesh.position.set(
-            shapeWorldPosition.x,
-            shapeWorldPosition.y,
-            shapeWorldPosition.z
-          );
-
-          if (mesh.rotationQuaternion) {
-            mesh.rotationQuaternion.set(
-              shapeWorldQuaternion.x,
-              shapeWorldQuaternion.y,
-              shapeWorldQuaternion.z,
-              shapeWorldQuaternion.w
-            );
-          }
-        }
-        meshIndex++;
-      }
-    }
-  };
-
-  const startEngineLoop = ({ bodies, meshes, world }) => {
-    const camera = new ArcRotateCamera(
-      "camera",
-      -Math.PI / 2,
-      Math.PI / 3.5,
-      // 130,
-      20,
-      Vector3.Zero()
-    );
-
-    camera.lowerBetaLimit = -Math.PI / 2.5;
-    camera.upperBetaLimit = Math.PI / 2.5;
-    camera.lowerRadiusLimit = 10;
-    camera.upperRadiusLimit = 200;
-
-    camera.attachControl(canvas, true);
-
-    const light = new HemisphericLight("light", new Vector3(1, 1, 0), scene);
-
-    // Default intensity is 1. Let's dim the light a small amount
-    light.intensity = 0.7;
-
-    engine.runRenderLoop(() => {
-      world.fixedStep();
-
-      scene.render();
-
-      updateMeshPositions({ bodies, meshes, world });
-
-      FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
-    });
-  };
 
   const sendAction = (playerActions: string[]) => {
     socket.emit("player:action", {
@@ -177,13 +102,13 @@ interface ServerToClientEvents {
     (
       playersList: Array<{
         name: string;
-        vehicle: VehicleTemplate;
+        vehicle: any;
       }>
     ) => {
       game.playersMap.clear();
 
       playersList.forEach(
-        ({ name, vehicle }: { name: string; vehicle: VehicleTemplate }) => {
+        ({ name, vehicle }: { name: string; vehicle: any }) => {
           game.playersMap.set(name, {
             name,
             vehicle,
@@ -215,10 +140,12 @@ interface ServerToClientEvents {
   socket.on("server:start-race", async () => {
     await startRace({
       canvas,
+      engine,
+      playersMap: game.playersMap,
+      sendAction,
+      socket,
+      FPSEl,
     });
-
-    // scene = newScene;
-    // startEngineLoop({ bodies, meshes, world });
   });
 
   startBtn.addEventListener("click", async () => {
