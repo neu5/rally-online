@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import { Engine } from "@babylonjs/core";
 
 import { startRace } from "./scene/scene";
 import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
@@ -84,6 +85,7 @@ interface ServerToClientEvents {
 }
 
 (async () => {
+  const engine = new Engine(canvas, true);
   // share sockets interfaces?
   const socket: Socket<ServerToClientEvents> = io();
 
@@ -138,6 +140,7 @@ interface ServerToClientEvents {
   socket.on("server:start-race", async () => {
     await startRace({
       canvas,
+      engine,
       playersMap: game.playersMap,
       sendAction,
       socket,
@@ -150,7 +153,7 @@ interface ServerToClientEvents {
   });
 
   window.addEventListener("resize", () => {
-    // engine.resize();
+    engine.resize();
 
     updateWindowSize();
     updateControls();

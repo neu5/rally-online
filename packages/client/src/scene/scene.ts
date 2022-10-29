@@ -2,7 +2,6 @@ import {
   ArcRotateCamera,
   CascadedShadowGenerator,
   DirectionalLight,
-  Engine,
   HemisphericLight,
   MeshBuilder,
   Quaternion,
@@ -13,7 +12,7 @@ import type { Socket } from "socket.io-client";
 // import * as CANNON from "cannon-es";
 // import CannonDebugger from "cannon-es-debugger-babylonjs";
 
-import type { Mesh, ShadowGenerator } from "@babylonjs/core";
+import type { Engine, Mesh, ShadowGenerator } from "@babylonjs/core";
 import type { PlayersMap } from "../main";
 import type { ActionTypes } from "@neu5/types/src";
 // import { UIPlayersIndicators } from "../ui";
@@ -123,12 +122,14 @@ const keyup = (event: KeyboardEvent) => {
 
 const startRace = async ({
   canvas,
+  engine,
   playersMap,
   sendAction,
   socket,
   FPSEl,
 }: {
   canvas: HTMLCanvasElement;
+  engine: Engine;
   FPSEl: HTMLElement;
   playersMap: PlayersMap;
   sendAction: Function;
@@ -137,7 +138,7 @@ const startRace = async ({
   // ============
   // helper functions
   // ============
-  async function initBabylonJS(engine: Engine) {
+  async function initBabylonJS() {
     const scene = new Scene(engine);
 
     const camera = new ArcRotateCamera(
@@ -157,10 +158,6 @@ const startRace = async ({
     camera.maxZ = 100;
 
     const shadowGenerator = new CascadedShadowGenerator(1024, light);
-
-    window.addEventListener("resize", () => {
-      engine.resize();
-    });
 
     return { scene, shadowGenerator };
   }
@@ -278,8 +275,6 @@ const startRace = async ({
     };
   }
 
-  const engine = new Engine(canvas, true); // Generate the BABYLON 3D engine
-
   // To be kept in sync
   let meshes: Meshes = [];
 
@@ -290,7 +285,7 @@ const startRace = async ({
     right: false,
   };
 
-  const { scene, shadowGenerator } = await initBabylonJS(engine);
+  const { scene, shadowGenerator } = await initBabylonJS();
 
   addPlane({ meshes, scene });
 
@@ -302,7 +297,7 @@ const startRace = async ({
     });
   }
 
-  engine.runRenderLoop(function () {
+  engine.runRenderLoop(() => {
     playersMap.forEach((player) => {
       if (dataFromServer !== null) {
         const {
