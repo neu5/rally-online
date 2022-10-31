@@ -1,30 +1,21 @@
 import {
-  ArcRotateCamera,
   CascadedShadowGenerator,
   DirectionalLight,
   HemisphericLight,
-  MeshBuilder,
-  Quaternion,
   Scene,
   Vector3,
 } from "@babylonjs/core";
-import type { Socket } from "socket.io-client";
 // import * as CANNON from "cannon-es";
 // import CannonDebugger from "cannon-es-debugger-babylonjs";
 
-import type { Engine, Mesh, ShadowGenerator } from "@babylonjs/core";
+import { addPlane, addRigidVehicle } from "../utils";
+
+import type { Engine } from "@babylonjs/core";
 import type { PlayersMap } from "../main";
 import type { ActionTypes } from "@neu5/types/src";
 // import { UIPlayersIndicators } from "../ui";
 
 // const speedometerEl = document.getElementById("speedometer") as HTMLElement;
-
-let dataFromServer: null | Array<{
-  vehicle: {
-    body: { position: Vector3; quaternion: Quaternion };
-    wheels: Array<{ position: Vector3; quaternion: Quaternion }>;
-  };
-}> = null;
 
 let actions = {
   accelerate: false,
@@ -32,16 +23,6 @@ let actions = {
   left: false,
   right: false,
 };
-
-let meshCounter: number = 0;
-
-const getName = (name: string) => {
-  meshCounter = meshCounter + 1;
-
-  return `${name}_${meshCounter}`;
-};
-
-type Meshes = Array<Mesh>;
 
 // const throttle = (func: Function, timeFrame: number = 0) => {
 //   var lastTime = 0;
@@ -62,15 +43,18 @@ type Meshes = Array<Mesh>;
 //   "players-indicators"
 // ) as HTMLElement;
 
-// const createScene = async (engine: Engine) => {
-//   const newScene: Scene = new Scene(engine);
+const createScene = async (engine: Engine) => {
+  const scene: Scene = new Scene(engine);
 
-//   // Setup world
-//   const world = new CANNON.World();
-//   world.gravity.set(0, -9.81, 0);
+  new HemisphericLight("hemiLight", new Vector3(-1, 1, 0), scene);
 
-//   return { newScene, world };
-// };
+  const light = new DirectionalLight("dir01", new Vector3(2, -8, 2), scene);
+  light.intensity = 0.4;
+
+  const shadowGenerator = new CascadedShadowGenerator(1024, light);
+
+  return { scene, shadowGenerator };
+};
 
 const keydown = (event: KeyboardEvent) => {
   switch (event.key) {
@@ -121,163 +105,14 @@ const keyup = (event: KeyboardEvent) => {
 };
 
 const startRace = async ({
-  canvas,
   engine,
   playersMap,
   sendAction,
-  socket,
-  FPSEl,
 }: {
-  canvas: HTMLCanvasElement;
   engine: Engine;
-  FPSEl: HTMLElement;
   playersMap: PlayersMap;
   sendAction: Function;
-  socket: Socket;
 }) => {
-  // ============
-  // helper functions
-  // ============
-  async function initBabylonJS() {
-    const scene = new Scene(engine);
-
-    const camera = new ArcRotateCamera(
-      "camera",
-      -Math.PI / 2,
-      Math.PI / 2.5,
-      15,
-      new Vector3(0, 0, 0)
-    );
-    camera.attachControl(canvas, true);
-
-    new HemisphericLight("hemiLight", new Vector3(-1, 1, 0), scene);
-
-    const light = new DirectionalLight("dir01", new Vector3(2, -8, 2), scene);
-    light.intensity = 0.4;
-
-    camera.maxZ = 100;
-
-    const shadowGenerator = new CascadedShadowGenerator(1024, light);
-
-    return { scene, shadowGenerator };
-  }
-
-  function addPlane({
-    name = "plane",
-    meshes,
-    scene,
-  }: {
-    name?: string;
-    meshes: Meshes;
-    scene: Scene;
-  }) {
-    // Graphics
-    const plane = MeshBuilder.CreatePlane(
-      getName(name),
-      { width: 100, height: 100 },
-      scene
-    );
-    plane.rotation = new Vector3(Math.PI / 2, 0, 0);
-    plane.receiveShadows = true;
-
-    meshes.push(plane);
-
-    return plane;
-  }
-
-  function addBox({
-    width,
-    height,
-    depth,
-    name = "box",
-    meshes,
-    shadowGenerator,
-  }: {
-    width: number;
-    height: number;
-    depth: number;
-    name?: string;
-    meshes: Meshes;
-    shadowGenerator: ShadowGenerator;
-  }) {
-    // Graphics
-    const box = MeshBuilder.CreateBox(getName(name), {
-      width,
-      height,
-      depth,
-    });
-    box.rotationQuaternion = box.rotationQuaternion || new Quaternion();
-    shadowGenerator.addShadowCaster(box, true);
-    meshes.push(box);
-
-    return box;
-  }
-
-  function addSphere({
-    diameter,
-    name = "sphere",
-    meshes,
-    shadowGenerator,
-  }: {
-    name?: string;
-    diameter: number;
-    meshes: Meshes;
-    shadowGenerator: ShadowGenerator;
-  }) {
-    // Graphics
-    const sphere = MeshBuilder.CreateSphere(getName(name));
-    sphere.scalingDeterminant = diameter * 2;
-    sphere.rotationQuaternion = sphere.rotationQuaternion || new Quaternion();
-    shadowGenerator.addShadowCaster(sphere, true);
-    meshes.push(sphere);
-
-    return sphere;
-  }
-
-  function addRigidVehicle({
-    meshes,
-    shadowGenerator,
-  }: {
-    meshes: Meshes;
-    shadowGenerator: ShadowGenerator;
-  }) {
-    const carChassisSize = {
-      width: 4,
-      height: 0.5,
-      depth: 2,
-    };
-    const carWheelSize = 0.5;
-
-    const carBody = addBox({
-      width: carChassisSize.width,
-      height: carChassisSize.height,
-      depth: carChassisSize.depth,
-      meshes,
-      shadowGenerator,
-    });
-
-    let wheels = [];
-
-    // wheels
-    for (let idx = 0; idx < 4; idx++) {
-      wheels.push(
-        addSphere({
-          diameter: carWheelSize,
-          meshes,
-          shadowGenerator,
-        })
-      );
-    }
-
-    return {
-      body: carBody,
-      wheels,
-    };
-  }
-
-  // To be kept in sync
-  let meshes: Meshes = [];
-
   actions = {
     accelerate: false,
     brake: false,
@@ -285,60 +120,17 @@ const startRace = async ({
     right: false,
   };
 
-  const { scene, shadowGenerator } = await initBabylonJS();
+  const { scene, shadowGenerator } = await createScene(engine);
 
-  addPlane({ meshes, scene });
+  addPlane({ scene });
 
-  const rigidVehicle = addRigidVehicle({ meshes, shadowGenerator });
+  const rigidVehicle = addRigidVehicle({ shadowGenerator });
 
   if (playersMap.size) {
     playersMap.forEach((player: any) => {
       player.vehicle = rigidVehicle;
     });
   }
-
-  engine.runRenderLoop(() => {
-    playersMap.forEach((player) => {
-      if (dataFromServer !== null) {
-        const {
-          vehicle: {
-            body: { position, quaternion },
-            wheels,
-          },
-        } = dataFromServer[0];
-
-        player.vehicle?.body.position.set(position.x, position.y, position.z);
-        player.vehicle?.body.rotationQuaternion.set(
-          quaternion.x,
-          quaternion.y,
-          quaternion.z,
-          quaternion.w
-        );
-
-        wheels.forEach((wheel, idx) => {
-          player.vehicle?.wheels[idx].position.set(
-            wheel.position.x,
-            wheel.position.y,
-            wheel.position.z
-          );
-          player.vehicle?.wheels[idx].rotationQuaternion.set(
-            quaternion.x,
-            quaternion.y,
-            quaternion.z,
-            quaternion.w
-          );
-        });
-      }
-    });
-
-    scene.render();
-
-    FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
-  });
-
-  socket.on("server:action", (playersFromServer) => {
-    dataFromServer = playersFromServer;
-  });
 
   setInterval(() => {
     playersMap.forEach((player) => {
@@ -353,6 +145,8 @@ const startRace = async ({
       }
     });
   }, 50);
+
+  return { playersMap, scene };
 };
 
 const touchStart = (ev: TouchEvent) => {

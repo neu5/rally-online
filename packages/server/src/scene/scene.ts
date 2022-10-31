@@ -185,8 +185,8 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
         vehicle.setWheelForce(-maxForce / 2, 2);
         vehicle.setWheelForce(-maxForce / 2, 3);
       } else {
-        vehicle.setWheelForce(0, 0);
-        vehicle.setWheelForce(0, 1);
+        vehicle.setWheelForce(0, 2);
+        vehicle.setWheelForce(0, 3);
       }
 
       if (actions.left) {

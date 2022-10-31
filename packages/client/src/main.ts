@@ -1,16 +1,44 @@
 import { io } from "socket.io-client";
-import { Engine } from "@babylonjs/core";
+import type { Quaternion } from "@babylonjs/core";
+import { ArcRotateCamera, Engine, Scene, Vector3 } from "@babylonjs/core";
 
 import { startRace } from "./scene/scene";
 import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 
 import type { Socket } from "socket.io-client";
-import type { Player } from "@neu5/types/src";
+import type { Player, Position } from "@neu5/types/src";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
 const startBtn = document.getElementById("start-btn") as HTMLAnchorElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
+
+// const throttle = (func: Function, timeFrame: number = 0) => {
+//   var lastTime = 0;
+//   return function (...args: any) {
+//     var now = Date.now();
+//     if (now - lastTime >= timeFrame) {
+//       func(...args);
+//       lastTime = now;
+//     }
+//   };
+// };
+
+// const log = throttle((...args: Array<any>) => {
+//   console.log(...args);
+// }, 1000);
+
+type PlayerFromServer = {
+  id: string;
+  vehicle: {
+    body: { position: Vector3; quaternion: Quaternion };
+    wheels: Array<{ position: Vector3; quaternion: Quaternion }>;
+  };
+};
+
+type PlayersFromServer = Array<PlayerFromServer>;
+
+let dataFromServer: PlayersFromServer = [];
 
 type Car = {
   wheelMeshes: Array<any>;
@@ -77,7 +105,7 @@ let currentPlayerId: string | undefined = undefined;
 interface ServerToClientEvents {
   playerListUpdate: (playersList: Array<PlayersMap>) => void;
   playerID: (id: string) => void;
-  "server:action": (data: Object) => void;
+  "server:action": (data: PlayersFromServer) => void;
   "server:start-race": (data: Object) => void;
   "player:action": (data: Object) => void;
   getPlayerList: () => void;
@@ -86,8 +114,77 @@ interface ServerToClientEvents {
 
 (async () => {
   const engine = new Engine(canvas, true);
+  let scene: Scene = new Scene(engine);
+
   // share sockets interfaces?
   const socket: Socket<ServerToClientEvents> = io();
+
+  const startEngineLoop = () => {
+    const camera = new ArcRotateCamera(
+      "camera",
+      -Math.PI / 2,
+      Math.PI / 2.5,
+      15,
+      new Vector3(0, 0, 0)
+    );
+    camera.attachControl(canvas, true);
+
+    camera.lowerBetaLimit = -Math.PI / 2.5;
+    camera.upperBetaLimit = Math.PI / 2.5;
+    camera.lowerRadiusLimit = 10;
+    camera.upperRadiusLimit = 200;
+
+    camera.maxZ = 100;
+
+    camera.attachControl(canvas, true);
+
+    engine.runRenderLoop(() => {
+      scene.render();
+
+      if (dataFromServer === null || !dataFromServer.length) {
+        return;
+      }
+
+      dataFromServer.forEach((playerFromServer: PlayerFromServer) => {
+        const player = game.playersMap.get(playerFromServer.id);
+
+        if (!player || !playerFromServer.vehicle) {
+          return;
+        }
+
+        const {
+          vehicle: {
+            body: { position, quaternion },
+            wheels,
+          },
+        } = playerFromServer;
+
+        player.vehicle?.body.position.set(position.x, position.y, position.z);
+        player.vehicle?.body.rotationQuaternion.set(
+          quaternion.x,
+          quaternion.y,
+          quaternion.z,
+          quaternion.w
+        );
+
+        wheels.forEach((wheel: { position: Position }, idx: number) => {
+          player.vehicle?.wheels[idx].position.set(
+            wheel.position.x,
+            wheel.position.y,
+            wheel.position.z
+          );
+          player.vehicle?.wheels[idx].rotationQuaternion.set(
+            quaternion.x,
+            quaternion.y,
+            quaternion.z,
+            quaternion.w
+          );
+        });
+      });
+
+      FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
+    });
+  };
 
   const sendAction = (playerActions: string[]) => {
     socket.emit("player:action", {
@@ -138,14 +235,23 @@ interface ServerToClientEvents {
   });
 
   socket.on("server:start-race", async () => {
-    await startRace({
-      canvas,
+    scene.dispose();
+    engine.stopRenderLoop();
+
+    const newScene = await startRace({
       engine,
       playersMap: game.playersMap,
       sendAction,
-      socket,
-      FPSEl,
     });
+
+    scene = newScene.scene;
+    game.playersMap = newScene.playersMap;
+
+    startEngineLoop();
+  });
+
+  socket.on("server:action", (playersFromServer: PlayersFromServer) => {
+    dataFromServer = playersFromServer;
   });
 
   startBtn.addEventListener("click", async () => {
