@@ -42,6 +42,7 @@ type VehicleTemplate = {
     quaternion?: any;
     rotationQuaternion?: any;
   };
+  physicalVehicle: any;
 };
 
 type Position = {

@@ -123,8 +123,8 @@ interface ServerToClientEvents {
     const camera = new ArcRotateCamera(
       "camera",
       -Math.PI / 2,
-      Math.PI / 2.5,
-      15,
+      Math.PI / 4,
+      130,
       new Vector3(0, 0, 0)
     );
     camera.attachControl(canvas, true);
@@ -134,7 +134,7 @@ interface ServerToClientEvents {
     camera.lowerRadiusLimit = 10;
     camera.upperRadiusLimit = 200;
 
-    camera.maxZ = 100;
+    camera.maxZ = 500;
 
     camera.attachControl(canvas, true);
 
@@ -251,6 +251,7 @@ interface ServerToClientEvents {
   });
 
   socket.on("server:action", (playersFromServer: PlayersFromServer) => {
+    // log(playersFromServer);
     dataFromServer = playersFromServer;
   });
 

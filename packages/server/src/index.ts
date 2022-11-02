@@ -4,9 +4,8 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-import type { Vec3 } from "cannon-es";
 import type { Socket } from "socket.io";
-import type { VehicleTemplate } from "@neu5/types/src";
+import type { Position, VehicleTemplate } from "@neu5/types/src";
 
 import { startRace } from "./scene/scene";
 
@@ -83,7 +82,7 @@ export type PlayersMap = Map<
     vehicleSteering: number;
     vehicleTemplate?: VehicleTemplate;
     car?: Car;
-    spherePos?: Vec3;
+    startingPos?: Position;
   }
 >;
 const playersMap: PlayersMap = new Map();
@@ -109,10 +108,17 @@ const actions: Actions = {
 } as const;
 
 const playersMapToArray = (list: PlayersMap) =>
-  Array.from(list).map(([id, { name, ...rest }]) => ({
+  Array.from(list).map(([id, { name, vehicle }]) => ({
     id,
     name,
-    ...rest,
+    ...(vehicle
+      ? {
+          vehicle: {
+            body: vehicle?.body,
+            wheels: vehicle?.wheels,
+          },
+        }
+      : undefined),
   }));
 
 type Race = {

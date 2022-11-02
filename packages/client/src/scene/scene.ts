@@ -124,11 +124,9 @@ const startRace = async ({
 
   addPlane({ scene });
 
-  const rigidVehicle = addRigidVehicle({ shadowGenerator });
-
   if (playersMap.size) {
     playersMap.forEach((player: any) => {
-      player.vehicle = rigidVehicle;
+      player.vehicle = addRigidVehicle({ shadowGenerator });
     });
   }
 
