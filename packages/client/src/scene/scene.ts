@@ -8,7 +8,7 @@ import {
 // import * as CANNON from "cannon-es";
 // import CannonDebugger from "cannon-es-debugger-babylonjs";
 
-import { addPlane, addRigidVehicle } from "../utils";
+import { addColors, addPlane, addRigidVehicle } from "../utils";
 
 import type { Engine } from "@babylonjs/core";
 import type { PlayersMap } from "../main";
@@ -122,13 +122,16 @@ const startRace = async ({
 
   const { scene, shadowGenerator } = await createScene(engine);
 
+  addColors(scene);
   addPlane({ scene });
-
-  const rigidVehicle = addRigidVehicle({ shadowGenerator });
 
   if (playersMap.size) {
     playersMap.forEach((player: any) => {
-      player.vehicle = rigidVehicle;
+      player.vehicle = addRigidVehicle({
+        colorName: player.color,
+        scene,
+        shadowGenerator,
+      });
     });
   }
 

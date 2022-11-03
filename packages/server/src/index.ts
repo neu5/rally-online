@@ -4,9 +4,8 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-import type { Vec3 } from "cannon-es";
 import type { Socket } from "socket.io";
-import type { VehicleTemplate } from "@neu5/types/src";
+import type { Position, VehicleTemplate } from "@neu5/types/src";
 
 import { startRace } from "./scene/scene";
 
@@ -77,13 +76,14 @@ export type PlayersMap = Map<
     accelerateTimeMS: number;
     turnTimeMS: number;
     actions: Actions;
+    color: string;
     name: string;
     vehicle?: VehicleTemplate;
     playerNumber?: number;
     vehicleSteering: number;
     vehicleTemplate?: VehicleTemplate;
     car?: Car;
-    spherePos?: Vec3;
+    startingPos?: Position;
   }
 >;
 const playersMap: PlayersMap = new Map();
@@ -109,10 +109,18 @@ const actions: Actions = {
 } as const;
 
 const playersMapToArray = (list: PlayersMap) =>
-  Array.from(list).map(([id, { name, ...rest }]) => ({
+  Array.from(list).map(([id, { color, name, vehicle }]) => ({
     id,
+    color,
     name,
-    ...rest,
+    ...(vehicle
+      ? {
+          vehicle: {
+            body: vehicle?.body,
+            wheels: vehicle?.wheels,
+          },
+        }
+      : undefined),
   }));
 
 type Race = {
@@ -202,12 +210,14 @@ const race: Race = {
 
   io.on("connection", (socket) => {
     const playerNumber = playerNumbers.find(({ isFree }) => isFree);
-    let vehicle = null;
+    let vehiclesTemplate = null;
 
-    if (playerNumber) {
-      vehicle = vehicles[playerNumber.idx];
-      playerNumber.isFree = false;
+    if (!playerNumber) {
+      return;
     }
+
+    vehiclesTemplate = vehicles[playerNumber.idx];
+    playerNumber.isFree = false;
 
     playersMap.set(socket.id, {
       name: socket.id,
@@ -215,9 +225,8 @@ const race: Race = {
       accelerateTimeMS: 0,
       turnTimeMS: 0,
       vehicleSteering: 0,
-      ...vehicle,
       playerNumber: playerNumber?.idx,
-      // ...(vehicle ? { vehicle, playerNumber: playerNumber?.idx } : {}),
+      ...vehiclesTemplate,
     });
 
     createSocketHandlers(socket);

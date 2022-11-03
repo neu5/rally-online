@@ -1,6 +1,51 @@
-import { MeshBuilder, Quaternion, Vector3 } from "@babylonjs/core";
+import {
+  Color3,
+  MeshBuilder,
+  Quaternion,
+  StandardMaterial,
+  Vector3,
+} from "@babylonjs/core";
 
 import type { Scene, ShadowGenerator } from "@babylonjs/core";
+
+const COLOR_NAMES = {
+  BLACK: "BlackMaterial",
+  BLUE: "BlueMaterial",
+  GREEN: "GreenMaterial",
+  RED: "RedMaterial",
+  YELLOW: "YellowMaterial",
+} as const;
+
+const colors: Array<{ name: string; color: Color3 }> = [
+  {
+    name: COLOR_NAMES.BLACK,
+    color: new Color3(0, 0, 0),
+  },
+  {
+    name: COLOR_NAMES.BLUE,
+    color: new Color3(0, 1, 1),
+  },
+  {
+    name: COLOR_NAMES.GREEN,
+    color: new Color3(0, 1, 0),
+  },
+  {
+    name: COLOR_NAMES.RED,
+    color: new Color3(1, 0, 0),
+  },
+  {
+    name: COLOR_NAMES.YELLOW,
+    color: new Color3(1, 1, 0),
+  },
+];
+
+const addColors = (scene: Scene) => {
+  colors.forEach(({ name, color }) => {
+    const material = new StandardMaterial(name, scene);
+    material.diffuseColor = color;
+    material.emissiveColor = color;
+  });
+};
 
 let meshCounter: number = 0;
 
@@ -73,8 +118,12 @@ const addSphere = ({
 };
 
 const addRigidVehicle = ({
+  colorName,
+  scene,
   shadowGenerator,
 }: {
+  colorName: string;
+  scene: Scene;
   shadowGenerator: ShadowGenerator;
 }) => {
   const carChassisSize = {
@@ -91,16 +140,18 @@ const addRigidVehicle = ({
     shadowGenerator,
   });
 
+  carBody.material = scene.getMaterialByName(colorName);
+
   let wheels = [];
 
   // wheels
   for (let idx = 0; idx < 4; idx++) {
-    wheels.push(
-      addSphere({
-        diameter: carWheelSize,
-        shadowGenerator,
-      })
-    );
+    const wheel = addSphere({
+      diameter: carWheelSize,
+      shadowGenerator,
+    });
+    wheel.material = scene.getMaterialByName(COLOR_NAMES.BLACK);
+    wheels.push(wheel);
   }
 
   return {
@@ -109,4 +160,4 @@ const addRigidVehicle = ({
   };
 };
 
-export { addBox, addPlane, addSphere, addRigidVehicle };
+export { addBox, addColors, addPlane, addSphere, addRigidVehicle };

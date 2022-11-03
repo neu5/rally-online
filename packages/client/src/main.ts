@@ -123,8 +123,8 @@ interface ServerToClientEvents {
     const camera = new ArcRotateCamera(
       "camera",
       -Math.PI / 2,
-      Math.PI / 2.5,
-      15,
+      Math.PI / 4,
+      130,
       new Vector3(0, 0, 0)
     );
     camera.attachControl(canvas, true);
@@ -134,7 +134,7 @@ interface ServerToClientEvents {
     camera.lowerRadiusLimit = 10;
     camera.upperRadiusLimit = 200;
 
-    camera.maxZ = 100;
+    camera.maxZ = 500;
 
     camera.attachControl(canvas, true);
 
@@ -198,6 +198,7 @@ interface ServerToClientEvents {
     // @ts-ignore
     (
       playersList: Array<{
+        color: string;
         name: string;
         vehicle: any;
       }>
@@ -205,8 +206,17 @@ interface ServerToClientEvents {
       game.playersMap.clear();
 
       playersList.forEach(
-        ({ name, vehicle }: { name: string; vehicle: any }) => {
+        ({
+          color,
+          name,
+          vehicle,
+        }: {
+          color: string;
+          name: string;
+          vehicle: any;
+        }) => {
           game.playersMap.set(name, {
+            ...(color ? { color } : undefined),
             name,
             vehicle,
             isCurrentPlayer: name === currentPlayerId,

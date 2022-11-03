@@ -26,12 +26,6 @@ interface KeysActions {
 }
 
 type VehicleTemplate = {
-  color?: string;
-  startingPos?: {
-    x: number;
-    y: number;
-    z: number;
-  };
   wheels: Array<{
     position: any;
     quaternion: any;
@@ -42,6 +36,7 @@ type VehicleTemplate = {
     quaternion?: any;
     rotationQuaternion?: any;
   };
+  physicalVehicle: any;
 };
 
 type Position = {
