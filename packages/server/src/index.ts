@@ -210,12 +210,14 @@ const race: Race = {
 
   io.on("connection", (socket) => {
     const playerNumber = playerNumbers.find(({ isFree }) => isFree);
-    let vehicle = null;
+    let vehiclesTemplate = null;
 
-    if (playerNumber) {
-      vehicle = vehicles[playerNumber.idx];
-      playerNumber.isFree = false;
+    if (!playerNumber) {
+      return;
     }
+
+    vehiclesTemplate = vehicles[playerNumber.idx];
+    playerNumber.isFree = false;
 
     playersMap.set(socket.id, {
       name: socket.id,
@@ -223,9 +225,8 @@ const race: Race = {
       accelerateTimeMS: 0,
       turnTimeMS: 0,
       vehicleSteering: 0,
-      ...vehicle,
       playerNumber: playerNumber?.idx,
-      // ...(vehicle ? { vehicle, playerNumber: playerNumber?.idx } : {}),
+      ...vehiclesTemplate,
     });
 
     createSocketHandlers(socket);

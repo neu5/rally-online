@@ -9,6 +9,7 @@ import {
 import type { Scene, ShadowGenerator } from "@babylonjs/core";
 
 const COLOR_NAMES = {
+  BLACK: "BlackMaterial",
   BLUE: "BlueMaterial",
   GREEN: "GreenMaterial",
   RED: "RedMaterial",
@@ -16,6 +17,10 @@ const COLOR_NAMES = {
 } as const;
 
 const colors: Array<{ name: string; color: Color3 }> = [
+  {
+    name: COLOR_NAMES.BLACK,
+    color: new Color3(0, 0, 0),
+  },
   {
     name: COLOR_NAMES.BLUE,
     color: new Color3(0, 1, 1),
@@ -141,12 +146,12 @@ const addRigidVehicle = ({
 
   // wheels
   for (let idx = 0; idx < 4; idx++) {
-    wheels.push(
-      addSphere({
-        diameter: carWheelSize,
-        shadowGenerator,
-      })
-    );
+    const wheel = addSphere({
+      diameter: carWheelSize,
+      shadowGenerator,
+    });
+    wheel.material = scene.getMaterialByName(COLOR_NAMES.BLACK);
+    wheels.push(wheel);
   }
 
   return {

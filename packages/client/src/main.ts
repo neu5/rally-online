@@ -217,7 +217,7 @@ interface ServerToClientEvents {
         }) => {
           game.playersMap.set(name, {
             name,
-            color,
+            ...(color ? { color } : undefined),
             vehicle,
             isCurrentPlayer: name === currentPlayerId,
             vehicleSteering: 0,
@@ -261,7 +261,6 @@ interface ServerToClientEvents {
   });
 
   socket.on("server:action", (playersFromServer: PlayersFromServer) => {
-    // log(playersFromServer);
     dataFromServer = playersFromServer;
   });
 

@@ -127,7 +127,6 @@ const startRace = async ({
 
   if (playersMap.size) {
     playersMap.forEach((player: any) => {
-      console.log(player);
       player.vehicle = addRigidVehicle({
         colorName: player.color,
         scene,
