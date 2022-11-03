@@ -198,6 +198,7 @@ interface ServerToClientEvents {
     // @ts-ignore
     (
       playersList: Array<{
+        color: string;
         name: string;
         vehicle: any;
       }>
@@ -205,9 +206,18 @@ interface ServerToClientEvents {
       game.playersMap.clear();
 
       playersList.forEach(
-        ({ name, vehicle }: { name: string; vehicle: any }) => {
+        ({
+          color,
+          name,
+          vehicle,
+        }: {
+          color: string;
+          name: string;
+          vehicle: any;
+        }) => {
           game.playersMap.set(name, {
             name,
+            color,
             vehicle,
             isCurrentPlayer: name === currentPlayerId,
             vehicleSteering: 0,

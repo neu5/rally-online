@@ -76,6 +76,7 @@ export type PlayersMap = Map<
     accelerateTimeMS: number;
     turnTimeMS: number;
     actions: Actions;
+    color: string;
     name: string;
     vehicle?: VehicleTemplate;
     playerNumber?: number;
@@ -108,8 +109,9 @@ const actions: Actions = {
 } as const;
 
 const playersMapToArray = (list: PlayersMap) =>
-  Array.from(list).map(([id, { name, vehicle }]) => ({
+  Array.from(list).map(([id, { color, name, vehicle }]) => ({
     id,
+    color,
     name,
     ...(vehicle
       ? {
