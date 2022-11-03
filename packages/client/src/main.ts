@@ -217,7 +217,7 @@ interface ServerToClientEvents {
         }) => {
           game.playersMap.set(name, {
             name,
-            ...(color ? { color } : undefined),
+            color,
             vehicle,
             isCurrentPlayer: name === currentPlayerId,
             vehicleSteering: 0,
