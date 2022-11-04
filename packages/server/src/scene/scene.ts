@@ -22,6 +22,16 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
   groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // make it face up
   physicsWorld.addBody(groundBody);
 
+  const wall1 = new Body({ type: Body.STATIC, shape: new Plane() });
+
+  wall1.position = new Vec3(0, 50, 50);
+  console.log(wall1.position);
+  physicsWorld.addBody(wall1);
+
+  // const wall1 = addPlane({ width: 100, height: 100, scene });
+  // wall1.rotation = new Vector3(0, 0, 0);
+  // wall1.position = new Vector3(0, 50, 50);
+
   playersMap.forEach((player) => {
     const vehicle = addRigidVehicle({
       position: {

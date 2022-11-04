@@ -57,15 +57,19 @@ const getName = (name: string) => {
 
 const addPlane = ({
   name = "plane",
+  width,
+  height,
   scene,
 }: {
   name?: string;
+  width: number;
+  height: number;
   scene: Scene;
 }) => {
   // Graphics
   const plane = MeshBuilder.CreatePlane(
     getName(name),
-    { width: 100, height: 100 },
+    { width, height },
     scene
   );
   plane.rotation = new Vector3(Math.PI / 2, 0, 0);

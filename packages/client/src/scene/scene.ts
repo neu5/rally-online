@@ -123,7 +123,23 @@ const startRace = async ({
   const { scene, shadowGenerator } = await createScene(engine);
 
   addColors(scene);
-  addPlane({ scene });
+  addPlane({ width: 100, height: 100, scene });
+
+  // const wall3 = addPlane({ width: 100, height: 100, scene });
+  // wall3.rotation = new Vector3(0, Math.PI / 2, 0);
+  // wall3.position = new Vector3(-50, 50, 0);
+
+  // const wall2 = addPlane({ width: 100, height: 100, scene });
+  // wall2.rotation = new Vector3(0, Math.PI / 2, 0);
+  // wall2.position = new Vector3(50, 50, 0);
+
+  const wall1 = addPlane({ width: 100, height: 100, scene });
+  wall1.rotation = new Vector3(0, 0, 0);
+  wall1.position = new Vector3(0, 50, 50);
+
+  // const wall4 = addPlane({ width: 100, height: 100, scene });
+  // wall4.rotation = new Vector3(0, 0, 0);
+  // wall4.position = new Vector3(0, 50, -50);
 
   if (playersMap.size) {
     playersMap.forEach((player: any) => {
