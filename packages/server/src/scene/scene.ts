@@ -124,13 +124,6 @@ const startRace = async ({
         return;
       }
 
-      // log(vehicle.body.position);
-      if (vehicle.body.position.x < -50) {
-        vehicle.body.position.x = -50;
-      } else if (vehicle.body.position.x > 50) {
-        vehicle.body.position.x = 50;
-      }
-
       if (actions.accelerate) {
         vehicle.physicalVehicle.setWheelForce(maxForce, 2);
         vehicle.physicalVehicle.setWheelForce(maxForce, 3);

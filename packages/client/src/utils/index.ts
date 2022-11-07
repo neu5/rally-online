@@ -7,7 +7,7 @@ import {
 } from "@babylonjs/core";
 
 import type { Scene, ShadowGenerator } from "@babylonjs/core";
-import type { GameQuaternion, Position } from "~/../types/src";
+import type { GameQuaternion, Position } from "@neu5/types/src";
 
 const COLOR_NAMES = {
   BLACK: "BlackMaterial",
