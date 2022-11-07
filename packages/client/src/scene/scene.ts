@@ -8,11 +8,11 @@ import {
 // import * as CANNON from "cannon-es";
 // import CannonDebugger from "cannon-es-debugger-babylonjs";
 
-import { addColors, addPlane, addRigidVehicle } from "../utils";
+import { addBox, addColors, addPlane, addRigidVehicle } from "../utils";
 
 import type { Engine } from "@babylonjs/core";
 import type { PlayersMap } from "../main";
-import type { ActionTypes } from "@neu5/types/src";
+import type { ActionTypes, GameQuaternion, Position } from "@neu5/types/src";
 // import { UIPlayersIndicators } from "../ui";
 
 // const speedometerEl = document.getElementById("speedometer") as HTMLElement;
@@ -104,12 +104,31 @@ const keyup = (event: KeyboardEvent) => {
   }
 };
 
+type GameObject = {
+  name: string;
+  position: Position;
+  quaternion: GameQuaternion;
+  width: number;
+  height: number;
+  depth: number;
+};
+
+type GameConfig = {
+  width: number;
+  height: number;
+  depth: number;
+};
+
 const startRace = async ({
   engine,
+  gameConfig,
+  gameObjects,
   playersMap,
   sendAction,
 }: {
   engine: Engine;
+  gameConfig: GameConfig;
+  gameObjects: GameObject[];
   playersMap: PlayersMap;
   sendAction: Function;
 }) => {
@@ -122,8 +141,12 @@ const startRace = async ({
 
   const { scene, shadowGenerator } = await createScene(engine);
 
+  gameObjects.forEach((gameObject) => {
+    addBox({ ...gameObject, shadowGenerator });
+  });
+
   addColors(scene);
-  addPlane({ scene });
+  addPlane({ scene, width: gameConfig.width, height: gameConfig.height });
 
   if (playersMap.size) {
     playersMap.forEach((player: any) => {

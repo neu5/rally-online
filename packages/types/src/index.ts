@@ -45,6 +45,29 @@ type Position = {
   z: number;
 };
 
+type GameConfig = {
+  width: number;
+  height: number;
+  depth: number;
+};
+
+type GameObject = {
+  name: string;
+  isWall: boolean;
+  position: Position;
+  quaternion: GameQuaternion;
+  width: number;
+  height: number;
+  depth: number;
+};
+
+type GameQuaternion = {
+  x: number;
+  y: number;
+  z: number;
+  w: number;
+};
+
 type Player = {
   updateAction?: (actions: Actions) => void;
   actions: Actions;
@@ -60,6 +83,9 @@ export { ACCELERATE, BRAKE, LEFT, RIGHT };
 export type {
   ActionTypes,
   Actions,
+  GameConfig,
+  GameObject,
+  GameQuaternion,
   KeysActions,
   Player,
   Position,

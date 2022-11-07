@@ -5,7 +5,12 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 
 import type { Socket } from "socket.io";
-import type { Position, VehicleTemplate } from "@neu5/types/src";
+import type {
+  GameConfig,
+  GameObject,
+  Position,
+  VehicleTemplate,
+} from "@neu5/types/src";
 
 import { startRace } from "./scene/scene";
 
@@ -86,6 +91,15 @@ export type PlayersMap = Map<
     startingPos?: Position;
   }
 >;
+
+export type Game = {
+  config?: GameConfig;
+  objects: GameObject[];
+};
+
+let game: Game = {
+  objects: [],
+};
 const playersMap: PlayersMap = new Map();
 
 const ACCELERATE = "accelerate";
@@ -155,10 +169,24 @@ const race: Race = {
     socket.on("player:start-race", async () => {
       race.isStarted = true;
 
-      await startRace({ playersMap });
+      game.config = {
+        width: 100,
+        height: 100,
+        depth: 0.1,
+      };
+
+      await startRace({ game, playersMap });
 
       io.emit("server:start-race", {
         playersList: playersMapToArray(playersMap),
+        config: game.config,
+        objects: game.objects.map(({ isWall, name, position, quaternion }) => ({
+          name,
+          isWall,
+          position,
+          quaternion,
+          ...game.config,
+        })),
       });
     });
 
