@@ -3,21 +3,6 @@ import { addBox, addRigidVehicle } from "../utils";
 
 import type { Game, PlayersMap } from "../index";
 
-// const throttle = (func: Function, timeFrame: number = 0) => {
-//   var lastTime = 0;
-//   return function (...args: any) {
-//     var now = Date.now();
-//     if (now - lastTime >= timeFrame) {
-//       func(...args);
-//       lastTime = now;
-//     }
-//   };
-// };
-
-// const log = throttle((...args: Array<any>) => {
-//   console.log(...args);
-// }, 1000);
-
 const FRAME_IN_MS = 1000 / 30; // 30 FPS
 let loop = setInterval(() => {}, FRAME_IN_MS);
 
