@@ -6,7 +6,7 @@ import { startRace } from "./scene/scene";
 import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 
 import type { Socket } from "socket.io-client";
-import type { Player, Position } from "@neu5/types/src";
+import type { GameConfig, GameObject, Player, Position } from "@neu5/types/src";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
@@ -106,7 +106,13 @@ interface ServerToClientEvents {
   playerListUpdate: (playersList: Array<PlayersMap>) => void;
   playerID: (id: string) => void;
   "server:action": (data: PlayersFromServer) => void;
-  "server:start-race": (data: Object) => void;
+  "server:start-race": ({
+    objects,
+    config,
+  }: {
+    objects: GameObject[];
+    config: GameConfig;
+  }) => void;
   "player:action": (data: Object) => void;
   getPlayerList: () => void;
   "player:start-race": () => void;
@@ -244,21 +250,32 @@ interface ServerToClientEvents {
     socket.emit("getPlayerList");
   });
 
-  socket.on("server:start-race", async () => {
-    scene.dispose();
-    engine.stopRenderLoop();
+  socket.on(
+    "server:start-race",
+    async ({
+      config,
+      objects,
+    }: {
+      config: GameConfig;
+      objects: GameObject[];
+    }) => {
+      scene.dispose();
+      engine.stopRenderLoop();
 
-    const newScene = await startRace({
-      engine,
-      playersMap: game.playersMap,
-      sendAction,
-    });
+      const newScene = await startRace({
+        engine,
+        gameConfig: config,
+        gameObjects: objects,
+        playersMap: game.playersMap,
+        sendAction,
+      });
 
-    scene = newScene.scene;
-    game.playersMap = newScene.playersMap;
+      scene = newScene.scene;
+      game.playersMap = newScene.playersMap;
 
-    startEngineLoop();
-  });
+      startEngineLoop();
+    }
+  );
 
   socket.on("server:action", (playersFromServer: PlayersFromServer) => {
     dataFromServer = playersFromServer;

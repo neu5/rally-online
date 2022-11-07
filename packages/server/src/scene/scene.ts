@@ -1,13 +1,35 @@
 import { Body, Plane, Vec3, World } from "cannon-es";
-import { addRigidVehicle } from "../utils";
+import { addBox, addRigidVehicle } from "../utils";
 
-import type { PlayersMap } from "../index";
+import type { Game, PlayersMap } from "../index";
+
+// const throttle = (func: Function, timeFrame: number = 0) => {
+//   var lastTime = 0;
+//   return function (...args: any) {
+//     var now = Date.now();
+//     if (now - lastTime >= timeFrame) {
+//       func(...args);
+//       lastTime = now;
+//     }
+//   };
+// };
+
+// const log = throttle((...args: Array<any>) => {
+//   console.log(...args);
+// }, 1000);
 
 const FRAME_IN_MS = 1000 / 30; // 30 FPS
 let loop = setInterval(() => {}, FRAME_IN_MS);
 
-const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
+const startRace = async ({
+  game,
+  playersMap,
+}: {
+  game: Game;
+  playersMap: PlayersMap;
+}) => {
   clearInterval(loop);
+  game.objects = [];
 
   // physics world
   const physicsWorld = new World({
@@ -22,15 +44,65 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
   groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // make it face up
   physicsWorld.addBody(groundBody);
 
-  const wall1 = new Body({ type: Body.STATIC, shape: new Plane() });
+  if (game.config) {
+    const wallWidth = game.config.width / 2;
 
-  wall1.position = new Vec3(0, 50, 50);
-  console.log(wall1.position);
-  physicsWorld.addBody(wall1);
+    const wall1 = addBox({
+      ...game.config,
+      position: { x: 0, y: wallWidth, z: wallWidth },
+      mass: 0,
+      world: physicsWorld,
+    });
+    game.objects.push({
+      name: "wall1",
+      isWall: true,
+      ...game.config,
+      ...wall1,
+    });
 
-  // const wall1 = addPlane({ width: 100, height: 100, scene });
-  // wall1.rotation = new Vector3(0, 0, 0);
-  // wall1.position = new Vector3(0, 50, 50);
+    const wall2 = addBox({
+      ...game.config,
+      position: { x: 0, y: wallWidth, z: -wallWidth },
+      mass: 0,
+      world: physicsWorld,
+    });
+    game.objects.push({
+      name: "wall2",
+      isWall: true,
+      ...game.config,
+      ...wall2,
+    });
+
+    const wall3 = addBox({
+      ...game.config,
+      position: { x: -wallWidth, y: wallWidth, z: 0 },
+      mass: 0,
+      world: physicsWorld,
+    });
+
+    wall3.quaternion.setFromAxisAngle(new Vec3(0, 1, 0), 1.5708);
+    game.objects.push({
+      name: "wall3",
+      isWall: true,
+      ...game.config,
+      ...wall3,
+    });
+
+    const wall4 = addBox({
+      ...game.config,
+      position: { x: wallWidth, y: wallWidth, z: 0 },
+      mass: 0,
+      world: physicsWorld,
+    });
+
+    wall4.quaternion.setFromAxisAngle(new Vec3(0, 1, 0), 1.5708);
+    game.objects.push({
+      name: "wall4",
+      isWall: true,
+      ...game.config,
+      ...wall4,
+    });
+  }
 
   playersMap.forEach((player) => {
     const vehicle = addRigidVehicle({
@@ -65,6 +137,13 @@ const startRace = async ({ playersMap }: { playersMap: PlayersMap }) => {
     playersMap.forEach(({ actions, vehicle }) => {
       if (!vehicle) {
         return;
+      }
+
+      // log(vehicle.body.position);
+      if (vehicle.body.position.x < -50) {
+        vehicle.body.position.x = -50;
+      } else if (vehicle.body.position.x > 50) {
+        vehicle.body.position.x = 50;
       }
 
       if (actions.accelerate) {

@@ -7,6 +7,7 @@ import {
 } from "@babylonjs/core";
 
 import type { Scene, ShadowGenerator } from "@babylonjs/core";
+import type { GameQuaternion, Position } from "~/../types/src";
 
 const COLOR_NAMES = {
   BLACK: "BlackMaterial",
@@ -57,19 +58,22 @@ const getName = (name: string) => {
 
 const addPlane = ({
   name = "plane",
-  width,
-  height,
+  width = 100,
+  height = 100,
   scene,
 }: {
   name?: string;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   scene: Scene;
 }) => {
   // Graphics
   const plane = MeshBuilder.CreatePlane(
     getName(name),
-    { width, height },
+    {
+      width,
+      height,
+    },
     scene
   );
   plane.rotation = new Vector3(Math.PI / 2, 0, 0);
@@ -82,12 +86,18 @@ const addBox = ({
   width,
   height,
   depth,
+  position,
+  quaternion,
+  isWall,
   name = "box",
   shadowGenerator,
 }: {
   width: number;
   height: number;
   depth: number;
+  position?: Position;
+  quaternion?: GameQuaternion;
+  isWall?: boolean;
   name?: string;
   shadowGenerator: ShadowGenerator;
 }) => {
@@ -98,7 +108,25 @@ const addBox = ({
     depth,
   });
   box.rotationQuaternion = box.rotationQuaternion || new Quaternion();
-  shadowGenerator.addShadowCaster(box, true);
+
+  if (position) {
+    box.position.set(position.x, position.y, position.z);
+  }
+
+  if (quaternion) {
+    box.rotationQuaternion = new Quaternion(
+      quaternion.x,
+      quaternion.y,
+      quaternion.z,
+      quaternion.w
+    );
+  }
+
+  if (isWall) {
+    box.isVisible = false;
+  } else {
+    shadowGenerator.addShadowCaster(box, true);
+  }
 
   return box;
 };
