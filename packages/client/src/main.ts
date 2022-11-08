@@ -10,7 +10,12 @@ import type { GameConfig, GameObject, Player, Position } from "@neu5/types/src";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
-const startBtn = document.getElementById("start-btn") as HTMLAnchorElement;
+const startRaceBtn = document.getElementById(
+  "start-race-btn"
+) as HTMLAnchorElement;
+const stopRaceBtn = document.getElementById(
+  "stop-race-btn"
+) as HTMLAnchorElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
 
 // const throttle = (func: Function, timeFrame: number = 0) => {
@@ -281,8 +286,12 @@ interface ServerToClientEvents {
     dataFromServer = playersFromServer;
   });
 
-  startBtn.addEventListener("click", async () => {
+  startRaceBtn.addEventListener("click", async () => {
     socket.emit("player:start-race");
+  });
+
+  stopRaceBtn.addEventListener("click", async () => {
+    socket.emit("player:stop-race");
   });
 
   window.addEventListener("resize", () => {
