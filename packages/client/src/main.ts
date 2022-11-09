@@ -10,7 +10,12 @@ import type { GameConfig, GameObject, Player, Position } from "@neu5/types/src";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
-const startBtn = document.getElementById("start-btn") as HTMLAnchorElement;
+const startRaceBtn = document.getElementById(
+  "start-race-btn"
+) as HTMLAnchorElement;
+const stopRaceBtn = document.getElementById(
+  "stop-race-btn"
+) as HTMLAnchorElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
 
 // const throttle = (func: Function, timeFrame: number = 0) => {
@@ -42,6 +47,15 @@ let dataFromServer: PlayersFromServer = [];
 
 type Car = {
   wheelMeshes: Array<any>;
+};
+
+type Race = {
+  isStarted: boolean;
+};
+
+type GameInfo = {
+  id: string;
+  race: Race;
 };
 
 export type PlayersMap = Map<
@@ -77,6 +91,16 @@ const updateWindowSize = () => {
   };
 };
 
+const toggleRaceBtns = (isRaceStarted: boolean) => {
+  if (isRaceStarted) {
+    startRaceBtn.setAttribute("disabled", "disabled");
+    stopRaceBtn.removeAttribute("disabled");
+  } else {
+    startRaceBtn.removeAttribute("disabled");
+    stopRaceBtn.setAttribute("disabled", "disabled");
+  }
+};
+
 const verticalMobileDialog = new UIDialogWrapper();
 
 const pEl = document.createElement("p");
@@ -109,13 +133,18 @@ interface ServerToClientEvents {
   "server:start-race": ({
     objects,
     config,
+    race,
   }: {
     objects: GameObject[];
     config: GameConfig;
+    race: Race;
   }) => void;
+  "server:stop-race": (race: Race) => void;
+  "server:gameInfo": (gameInfo: GameInfo) => void;
   "player:action": (data: Object) => void;
   getPlayerList: () => void;
   "player:start-race": () => void;
+  "player:stop-race": () => void;
 }
 
 (async () => {
@@ -245,8 +274,11 @@ interface ServerToClientEvents {
     }
   );
 
-  socket.on("playerID", (id: string) => {
+  socket.on("server:gameInfo", ({ id, race }: GameInfo) => {
     currentPlayerId = id;
+
+    toggleRaceBtns(race.isStarted);
+
     socket.emit("getPlayerList");
   });
 
@@ -255,12 +287,16 @@ interface ServerToClientEvents {
     async ({
       config,
       objects,
+      race,
     }: {
       config: GameConfig;
       objects: GameObject[];
+      race: Race;
     }) => {
       scene.dispose();
       engine.stopRenderLoop();
+
+      toggleRaceBtns(race.isStarted);
 
       const newScene = await startRace({
         engine,
@@ -277,12 +313,23 @@ interface ServerToClientEvents {
     }
   );
 
+  socket.on("server:stop-race", (race: Race) => {
+    toggleRaceBtns(race.isStarted);
+
+    scene.dispose();
+    engine.stopRenderLoop();
+  });
+
   socket.on("server:action", (playersFromServer: PlayersFromServer) => {
     dataFromServer = playersFromServer;
   });
 
-  startBtn.addEventListener("click", async () => {
+  startRaceBtn.addEventListener("click", async () => {
     socket.emit("player:start-race");
+  });
+
+  stopRaceBtn.addEventListener("click", async () => {
+    socket.emit("player:stop-race");
   });
 
   window.addEventListener("resize", () => {
