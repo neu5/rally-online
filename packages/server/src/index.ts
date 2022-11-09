@@ -56,6 +56,19 @@ const vehicles = [
   },
 ];
 
+type Race = {
+  isStarted: boolean;
+};
+
+type GameInfo = {
+  id: string;
+  race: Race;
+};
+
+const race: Race = {
+  isStarted: false,
+};
+
 const getDirname = (meta: { url: string }) => fileURLToPath(meta.url);
 const rootDir = getDirname(import.meta);
 const distDir = resolve(rootDir, "../../../", "client/dist");
@@ -65,9 +78,10 @@ const httpServer = createServer(app);
 
 interface ServerToClientEvents {
   playerListUpdate: (playersList: Object) => void;
-  playerID: (id: string) => void;
+  "server:gameInfo": (data: GameInfo) => void;
   "server:action": (data: Object) => void;
   "server:start-race": (data: Object) => void;
+  "server:stop-race": (data: Object) => void;
 }
 const io = new Server<ServerToClientEvents>(httpServer);
 
@@ -100,6 +114,8 @@ export type Game = {
 let game: Game = {
   objects: [],
 };
+let raceLoop: NodeJS.Timer | null = null;
+
 const playersMap: PlayersMap = new Map();
 
 const ACCELERATE = "accelerate";
@@ -137,14 +153,6 @@ const playersMapToArray = (list: PlayersMap) =>
       : undefined),
   }));
 
-type Race = {
-  isStarted: boolean;
-};
-
-const race: Race = {
-  isStarted: false,
-};
-
 // const throttle = (func: Function, timeFrame: number = 0) => {
 //   var lastTime = 0;
 //   return function (...args: any) {
@@ -175,10 +183,11 @@ const race: Race = {
         depth: 0.1,
       };
 
-      await startRace({ game, playersMap });
+      raceLoop = await startRace({ game, playersMap });
 
       io.emit("server:start-race", {
         playersList: playersMapToArray(playersMap),
+        race,
         config: game.config,
         objects: game.objects.map(({ isWall, name, position, quaternion }) => ({
           name,
@@ -188,6 +197,16 @@ const race: Race = {
           ...game.config,
         })),
       });
+    });
+
+    socket.on("player:stop-race", () => {
+      race.isStarted = false;
+
+      if (raceLoop !== null) {
+        clearInterval(raceLoop);
+      }
+
+      io.emit("server:stop-race", race);
     });
 
     socket.on(
@@ -261,7 +280,10 @@ const race: Race = {
 
     io.emit("playerListUpdate", playersMapToArray(playersMap));
 
-    socket.emit("playerID", socket.id);
+    socket.emit("server:gameInfo", {
+      id: socket.id,
+      race,
+    });
   });
 
   setInterval(() => {

@@ -146,6 +146,8 @@ const startRace = async ({
       }
     });
   }, FRAME_IN_MS);
+
+  return loop;
 };
 
 export { startRace };

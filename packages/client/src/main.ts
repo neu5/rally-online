@@ -49,6 +49,15 @@ type Car = {
   wheelMeshes: Array<any>;
 };
 
+type Race = {
+  isStarted: boolean;
+};
+
+type GameInfo = {
+  id: string;
+  race: Race;
+};
+
 export type PlayersMap = Map<
   string,
   Player & {
@@ -80,6 +89,16 @@ const updateWindowSize = () => {
     width: window.innerWidth,
     height: window.innerHeight,
   };
+};
+
+const toggleRaceBtns = (isRaceStarted: boolean) => {
+  if (isRaceStarted) {
+    startRaceBtn.setAttribute("disabled", "disabled");
+    stopRaceBtn.removeAttribute("disabled");
+  } else {
+    startRaceBtn.removeAttribute("disabled");
+    stopRaceBtn.setAttribute("disabled", "disabled");
+  }
 };
 
 const verticalMobileDialog = new UIDialogWrapper();
@@ -114,13 +133,18 @@ interface ServerToClientEvents {
   "server:start-race": ({
     objects,
     config,
+    race,
   }: {
     objects: GameObject[];
     config: GameConfig;
+    race: Race;
   }) => void;
+  "server:stop-race": (race: Race) => void;
+  "server:gameInfo": (gameInfo: GameInfo) => void;
   "player:action": (data: Object) => void;
   getPlayerList: () => void;
   "player:start-race": () => void;
+  "player:stop-race": () => void;
 }
 
 (async () => {
@@ -250,8 +274,11 @@ interface ServerToClientEvents {
     }
   );
 
-  socket.on("playerID", (id: string) => {
+  socket.on("server:gameInfo", ({ id, race }: GameInfo) => {
     currentPlayerId = id;
+
+    toggleRaceBtns(race.isStarted);
+
     socket.emit("getPlayerList");
   });
 
@@ -260,12 +287,16 @@ interface ServerToClientEvents {
     async ({
       config,
       objects,
+      race,
     }: {
       config: GameConfig;
       objects: GameObject[];
+      race: Race;
     }) => {
       scene.dispose();
       engine.stopRenderLoop();
+
+      toggleRaceBtns(race.isStarted);
 
       const newScene = await startRace({
         engine,
@@ -281,6 +312,13 @@ interface ServerToClientEvents {
       startEngineLoop();
     }
   );
+
+  socket.on("server:stop-race", (race: Race) => {
+    toggleRaceBtns(race.isStarted);
+
+    scene.dispose();
+    engine.stopRenderLoop();
+  });
 
   socket.on("server:action", (playersFromServer: PlayersFromServer) => {
     dataFromServer = playersFromServer;
