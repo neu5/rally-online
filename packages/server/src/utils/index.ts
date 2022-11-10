@@ -68,10 +68,10 @@ const addRigidVehicle = ({
     height: 0.5,
     depth: 2,
   };
-  const carWheelSize = 0.5;
+  const carWheelSize = 0.8;
 
   const carBody = addBox({
-    mass: 5,
+    mass: 50,
     position,
     width: carChassisSize.width,
     height: carChassisSize.height,
@@ -102,12 +102,12 @@ const addRigidVehicle = ({
     });
 
     wheelBody.angularDamping = 0.4;
-    const isFrontAxis = idx < 2 ? -1 : 1;
+    const isFrontAxis = idx < 2 ? -1.4 : 1.4;
     const yPos = idx % 2 === 0 ? 1 : -1;
 
     vehicle.addWheel({
       body: wheelBody,
-      position: new Vec3(isFrontAxis, 0.3, (axisWidth * yPos) / 6),
+      position: new Vec3(isFrontAxis, 0.3, (axisWidth * yPos) / 2),
       axis: new Vec3(0, 0, isFrontAxis),
       direction: down,
     });
