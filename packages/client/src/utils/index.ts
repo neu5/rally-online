@@ -163,7 +163,7 @@ const addRigidVehicle = ({
     height: 0.5,
     depth: 2,
   };
-  const carWheelSize = 0.5;
+  const carWheelSize = 0.8;
 
   const carBody = addBox({
     width: carChassisSize.width,
