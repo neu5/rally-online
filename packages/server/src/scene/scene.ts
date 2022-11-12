@@ -113,7 +113,7 @@ const startRace = async ({
   });
 
   const maxSteerVal = Math.PI / 8;
-  const maxForce = 10;
+  const maxForce = 50;
 
   // Start the simulation loop
   loop = setInterval(() => {
