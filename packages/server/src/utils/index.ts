@@ -1,6 +1,6 @@
 import type { World } from "cannon-es";
 import { Body, Box, Material, RigidVehicle, Sphere, Vec3 } from "cannon-es";
-import type { Position } from "@neu5/types/src";
+import type { GameConfig, Position } from "@neu5/types/src";
 
 const addBox = ({
   width,
@@ -118,4 +118,42 @@ const addRigidVehicle = ({
   return vehicle;
 };
 
-export { addBox, addRigidVehicle, addSphere };
+const getMapWalls = (config: GameConfig, world: World) => {
+  const wallWidth = config.width / 2;
+
+  const wall1 = addBox({
+    ...config,
+    position: { x: 0, y: wallWidth, z: wallWidth },
+    mass: 0,
+    world,
+  });
+
+  const wall2 = addBox({
+    ...config,
+    position: { x: 0, y: wallWidth, z: -wallWidth },
+    mass: 0,
+    world,
+  });
+
+  const wall3 = addBox({
+    ...config,
+    position: { x: -wallWidth, y: wallWidth, z: 0 },
+    mass: 0,
+    world,
+  });
+
+  wall3.quaternion.setFromAxisAngle(new Vec3(0, 1, 0), 1.5708);
+
+  const wall4 = addBox({
+    ...config,
+    position: { x: wallWidth, y: wallWidth, z: 0 },
+    mass: 0,
+    world,
+  });
+
+  wall4.quaternion.setFromAxisAngle(new Vec3(0, 1, 0), 1.5708);
+
+  return [wall1, wall2, wall3, wall4];
+};
+
+export { addBox, addRigidVehicle, addSphere, getMapWalls };

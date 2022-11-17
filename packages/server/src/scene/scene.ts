@@ -1,5 +1,5 @@
 import { Body, Plane, Vec3, World } from "cannon-es";
-import { addBox, addRigidVehicle } from "../utils";
+import { addRigidVehicle, getMapWalls } from "../utils";
 
 import type { Game, PlayersMap } from "../index";
 
@@ -30,62 +30,16 @@ const startRace = async ({
   physicsWorld.addBody(groundBody);
 
   if (game.config) {
-    const wallWidth = game.config.width / 2;
+    const walls = getMapWalls(game.config, physicsWorld);
 
-    const wall1 = addBox({
-      ...game.config,
-      position: { x: 0, y: wallWidth, z: wallWidth },
-      mass: 0,
-      world: physicsWorld,
-    });
-    game.objects.push({
-      name: "wall1",
-      isWall: true,
-      ...game.config,
-      ...wall1,
-    });
-
-    const wall2 = addBox({
-      ...game.config,
-      position: { x: 0, y: wallWidth, z: -wallWidth },
-      mass: 0,
-      world: physicsWorld,
-    });
-    game.objects.push({
-      name: "wall2",
-      isWall: true,
-      ...game.config,
-      ...wall2,
-    });
-
-    const wall3 = addBox({
-      ...game.config,
-      position: { x: -wallWidth, y: wallWidth, z: 0 },
-      mass: 0,
-      world: physicsWorld,
-    });
-
-    wall3.quaternion.setFromAxisAngle(new Vec3(0, 1, 0), 1.5708);
-    game.objects.push({
-      name: "wall3",
-      isWall: true,
-      ...game.config,
-      ...wall3,
-    });
-
-    const wall4 = addBox({
-      ...game.config,
-      position: { x: wallWidth, y: wallWidth, z: 0 },
-      mass: 0,
-      world: physicsWorld,
-    });
-
-    wall4.quaternion.setFromAxisAngle(new Vec3(0, 1, 0), 1.5708);
-    game.objects.push({
-      name: "wall4",
-      isWall: true,
-      ...game.config,
-      ...wall4,
+    walls.forEach(({ position, quaternion }, i: number) => {
+      game.objects.push({
+        name: `wall${i}`,
+        isWall: true,
+        position,
+        quaternion,
+        ...game.config,
+      });
     });
   }
 
