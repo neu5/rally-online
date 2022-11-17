@@ -107,11 +107,16 @@ export type PlayersMap = Map<
 >;
 
 export type Game = {
-  config?: GameConfig;
+  config: GameConfig;
   objects: GameObject[];
 };
 
 let game: Game = {
+  config: {
+    width: 0,
+    height: 0,
+    depth: 0,
+  },
   objects: [],
 };
 let raceLoop: NodeJS.Timer | null = null;

@@ -3,8 +3,6 @@ import { addRigidVehicle, getMapWalls } from "../utils";
 
 import type { Game, PlayersMap } from "../index";
 
-import type { GameObject } from "@neu5/types/src";
-
 const FRAME_IN_MS = 1000 / 30; // 30 FPS
 let loop = setInterval(() => {}, FRAME_IN_MS);
 
@@ -34,13 +32,13 @@ const startRace = async ({
   if (game.config) {
     const walls = getMapWalls(game.config, physicsWorld);
 
-    walls.forEach((wall: GameObject, i: number) => {
-      console.log(wall);
+    walls.forEach(({ position, quaternion }, i: number) => {
       game.objects.push({
-        name: "wall" + i,
+        name: `wall${i}`,
         isWall: true,
+        position,
+        quaternion,
         ...game.config,
-        ...wall,
       });
     });
   }
