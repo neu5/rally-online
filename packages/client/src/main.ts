@@ -278,6 +278,12 @@ interface ServerToClientEvents {
     currentPlayerId = id;
 
     toggleRaceBtns(race.isStarted);
+    const displayNameForm = new UIDialogWrapper();
+    const labelName = document.createElement("p");
+    labelName.textContent = "Display name";
+    displayNameForm.show({
+      content: labelName,
+    });
 
     socket.emit("getPlayerList");
   });
