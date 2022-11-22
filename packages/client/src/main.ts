@@ -101,7 +101,7 @@ const toggleRaceBtns = (isRaceStarted: boolean) => {
   }
 };
 
-const verticalMobileDialog = new UIDialogWrapper();
+const dialog = new UIDialogWrapper();
 
 const pEl = document.createElement("p");
 pEl.textContent =
@@ -115,7 +115,7 @@ const updateControls = () => {
   }
 
   if (isTouchDevice() && windowSize.width / windowSize.height < 1) {
-    verticalMobileDialog.show({
+    dialog.show({
       content: pEl,
     });
   }
@@ -278,11 +278,20 @@ interface ServerToClientEvents {
     currentPlayerId = id;
 
     toggleRaceBtns(race.isStarted);
-    const displayNameForm = new UIDialogWrapper();
-    const labelName = document.createElement("p");
-    labelName.textContent = "Display name";
-    displayNameForm.show({
+
+    const labelName = document.createElement("label");
+    labelName.textContent = "Display name ";
+    const inputName = document.createElement("input");
+    inputName.type = "text";
+    labelName.appendChild(inputName);
+
+    const inputSubmit = document.createElement("input");
+    inputSubmit.type = "submit";
+    labelName.appendChild(inputSubmit);
+
+    dialog.show({
       content: labelName,
+      inputToLook: inputName,
     });
 
     socket.emit("getPlayerList");

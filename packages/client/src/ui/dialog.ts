@@ -15,6 +15,8 @@ export class UIDialogWrapper {
 
   dialogFooter: Element;
 
+  inputToLook: HTMLInputElement | null;
+
   constructor() {
     const [dialogWrapper] = document.getElementsByClassName(
       DIALOG_WRAPPER_CLASSNAME
@@ -39,6 +41,16 @@ export class UIDialogWrapper {
     dialogCloseButton?.addEventListener("click", () => {
       this.close();
     });
+
+    this.inputToLook = null;
+
+    dialogContent.addEventListener("click", (ev: Event) => {
+      const element = ev.target as HTMLButtonElement;
+
+      if (element?.type === "submit") {
+        console.log(this.inputToLook?.value);
+      }
+    });
   }
 
   close() {
@@ -61,9 +73,21 @@ export class UIDialogWrapper {
     }
   }
 
-  show({ content, footer }: { content: Node; footer?: Node }) {
+  show({
+    content,
+    footer,
+    inputToLook,
+  }: {
+    content: Node;
+    footer?: Node;
+    inputToLook?: HTMLInputElement;
+  }) {
     this.setContent(content);
     this.setFooter(footer);
+
+    if (inputToLook) {
+      this.inputToLook = inputToLook;
+    }
 
     this.dialogWrapper.classList.remove("hide");
   }
