@@ -17,6 +17,9 @@ const stopRaceBtn = document.getElementById(
   "stop-race-btn"
 ) as HTMLAnchorElement;
 const playersListEl = document.getElementById("players-list") as HTMLElement;
+const settingsBtn = document.getElementById(
+  "settings-btn"
+) as HTMLAnchorElement;
 
 // const throttle = (func: Function, timeFrame: number = 0) => {
 //   var lastTime = 0;
@@ -324,12 +327,16 @@ interface ServerToClientEvents {
     dataFromServer = playersFromServer;
   });
 
-  startRaceBtn.addEventListener("click", async () => {
+  startRaceBtn.addEventListener("click", () => {
     socket.emit("player:start-race");
   });
 
-  stopRaceBtn.addEventListener("click", async () => {
+  stopRaceBtn.addEventListener("click", () => {
     socket.emit("player:stop-race");
+  });
+
+  settingsBtn.addEventListener("click", () => {
+    console.log("settings button clicked");
   });
 
   window.addEventListener("resize", () => {
