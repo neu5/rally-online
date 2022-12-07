@@ -67,9 +67,12 @@ export type PlayersMap = Map<
 
 type GameType = {
   playersMap: PlayersMap;
+  rootEl: HTMLElement | null;
 };
+
 const game: GameType = {
   playersMap: new Map(),
+  rootEl: document.getElementById("root"),
 };
 
 const [...mobileControlsEls] = document.getElementsByClassName(
@@ -101,7 +104,7 @@ const toggleRaceBtns = (isRaceStarted: boolean) => {
   }
 };
 
-const dialog = new UIDialogWrapper();
+const dialog = new UIDialogWrapper({ rootEl: game.rootEl });
 
 const pEl = document.createElement("p");
 pEl.textContent =
@@ -145,6 +148,7 @@ interface ServerToClientEvents {
   getPlayerList: () => void;
   "player:start-race": () => void;
   "player:stop-race": () => void;
+  "player:set-name": ({ id, name }: { id: string; name: string }) => void;
 }
 
 (async () => {
@@ -296,6 +300,21 @@ interface ServerToClientEvents {
 
     socket.emit("getPlayerList");
   });
+
+  if (game.rootEl) {
+    game.rootEl.addEventListener("setName", (ev) => {
+      const customEvent = ev as CustomEvent<string>;
+
+      if (customEvent.detail && currentPlayerId) {
+        socket.emit("player:set-name", {
+          id: currentPlayerId,
+          name: customEvent.detail,
+        });
+      }
+
+      dialog.close();
+    });
+  }
 
   socket.on(
     "server:start-race",

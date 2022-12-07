@@ -214,6 +214,16 @@ const playersMapToArray = (list: PlayersMap) =>
       io.emit("server:stop-race", race);
     });
 
+    socket.on("player:set-name", ({ id, name }) => {
+      const player = playersMap.get(id);
+
+      if (player) {
+        player.name = name;
+      }
+
+      io.emit("playerListUpdate", playersMapToArray(playersMap));
+    });
+
     socket.on(
       "player:action",
       ({ playerActions, id }: { playerActions: ActionTypes[]; id: string }) => {

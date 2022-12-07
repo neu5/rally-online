@@ -17,7 +17,7 @@ export class UIDialogWrapper {
 
   inputToLook: HTMLInputElement | null;
 
-  constructor() {
+  constructor({ rootEl }: { rootEl: HTMLElement | null }) {
     const [dialogWrapper] = document.getElementsByClassName(
       DIALOG_WRAPPER_CLASSNAME
     );
@@ -47,8 +47,12 @@ export class UIDialogWrapper {
     dialogContent.addEventListener("click", (ev: Event) => {
       const element = ev.target as HTMLButtonElement;
 
-      if (element?.type === "submit") {
-        console.log(this.inputToLook?.value);
+      if (element?.type === "submit" && this.inputToLook && rootEl) {
+        const event = new CustomEvent("setName", {
+          detail: this.inputToLook.value,
+        });
+
+        rootEl.dispatchEvent(event);
       }
     });
   }

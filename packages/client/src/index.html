@@ -7,30 +7,32 @@
   </head>
   <body>
     <canvas id="canvas"></canvas>
-    <div id="speedometer">0</div>
-    <div id="fps">0</div>
-    <div class="mobile-controls acceleration hide">
-      <button data-type="accelerate">accelerate</button>
-      <button data-type="brake">brake</button>
-    </div>
-    <div class="mobile-controls turning hide">
-      <button data-type="left">left</button>
-      <button data-type="right">right</button>
-    </div>
-    <section id="players">
-      <button id="start-race-btn" disabled>start</button>
-      <button id="stop-race-btn" disabled>stop</button>
-      <h2>Players</h2>
-      <ul id="players-list"></ul>
-    </section>
-    <section id="players-indicators"></section>
-    <div class="dialog-wrapper hide">
-      <div class="dialog">
-        <div class="dialog-header">
-          <button class="dialog-header__close-button">close</button>
+    <div id="root">
+      <div id="speedometer">0</div>
+      <div id="fps">0</div>
+      <div class="mobile-controls acceleration hide">
+        <button data-type="accelerate">accelerate</button>
+        <button data-type="brake">brake</button>
+      </div>
+      <div class="mobile-controls turning hide">
+        <button data-type="left">left</button>
+        <button data-type="right">right</button>
+      </div>
+      <section id="players">
+        <button id="start-race-btn" disabled>start</button>
+        <button id="stop-race-btn" disabled>stop</button>
+        <h2>Players</h2>
+        <ul id="players-list"></ul>
+      </section>
+      <section id="players-indicators"></section>
+      <div class="dialog-wrapper hide">
+        <div class="dialog">
+          <div class="dialog-header">
+            <button class="dialog-header__close-button">close</button>
+          </div>
+          <div class="dialog-content">content</div>
+          <div class="dialog-footer">footer</div>
         </div>
-        <div class="dialog-content">content</div>
-        <div class="dialog-footer">footer</div>
       </div>
     </div>
     <script type="module" src="main.ts"></script>
