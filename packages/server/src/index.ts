@@ -13,29 +13,7 @@ import type {
 } from "@neu5/types/src";
 
 import { startRace } from "./scene/scene";
-
-type PlayerNumbers = Array<{
-  idx: number;
-  isFree: boolean;
-}>;
-const playerNumbers: PlayerNumbers = [
-  {
-    idx: 0,
-    isFree: true,
-  },
-  {
-    idx: 1,
-    isFree: true,
-  },
-  {
-    idx: 2,
-    isFree: true,
-  },
-  {
-    idx: 3,
-    isFree: true,
-  },
-];
+import { playerNames, playerNumbers } from "./utils";
 
 const vehicles = [
   {
@@ -62,6 +40,7 @@ type Race = {
 
 type GameInfo = {
   id: string;
+  name: string;
   race: Race;
 };
 
@@ -281,8 +260,23 @@ const playersMapToArray = (list: PlayersMap) =>
     vehiclesTemplate = vehicles[playerNumber.idx];
     playerNumber.isFree = false;
 
+    const getRandomInt = (min: number, max: number) => {
+      const minCeiled = Math.ceil(min);
+      const maxFloored = Math.floor(max);
+      return Math.floor(
+        Math.random() * (maxFloored - minCeiled + 1) + minCeiled
+      );
+    };
+
+    const getPlayerName = () => {
+      const randomInt = getRandomInt(0, playerNames.length - 1);
+      return playerNames[randomInt];
+    };
+
+    const playerName = getPlayerName();
+
     playersMap.set(socket.id, {
-      name: socket.id,
+      name: playerName,
       actions: { ...actions },
       accelerateTimeMS: 0,
       turnTimeMS: 0,
@@ -297,6 +291,7 @@ const playersMapToArray = (list: PlayersMap) =>
 
     socket.emit("server:gameInfo", {
       id: socket.id,
+      name: playerName,
       race,
     });
   });

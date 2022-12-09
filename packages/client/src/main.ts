@@ -55,6 +55,7 @@ type Race = {
 
 type GameInfo = {
   id: string;
+  name: string;
   race: Race;
 };
 
@@ -270,6 +271,8 @@ interface ServerToClientEvents {
         }
       );
 
+      console.log(playersList);
+
       UIcreatePlayersList(playersListEl, game.playersMap);
 
       if (currentPlayerId) {
@@ -278,7 +281,7 @@ interface ServerToClientEvents {
     }
   );
 
-  socket.on("server:gameInfo", ({ id, race }: GameInfo) => {
+  socket.on("server:gameInfo", ({ id, name, race }: GameInfo) => {
     currentPlayerId = id;
 
     toggleRaceBtns(race.isStarted);
@@ -287,6 +290,7 @@ interface ServerToClientEvents {
     labelName.textContent = "Display name ";
     const inputName = document.createElement("input");
     inputName.type = "text";
+    inputName.value = name;
     labelName.appendChild(inputName);
 
     const inputSubmit = document.createElement("input");
