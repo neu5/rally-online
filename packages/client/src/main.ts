@@ -148,7 +148,13 @@ interface ServerToClientEvents {
   getPlayerList: () => void;
   "player:start-race": () => void;
   "player:stop-race": () => void;
-  "player:set-name": ({ id, name }: { id: string; name: string }) => void;
+  "player:set-name": ({
+    id,
+    displayName,
+  }: {
+    id: string;
+    displayName: string;
+  }) => void;
 }
 
 (async () => {
@@ -238,7 +244,8 @@ interface ServerToClientEvents {
     (
       playersList: Array<{
         color: string;
-        name: string;
+        displayName: string;
+        socketId: string;
         vehicle: any;
       }>
     ) => {
@@ -247,18 +254,21 @@ interface ServerToClientEvents {
       playersList.forEach(
         ({
           color,
-          name,
+          displayName,
+          socketId,
           vehicle,
         }: {
           color: string;
-          name: string;
+          displayName: string;
+          socketId: string;
           vehicle: any;
         }) => {
-          game.playersMap.set(name, {
+          game.playersMap.set(socketId, {
             ...(color ? { color } : undefined),
-            name,
+            displayName,
+            socketId,
             vehicle,
-            isCurrentPlayer: name === currentPlayerId,
+            isCurrentPlayer: socketId === currentPlayerId,
             vehicleSteering: 0,
             actions: {
               accelerate: false,
@@ -308,7 +318,7 @@ interface ServerToClientEvents {
       if (customEvent.detail && currentPlayerId) {
         socket.emit("player:set-name", {
           id: currentPlayerId,
-          name: customEvent.detail,
+          displayName: customEvent.detail,
         });
       }
 

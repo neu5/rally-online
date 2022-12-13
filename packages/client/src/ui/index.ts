@@ -4,10 +4,10 @@ import type { PlayersMap } from "../main";
 const UIcreatePlayersList = (el: HTMLElement, list: PlayersMap) => {
   const fragment = new DocumentFragment();
 
-  list.forEach(({ name }) => {
+  list.forEach(({ displayName }) => {
     const li = document.createElement("li");
-    li.textContent = name;
-    li.dataset.id = name;
+    li.textContent = displayName;
+    li.dataset.id = displayName;
 
     fragment.appendChild(li);
   });
@@ -45,7 +45,7 @@ const UIPlayersIndicators = (el: HTMLElement, playersMap: PlayersMap) => {
     const playerIndicator = indicators[idx];
 
     const nameEl = playerIndicator.children[0];
-    nameEl.textContent = player.name;
+    nameEl.textContent = player.displayName;
 
     player.UIindicator = playerIndicator;
 

@@ -72,7 +72,8 @@ type Player = {
   updateAction?: (actions: Actions) => void;
   actions: Actions;
   actionsFromServer?: Actions;
-  name: string;
+  displayName: string;
+  socketId: string;
   vehicle?: VehicleTemplate;
   isCurrentPlayer: boolean;
   vehicleSteering: number;
