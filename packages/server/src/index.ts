@@ -96,7 +96,8 @@ export type PlayersMap = Map<
     turnTimeMS: number;
     actions: Actions;
     color: string;
-    name: string;
+    socketId: string;
+    displayName: string;
     vehicle?: VehicleTemplate;
     playerNumber?: number;
     vehicleSteering: number;
@@ -144,10 +145,11 @@ const actions: Actions = {
 } as const;
 
 const playersMapToArray = (list: PlayersMap) =>
-  Array.from(list).map(([id, { color, name, vehicle }]) => ({
+  Array.from(list).map(([id, { color, displayName, socketId, vehicle }]) => ({
     id,
     color,
-    name,
+    displayName,
+    socketId,
     ...(vehicle
       ? {
           vehicle: {
@@ -214,11 +216,11 @@ const playersMapToArray = (list: PlayersMap) =>
       io.emit("server:stop-race", race);
     });
 
-    socket.on("player:set-name", ({ id, name }) => {
+    socket.on("player:set-name", ({ id, displayName }) => {
       const player = playersMap.get(id);
 
       if (player) {
-        player.name = name;
+        player.displayName = displayName;
       }
 
       io.emit("playerListUpdate", playersMapToArray(playersMap));
@@ -282,7 +284,8 @@ const playersMapToArray = (list: PlayersMap) =>
     playerNumber.isFree = false;
 
     playersMap.set(socket.id, {
-      name: socket.id,
+      socketId: socket.id,
+      displayName: "test",
       actions: { ...actions },
       accelerateTimeMS: 0,
       turnTimeMS: 0,
