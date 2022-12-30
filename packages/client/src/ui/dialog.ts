@@ -77,15 +77,27 @@ export class UIDialogWrapper {
     }
   }
 
+  private setCloseButtonVisibility(showCloseButton: boolean) {
+    console.log({ showCloseButton });
+    if (showCloseButton) {
+      this.dialogCloseButton.classList.remove("hide");
+    } else {
+      this.dialogCloseButton.classList.add("hide");
+    }
+  }
+
   show({
     content,
     footer,
     inputToLook,
+    closeButtonVisibility = true,
   }: {
     content: Node;
     footer?: Node;
     inputToLook?: HTMLInputElement;
+    closeButtonVisibility?: boolean;
   }) {
+    this.setCloseButtonVisibility(closeButtonVisibility);
     this.setContent(content);
     this.setFooter(footer);
 
