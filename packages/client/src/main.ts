@@ -306,6 +306,7 @@ interface ServerToClientEvents {
     dialog.show({
       content: labelName,
       inputToLook: inputName,
+      closeButtonVisibility: false,
     });
 
     socket.emit("getPlayerList");
