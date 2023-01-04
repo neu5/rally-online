@@ -6,7 +6,7 @@ Being in the `root` directory run
 `yarn`
 
 To start local server run
-`yarn watch`
+`yarn dev`
 and after while you should have application working on
 `http://localhost:5000/`
 

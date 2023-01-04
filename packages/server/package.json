@@ -28,8 +28,8 @@
   "scripts": {
     "build": "tsc",
     "serve": "node --experimental-specifier-resolution=node dist/index.js",
-    "watch": "tsc --watch",
-    "watch:serve": "nodemon --experimental-specifier-resolution=node dist/index.js",
+    "dev": "tsc --watch",
+    "dev:serve": "nodemon --experimental-specifier-resolution=node dist/index.js",
     "test": "tsc --noEmit"
   }
 }
