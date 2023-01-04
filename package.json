@@ -28,10 +28,10 @@
   "scripts": {
     "build": "yarn workspaces foreach -p run build",
     "clean": "rm -Rf packages/client/dist && rm -Rf packages/server/dist && cd packages/client && mkdir dist && cd ../server && mkdir dist && echo 'done'",
-    "watch": "concurrently -k \"yarn:watch:*\"",
-    "watch:client": "yarn workspace @neu5/client watch",
-    "watch:server": "yarn workspace @neu5/server watch",
-    "watch:serve": "yarn workspace @neu5/server watch:serve",
+    "dev": "concurrently -k \"yarn:dev:*\"",
+    "dev:client": "yarn workspace @neu5/client dev",
+    "dev:server": "yarn workspace @neu5/server dev",
+    "dev:serve": "yarn workspace @neu5/server dev:serve",
     "lint": "eslint 'packages/**/*.ts'",
     "serve": "yarn workspace @neu5/server serve",
     "test": "yarn workspaces foreach -p run test"
