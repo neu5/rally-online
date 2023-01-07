@@ -219,11 +219,25 @@ const playersMapToArray = (list: PlayersMap) =>
     socket.on("player:set-name", ({ id, displayName }) => {
       const player = playersMap.get(id);
 
-      if (player) {
-        player.displayName = displayName;
+      console.log(displayName);
+
+      if (!player) {
+        return;
       }
 
-      io.emit("playerListUpdate", playersMapToArray(playersMap));
+      if (
+        typeof displayName === "string" &&
+        displayName.length >= 2 &&
+        displayName.length <= 16 &&
+        /^[\w]+$/.test(displayName)
+      ) {
+        player.displayName = displayName;
+
+        socket.emit("server:close-dialog");
+        io.emit("playerListUpdate", playersMapToArray(playersMap));
+      } else {
+        socket.emit("server:show-error", { message: "Wrong input" });
+      }
     });
 
     socket.on(

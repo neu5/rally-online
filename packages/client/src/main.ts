@@ -144,6 +144,8 @@ interface ServerToClientEvents {
   }) => void;
   "server:stop-race": (race: Race) => void;
   "server:gameInfo": (gameInfo: GameInfo) => void;
+  "server:close-dialog": () => void;
+  "server:show-error": ({ message }: { message: string }) => void;
   "player:action": (data: Object) => void;
   getPlayerList: () => void;
   "player:start-race": () => void;
@@ -316,14 +318,12 @@ interface ServerToClientEvents {
     game.rootEl.addEventListener("setName", (ev) => {
       const customEvent = ev as CustomEvent<string>;
 
-      if (customEvent.detail && currentPlayerId) {
+      if (customEvent.detail !== undefined && currentPlayerId) {
         socket.emit("player:set-name", {
           id: currentPlayerId,
           displayName: customEvent.detail,
         });
       }
-
-      dialog.close();
     });
   }
 
@@ -367,6 +367,14 @@ interface ServerToClientEvents {
 
   socket.on("server:action", (playersFromServer: PlayersFromServer) => {
     dataFromServer = playersFromServer;
+  });
+
+  socket.on("server:show-error", ({ message }: { message: string }) => {
+    console.log(message);
+  });
+
+  socket.on("server:close-dialog", () => {
+    dialog.close();
   });
 
   startRaceBtn.addEventListener("click", async () => {

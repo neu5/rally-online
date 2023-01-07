@@ -89,21 +89,34 @@ body {
   height: 100%;
   position: fixed;
   z-index: 2;
-  background: rgba(255, 255, 255, 0.5);
   top: 0;
   left: 0;
 }
 
+.toast-wrapper {
+  z-index: 10;
+  position: fixed;
+  top: 0;
+  width: 90%;
+  left: 5%;
+  background-color: #f6d9d9;
+}
+
 .dialog {
+  background-color: white;
+}
+
+.dialog,
+.toast {
   width: 100%;
   height: 100%;
   margin: 0 auto;
-  background-color: white;
   top: 0;
   position: relative;
 }
 
-.dialog-header {
+.dialog-header,
+.toast-header {
   overflow: hidden;
 
   &__close-button {
