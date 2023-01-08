@@ -130,7 +130,7 @@ updateControls();
 let currentPlayerId: string | undefined = undefined;
 
 interface ServerToClientEvents {
-  playerListUpdate: (playersList: Array<PlayersMap>) => void;
+  "server:users-list-update": (playersList: Array<PlayersMap>) => void;
   playerID: (id: string) => void;
   "server:action": (data: PlayersFromServer) => void;
   "server:start-race": ({
@@ -239,7 +239,7 @@ interface ServerToClientEvents {
   };
 
   socket.on(
-    "playerListUpdate",
+    "server:users-list-update",
     // @ts-ignore
     (
       playersList: Array<{
