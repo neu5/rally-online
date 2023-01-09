@@ -130,9 +130,19 @@ updateControls();
 let currentPlayerId: string | undefined = undefined;
 
 interface ServerToClientEvents {
-  playerListUpdate: (playersList: Array<PlayersMap>) => void;
-  playerID: (id: string) => void;
+  "player:action": (data: Object) => void;
+  "player:get-users-list": () => void;
+  "player:set-name": ({
+    id,
+    displayName,
+  }: {
+    id: string;
+    displayName: string;
+  }) => void;
+  "player:start-race": () => void;
+  "player:stop-race": () => void;
   "server:action": (data: PlayersFromServer) => void;
+  "server:game-info": (gameInfo: GameInfo) => void;
   "server:start-race": ({
     objects,
     config,
@@ -143,18 +153,7 @@ interface ServerToClientEvents {
     race: Race;
   }) => void;
   "server:stop-race": (race: Race) => void;
-  "server:gameInfo": (gameInfo: GameInfo) => void;
-  "player:action": (data: Object) => void;
-  getPlayerList: () => void;
-  "player:start-race": () => void;
-  "player:stop-race": () => void;
-  "player:set-name": ({
-    id,
-    displayName,
-  }: {
-    id: string;
-    displayName: string;
-  }) => void;
+  "server:users-list-update": (playersList: Array<PlayersMap>) => void;
 }
 
 (async () => {
@@ -239,7 +238,7 @@ interface ServerToClientEvents {
   };
 
   socket.on(
-    "playerListUpdate",
+    "server:users-list-update",
     // @ts-ignore
     (
       playersList: Array<{
@@ -288,7 +287,7 @@ interface ServerToClientEvents {
     }
   );
 
-  socket.on("server:gameInfo", ({ id, race }: GameInfo) => {
+  socket.on("server:game-info", ({ id, race }: GameInfo) => {
     currentPlayerId = id;
 
     toggleRaceBtns(race.isStarted);
@@ -309,7 +308,7 @@ interface ServerToClientEvents {
       closeButtonVisibility: false,
     });
 
-    socket.emit("getPlayerList");
+    socket.emit("player:get-users-list");
   });
 
   if (game.rootEl) {

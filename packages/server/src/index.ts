@@ -77,11 +77,12 @@ const app = express();
 const httpServer = createServer(app);
 
 interface ServerToClientEvents {
-  playerListUpdate: (playersList: Object) => void;
-  "server:gameInfo": (data: GameInfo) => void;
+  "player:get-users-list": () => void;
   "server:action": (data: Object) => void;
+  "server:game-info": (data: GameInfo) => void;
   "server:start-race": (data: Object) => void;
   "server:stop-race": (data: Object) => void;
+  "server:users-list-update": (playersList: Object) => void;
 }
 const io = new Server<ServerToClientEvents>(httpServer);
 
@@ -177,8 +178,8 @@ const playersMapToArray = (list: PlayersMap) =>
 
 (async () => {
   const createSocketHandlers = (socket: Socket) => {
-    socket.on("getPlayerList", () => {
-      socket.emit("playerListUpdate", playersMapToArray(playersMap));
+    socket.on("player:get-users-list", () => {
+      socket.emit("server:users-list-update", playersMapToArray(playersMap));
     });
 
     socket.on("player:start-race", async () => {
@@ -223,7 +224,7 @@ const playersMapToArray = (list: PlayersMap) =>
         player.displayName = displayName;
       }
 
-      io.emit("playerListUpdate", playersMapToArray(playersMap));
+      io.emit("server:users-list-update", playersMapToArray(playersMap));
     });
 
     socket.on(
@@ -268,7 +269,7 @@ const playersMapToArray = (list: PlayersMap) =>
 
       playersMap.delete(socket.id);
 
-      io.emit("playerListUpdate", playersMapToArray(playersMap));
+      io.emit("server:users-list-update", playersMapToArray(playersMap));
     });
   };
 
@@ -296,9 +297,9 @@ const playersMapToArray = (list: PlayersMap) =>
 
     createSocketHandlers(socket);
 
-    io.emit("playerListUpdate", playersMapToArray(playersMap));
+    io.emit("server:users-list-update", playersMapToArray(playersMap));
 
-    socket.emit("server:gameInfo", {
+    socket.emit("server:game-info", {
       id: socket.id,
       race,
     });
