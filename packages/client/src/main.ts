@@ -1,9 +1,12 @@
 import { io } from "socket.io-client";
 import type { Quaternion } from "@babylonjs/core";
 import { ArcRotateCamera, Engine, Scene, Vector3 } from "@babylonjs/core";
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
 
 import { startRace } from "./scene/scene";
 import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
+import { TOAST_COLORS } from "./utils";
 
 import type { Socket } from "socket.io-client";
 import type { GameConfig, GameObject, Player, Position } from "@neu5/types/src";
@@ -295,7 +298,7 @@ interface ServerToClientEvents {
     toggleRaceBtns(race.isStarted);
 
     const labelName = document.createElement("label");
-    labelName.textContent = "Display name ";
+    labelName.textContent = "Your display name (2-16 letters) ";
     const inputName = document.createElement("input");
     inputName.type = "text";
     labelName.appendChild(inputName);
@@ -369,7 +372,16 @@ interface ServerToClientEvents {
   });
 
   socket.on("server:show-error", ({ message }: { message: string }) => {
-    console.log(message);
+    Toastify({
+      text: message,
+      duration: -1,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: TOAST_COLORS.RED,
+      },
+    }).showToast();
   });
 
   socket.on("server:close-dialog", () => {
