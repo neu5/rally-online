@@ -220,8 +220,6 @@ const playersMapToArray = (list: PlayersMap) =>
     socket.on("player:set-name", ({ id, displayName }) => {
       const player = playersMap.get(id);
 
-      console.log(displayName);
-
       if (!player) {
         return;
       }
