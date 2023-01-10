@@ -1,9 +1,12 @@
 import { io } from "socket.io-client";
 import type { Quaternion } from "@babylonjs/core";
 import { ArcRotateCamera, Engine, Scene, Vector3 } from "@babylonjs/core";
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
 
 import { startRace } from "./scene/scene";
 import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
+import { TOAST_COLORS } from "./utils";
 
 import type { Socket } from "socket.io-client";
 import type { GameConfig, GameObject, Player, Position } from "@neu5/types/src";
@@ -142,7 +145,9 @@ interface ServerToClientEvents {
   "player:start-race": () => void;
   "player:stop-race": () => void;
   "server:action": (data: PlayersFromServer) => void;
+  "server:close-dialog": () => void;
   "server:game-info": (gameInfo: GameInfo) => void;
+  "server:show-error": ({ message }: { message: string }) => void;
   "server:start-race": ({
     objects,
     config,
@@ -293,7 +298,7 @@ interface ServerToClientEvents {
     toggleRaceBtns(race.isStarted);
 
     const labelName = document.createElement("label");
-    labelName.textContent = "Display name ";
+    labelName.textContent = "Your display name (2-16 characters) ";
     const inputName = document.createElement("input");
     inputName.type = "text";
     labelName.appendChild(inputName);
@@ -315,14 +320,12 @@ interface ServerToClientEvents {
     game.rootEl.addEventListener("setName", (ev) => {
       const customEvent = ev as CustomEvent<string>;
 
-      if (customEvent.detail && currentPlayerId) {
+      if (customEvent.detail !== undefined && currentPlayerId) {
         socket.emit("player:set-name", {
           id: currentPlayerId,
           displayName: customEvent.detail,
         });
       }
-
-      dialog.close();
     });
   }
 
@@ -366,6 +369,23 @@ interface ServerToClientEvents {
 
   socket.on("server:action", (playersFromServer: PlayersFromServer) => {
     dataFromServer = playersFromServer;
+  });
+
+  socket.on("server:show-error", ({ message }: { message: string }) => {
+    Toastify({
+      text: message,
+      duration: -1,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: TOAST_COLORS.RED,
+      },
+    }).showToast();
+  });
+
+  socket.on("server:close-dialog", () => {
+    dialog.close();
   });
 
   startRaceBtn.addEventListener("click", async () => {

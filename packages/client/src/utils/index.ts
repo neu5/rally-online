@@ -192,4 +192,15 @@ const addRigidVehicle = ({
   };
 };
 
-export { addBox, addColors, addPlane, addSphere, addRigidVehicle };
+const TOAST_COLORS = {
+  RED: "linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))",
+};
+
+export {
+  addBox,
+  addColors,
+  addPlane,
+  addSphere,
+  addRigidVehicle,
+  TOAST_COLORS,
+};
