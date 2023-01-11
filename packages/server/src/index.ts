@@ -6,9 +6,13 @@ import { Server } from "socket.io";
 
 import type { Socket } from "socket.io";
 import type {
+  ActionTypes,
+  Actions,
   GameConfig,
   GameObject,
   Position,
+  Race,
+  ServerToClientEvents,
   VehicleTemplate,
 } from "@neu5/types/src";
 
@@ -56,15 +60,6 @@ const vehicles = [
   },
 ];
 
-type Race = {
-  isStarted: boolean;
-};
-
-type GameInfo = {
-  id: string;
-  race: Race;
-};
-
 const race: Race = {
   isStarted: false,
 };
@@ -76,21 +71,39 @@ const distDir = resolve(rootDir, "../../../", "client/dist");
 const app = express();
 const httpServer = createServer(app);
 
-interface ServerToClientEvents {
-  "player:get-users-list": () => void;
-  "server:action": (data: Object) => void;
-  "server:game-info": (data: GameInfo) => void;
-  "server:start-race": (data: Object) => void;
-  "server:stop-race": (data: Object) => void;
-  "server:users-list-update": (playersList: Object) => void;
-}
+// interface ServerToClientEvents {
+//   "player:action": ({
+//     playerActions,
+//     id,
+//   }: {
+//     playerActions: ActionTypes[];
+//     id: string;
+//   }) => void;
+//   "player:get-users-list": () => void;
+//   "player:set-name": ({
+//     id,
+//     displayName,
+//   }: {
+//     id: string;
+//     displayName: string;
+//   }) => void;
+//   "player:start-race": () => void;
+//   "player:stop-race": () => void;
+//   "server:action": (data: Object) => void;
+//   "server:close-dialog": () => void;
+//   "server:game-info": (data: GameInfo) => void;
+//   "server:show-error": ({ message }: { message: string }) => void;
+//   "server:start-race": (data: Object) => void;
+//   "server:stop-race": (data: Object) => void;
+//   "server:users-list-update": (playersList: Object) => void;
+// }
 const io = new Server<ServerToClientEvents>(httpServer);
 
 type Car = {
   wheelMeshes: Array<any>;
 };
 
-export type PlayersMap = Map<
+export type PlayersMapServer = Map<
   string,
   {
     accelerateTimeMS: number;
@@ -123,21 +136,13 @@ let game: Game = {
 };
 let raceLoop: NodeJS.Timer | null = null;
 
-const playersMap: PlayersMap = new Map();
+const playersMap: PlayersMapServer = new Map();
 
 const ACCELERATE = "accelerate";
 const BRAKE = "brake";
 const LEFT = "left";
 const RIGHT = "right";
 
-type ActionTypes = "accelerate" | "brake" | "left" | "right";
-
-interface Actions {
-  [ACCELERATE]: boolean;
-  [BRAKE]: boolean;
-  [LEFT]: boolean;
-  [RIGHT]: boolean;
-}
 const actions: Actions = {
   [ACCELERATE]: false,
   [BRAKE]: false,
@@ -145,7 +150,7 @@ const actions: Actions = {
   [RIGHT]: false,
 } as const;
 
-const playersMapToArray = (list: PlayersMap) =>
+const playersMapToArray = (list: PlayersMapServer) =>
   Array.from(list).map(([id, { color, displayName, socketId, vehicle }]) => ({
     id,
     color,
@@ -177,7 +182,7 @@ const playersMapToArray = (list: PlayersMap) =>
 // }, 1000);
 
 (async () => {
-  const createSocketHandlers = (socket: Socket) => {
+  const createSocketHandlers = (socket: Socket<ServerToClientEvents>) => {
     socket.on("player:get-users-list", () => {
       socket.emit("server:users-list-update", playersMapToArray(playersMap));
     });

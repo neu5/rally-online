@@ -1,5 +1,4 @@
 import { io } from "socket.io-client";
-import type { Quaternion } from "@babylonjs/core";
 import { ArcRotateCamera, Engine, Scene, Vector3 } from "@babylonjs/core";
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
@@ -9,7 +8,18 @@ import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 import { TOAST_COLORS } from "./utils";
 
 import type { Socket } from "socket.io-client";
-import type { GameConfig, GameObject, Player, Position } from "@neu5/types/src";
+import type {
+  ActionTypes,
+  GameConfig,
+  GameInfo,
+  GameObject,
+  PlayerFromServer,
+  PlayersFromServer,
+  PlayersMap,
+  Position,
+  Race,
+  ServerToClientEvents,
+} from "@neu5/types/src";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
@@ -36,37 +46,7 @@ const playersListEl = document.getElementById("players-list") as HTMLElement;
 //   console.log(...args);
 // }, 1000);
 
-type PlayerFromServer = {
-  id: string;
-  vehicle: {
-    body: { position: Vector3; quaternion: Quaternion };
-    wheels: Array<{ position: Vector3; quaternion: Quaternion }>;
-  };
-};
-
-type PlayersFromServer = Array<PlayerFromServer>;
-
 let dataFromServer: PlayersFromServer = [];
-
-type Car = {
-  wheelMeshes: Array<any>;
-};
-
-type Race = {
-  isStarted: boolean;
-};
-
-type GameInfo = {
-  id: string;
-  race: Race;
-};
-
-export type PlayersMap = Map<
-  string,
-  Player & {
-    car?: Car;
-  }
->;
 
 type GameType = {
   playersMap: PlayersMap;
@@ -132,40 +112,10 @@ updateControls();
 
 let currentPlayerId: string | undefined = undefined;
 
-interface ServerToClientEvents {
-  "player:action": (data: Object) => void;
-  "player:get-users-list": () => void;
-  "player:set-name": ({
-    id,
-    displayName,
-  }: {
-    id: string;
-    displayName: string;
-  }) => void;
-  "player:start-race": () => void;
-  "player:stop-race": () => void;
-  "server:action": (data: PlayersFromServer) => void;
-  "server:close-dialog": () => void;
-  "server:game-info": (gameInfo: GameInfo) => void;
-  "server:show-error": ({ message }: { message: string }) => void;
-  "server:start-race": ({
-    objects,
-    config,
-    race,
-  }: {
-    objects: GameObject[];
-    config: GameConfig;
-    race: Race;
-  }) => void;
-  "server:stop-race": (race: Race) => void;
-  "server:users-list-update": (playersList: Array<PlayersMap>) => void;
-}
-
 (async () => {
   const engine = new Engine(canvas, true);
   let scene: Scene = new Scene(engine);
 
-  // share sockets interfaces?
   const socket: Socket<ServerToClientEvents> = io();
 
   const startEngineLoop = () => {
@@ -235,11 +185,13 @@ interface ServerToClientEvents {
     });
   };
 
-  const sendAction = (playerActions: string[]) => {
-    socket.emit("player:action", {
-      id: currentPlayerId,
-      playerActions,
-    });
+  const sendAction = (playerActions: ActionTypes[]) => {
+    if (currentPlayerId) {
+      socket.emit("player:action", {
+        id: currentPlayerId,
+        playerActions,
+      });
+    }
   };
 
   socket.on(
