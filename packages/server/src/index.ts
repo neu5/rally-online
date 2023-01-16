@@ -225,18 +225,36 @@ const playersMapToArray = (list: PlayersMap) =>
       }
 
       if (
-        typeof displayName === "string" &&
-        displayName.length >= 2 &&
-        displayName.length <= 16 &&
-        /^[\w]+$/.test(displayName)
+        !(
+          typeof displayName === "string" &&
+          displayName.length >= 2 &&
+          displayName.length <= 16 &&
+          /^[\w]+$/.test(displayName)
+        )
       ) {
-        player.displayName = displayName;
-
-        socket.emit("server:close-dialog");
-        io.emit("server:users-list-update", playersMapToArray(playersMap));
-      } else {
         socket.emit("server:show-error", { message: "Wrong input" });
+        return;
       }
+
+      let isPlayerNameAlreadyTaken: boolean = false;
+
+      playersMap.forEach((p) => {
+        if (p.displayName === displayName) {
+          isPlayerNameAlreadyTaken = true;
+        }
+      });
+
+      if (isPlayerNameAlreadyTaken) {
+        socket.emit("server:show-error", {
+          message: "That name is already taken. Choose different name",
+        });
+        return;
+      }
+
+      player.displayName = displayName;
+
+      socket.emit("server:close-dialog");
+      io.emit("server:users-list-update", playersMapToArray(playersMap));
     });
 
     socket.on(
