@@ -123,6 +123,9 @@ let game: Game = {
 };
 let raceLoop: NodeJS.Timer | null = null;
 
+type UsersMap = Map<string, {}>;
+const usersMap: UsersMap = new Map();
+
 const playersMap: PlayersMap = new Map();
 
 const ACCELERATE = "accelerate";
@@ -304,68 +307,62 @@ const playersMapToArray = (list: PlayersMap) =>
   };
 
   io.on("connection", (socket) => {
-    const playerNumber = playerNumbers.find(({ isFree }) => isFree);
-    let vehiclesTemplate = null;
-
-    if (!playerNumber) {
-      return;
-    }
-
-    vehiclesTemplate = vehicles[playerNumber.idx];
-    playerNumber.isFree = false;
-
-    playersMap.set(socket.id, {
-      socketId: socket.id,
-      displayName: "test",
-      actions: { ...actions },
-      accelerateTimeMS: 0,
-      turnTimeMS: 0,
-      vehicleSteering: 0,
-      playerNumber: playerNumber?.idx,
-      ...vehiclesTemplate,
-    });
-
-    createSocketHandlers(socket);
-
-    io.emit("server:users-list-update", playersMapToArray(playersMap));
-
-    socket.emit("server:game-info", {
-      id: socket.id,
-      race,
-    });
+    // const playerNumber = playerNumbers.find(({ isFree }) => isFree);
+    // let vehiclesTemplate = null;
+    // if (!playerNumber) {
+    //   return;
+    // }
+    // vehiclesTemplate = vehicles[playerNumber.idx];
+    // playerNumber.isFree = false;
+    // playersMap.set(socket.id, {
+    //   socketId: socket.id,
+    //   displayName: "test",
+    //   actions: { ...actions },
+    //   accelerateTimeMS: 0,
+    //   turnTimeMS: 0,
+    //   vehicleSteering: 0,
+    //   playerNumber: playerNumber?.idx,
+    //   ...vehiclesTemplate,
+    // });
+    // createSocketHandlers(socket);
+    // io.emit("server:users-list-update", playersMapToArray(playersMap));
+    // socket.emit("server:game-info", {
+    //   id: socket.id,
+    //   race,
+    // });
   });
 
-  setInterval(() => {
-    const now = Date.now();
+  // setInterval(() => {
+  //   const now = Date.now();
 
-    playersMap.forEach((player) => {
-      const dtAcceleration = now - player.accelerateTimeMS;
-      const dtTurning = now - player.turnTimeMS;
+  //   playersMap.forEach((player) => {
+  //     const dtAcceleration = now - player.accelerateTimeMS;
+  //     const dtTurning = now - player.turnTimeMS;
 
-      let newActions = { ...player.actions };
+  //     let newActions = { ...player.actions };
 
-      if (dtAcceleration > 250) {
-        player.accelerateTimeMS = now;
-        newActions = {
-          ...newActions,
-          [ACCELERATE]: false,
-          [BRAKE]: false,
-        };
-      }
-      if (dtTurning > 250) {
-        player.turnTimeMS = now;
-        newActions = {
-          ...newActions,
-          [LEFT]: false,
-          [RIGHT]: false,
-        };
-      }
+  //     if (dtAcceleration > 250) {
+  //       player.accelerateTimeMS = now;
+  //       newActions = {
+  //         ...newActions,
+  //         [ACCELERATE]: false,
+  //         [BRAKE]: false,
+  //       };
+  //     }
+  //     if (dtTurning > 250) {
+  //       player.turnTimeMS = now;
+  //       newActions = {
+  //         ...newActions,
+  //         [LEFT]: false,
+  //         [RIGHT]: false,
+  //       };
+  //     }
 
-      player.actions = { ...newActions };
-    });
+  //     player.actions = { ...newActions };
+  //   });
 
-    io.emit("server:action", playersMapToArray(playersMap));
-  }, 50);
+  //   io.emit("server:action", playersMapToArray(playersMap));
+  // }, 50);
 })();
 
 app.use(express.static(distDir));
