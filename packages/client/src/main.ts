@@ -42,9 +42,14 @@ import { createSocketHandler } from "./sockets/sockets";
 //   console.log(...args);
 // }, 1000);
 
+const game = {
+  thisPlayerSocketId: null,
+  // usersMap: new Map(),
+};
+
 (async () => {
   // const engine = new Engine(canvas, true);
   // let scene: Scene = new Scene(engine);
 
-  createSocketHandler();
+  createSocketHandler({ game });
 })();

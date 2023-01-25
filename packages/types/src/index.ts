@@ -9,13 +9,21 @@ type GameInfo = {
   socketId: string;
 };
 
+type Game = {
+  thisPlayerSocketId: string | null;
+};
+
+type PlayersList = Array<{
+  socketId: string;
+}>;
+
 interface ServerToClientEvents {
-  // "player:get-users-list": () => void;
+  "player:get-users-list": () => void;
   // "server:action": (data: Object) => void;
   "server:game-info": (data: GameInfo) => void;
   // "server:start-race": (data: Object) => void;
   // "server:stop-race": (data: Object) => void;
-  // "server:users-list-update": (playersList: Object) => void;
+  "server:users-list-update": (playersList: PlayersList) => void;
 }
 
-export type { ServerToClientEvents, UsersMap };
+export type { Game, PlayersList, ServerToClientEvents, UsersMap };

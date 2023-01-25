@@ -277,20 +277,20 @@ const createSocketHandlers = (socket: Socket) => {
     });
   });
 
-  //   socket.on("disconnect", () => {
-  //     const playerToDelete = playersMap.get(socket.id);
-  //     const playerNumber = playerNumbers.find(
-  //       (pNumber) => pNumber.idx === playerToDelete?.playerNumber
-  //     );
+  socket.on("disconnect", () => {
+    const playerToDelete = playersMap.get(socket.id);
+    const playerNumber = playerNumbers.find(
+      (pNumber) => pNumber.idx === playerToDelete?.playerNumber
+    );
 
-  //     if (playerNumber) {
-  //       playerNumber.isFree = true;
-  //     }
+    if (playerNumber) {
+      playerNumber.isFree = true;
+    }
 
-  //     playersMap.delete(socket.id);
+    playersMap.delete(socket.id);
 
-  //     io.emit("server:users-list-update", playersMapToArray(playersMap));
-  //   });
+    io.emit("server:users-list-update", playersMapToArray(playersMap));
+  });
 };
 
 setInterval(() => {

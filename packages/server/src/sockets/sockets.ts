@@ -1,12 +1,22 @@
-import type { Socket } from "socket.io";
-import type { ServerToClientEvents, UsersMap } from "@neu5/types/src";
+import type { Server, Socket } from "socket.io";
+import type {
+  PlayersList,
+  ServerToClientEvents,
+  UsersMap,
+} from "@neu5/types/src";
+
+const usersMapToArray = (usersMap: UsersMap): PlayersList =>
+  Array.from(usersMap).map(([id, { socketId }]) => ({
+    id,
+    socketId,
+  }));
 
 const createSocketHandlers = ({
-  //   gameInfo,
+  io,
   socket,
   usersMap,
 }: {
-  //   gameInfo: GameInfo;
+  io: Server<ServerToClientEvents>;
   socket: Socket<ServerToClientEvents>;
   usersMap: UsersMap;
 }) => {
@@ -19,21 +29,14 @@ const createSocketHandlers = ({
     // race,
   });
 
+  socket.on("player:get-users-list", () => {
+    socket.emit("server:users-list-update", usersMapToArray(usersMap));
+  });
+
   socket.on("disconnect", () => {
     usersMap.delete(socket.id);
 
-    // const playerToDelete = playersMap.get(socket.id);
-    // const playerNumber = playerNumbers.find(
-    //   (pNumber) => pNumber.idx === playerToDelete?.playerNumber
-    // );
-
-    // if (playerNumber) {
-    //   playerNumber.isFree = true;
-    // }
-
-    // playersMap.delete(socket.id);
-
-    // io.emit("server:users-list-update", playersMapToArray(playersMap));
+    io.emit("server:users-list-update", usersMapToArray(usersMap));
   });
 };
 
