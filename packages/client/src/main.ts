@@ -2,9 +2,10 @@
 // import { ArcRotateCamera, Engine, Scene, Vector3 } from "@babylonjs/core";
 // import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
+import type { Game } from "@neu5/types/src";
 
 import { createSocketHandler } from "./sockets/sockets";
-
+import { ui } from "./ui";
 // import { startRace } from "./scene/scene";
 // import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 // import { TOAST_COLORS } from "./utils";
@@ -42,9 +43,15 @@ import { createSocketHandler } from "./sockets/sockets";
 //   console.log(...args);
 // }, 1000);
 
+const game: Game = {
+  thisPlayerSocketId: null,
+  ui,
+  // usersMap: new Map(),
+};
+
 (async () => {
   // const engine = new Engine(canvas, true);
   // let scene: Scene = new Scene(engine);
 
-  createSocketHandler();
+  createSocketHandler({ game });
 })();

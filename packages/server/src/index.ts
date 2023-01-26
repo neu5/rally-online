@@ -24,13 +24,9 @@ const usersMap: UsersMap = new Map();
 //   isStarted: false,
 // };
 
-// const gameInfo: GameInfo = {
-//   id: '',
-// };
-
 (async () => {
   io.on("connection", (socket) => {
-    createSocketHandlers({ socket, usersMap });
+    createSocketHandlers({ io, socket, usersMap });
   });
 })();
 

@@ -4,7 +4,7 @@ const DIALOG_CLOSE_BUTTON_CLASSNAME = "dialog-header__close-button";
 const DIALOG_CONTENT_CLASSNAME = "dialog-content";
 const DIALOG_FOOTER_CLASSNAME = "dialog-footer";
 
-export class UIDialogWrapper {
+export class DialogWrapper {
   dialogWrapper: Element;
 
   dialog: Element;
