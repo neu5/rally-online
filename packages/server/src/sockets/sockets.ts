@@ -6,7 +6,8 @@ import type {
 } from "@neu5/types/src";
 
 const usersMapToArray = (usersMap: UsersMap): PlayersList =>
-  Array.from(usersMap).map(([id, { socketId }]) => ({
+  Array.from(usersMap).map(([id, { displayName, socketId }]) => ({
+    displayName,
     id,
     socketId,
   }));
@@ -22,12 +23,15 @@ const createSocketHandlers = ({
 }) => {
   usersMap.set(socket.id, {
     socketId: socket.id,
+    displayName: socket.id,
   });
 
   socket.emit("server:game-info", {
     socketId: socket.id,
     // race,
   });
+
+  io.emit("server:users-list-update", usersMapToArray(usersMap));
 
   socket.on("player:get-users-list", () => {
     socket.emit("server:users-list-update", usersMapToArray(usersMap));

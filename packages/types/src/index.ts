@@ -2,6 +2,7 @@ type UsersMap = Map<
   string,
   {
     socketId: string;
+    displayName: string;
   }
 >;
 
@@ -9,12 +10,18 @@ type GameInfo = {
   socketId: string;
 };
 
+type UI = {
+  createPlayersList: Function;
+};
+
 type Game = {
   thisPlayerSocketId: string | null;
+  ui: UI;
 };
 
 type PlayersList = Array<{
   socketId: string;
+  displayName: string;
 }>;
 
 interface ServerToClientEvents {
@@ -26,4 +33,4 @@ interface ServerToClientEvents {
   "server:users-list-update": (playersList: PlayersList) => void;
 }
 
-export type { Game, PlayersList, ServerToClientEvents, UsersMap };
+export type { Game, PlayersList, ServerToClientEvents, UI, UsersMap };
