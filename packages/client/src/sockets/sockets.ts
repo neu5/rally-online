@@ -12,10 +12,11 @@ const createSocketHandler = ({ game }: { game: Game }) => {
   });
 
   socket.on("server:users-list-update", (playersList: PlayersList) => {
-    console.log(playersList);
-
-    console.log(game);
     game.ui.createPlayersList(playersList);
+
+    if (game.thisPlayerSocketId) {
+      game.ui.setCurrentPlayer(game.thisPlayerSocketId);
+    }
   });
 };
 
