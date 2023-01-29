@@ -1,10 +1,9 @@
-import { DialogWrapper } from "./dialog";
-import type { PlayersMap } from "../main";
-import type { UI } from "@neu5/types/src";
+// import { DialogWrapper } from "./dialog";
+import type { PlayersList, UI } from "@neu5/types/src";
 
 const playersListEl = document.getElementById("players-list") as HTMLElement;
 
-const createPlayersList = (list: PlayersMap) => {
+const createPlayersList = (list: PlayersList) => {
   const fragment = new DocumentFragment();
 
   list.forEach(({ displayName }) => {
@@ -58,8 +57,7 @@ const PlayersIndicators = (el: HTMLElement, playersMap: PlayersMap) => {
   el.appendChild(fragment);
 };
 
-const setCurrentPlayer = (playersListEl: HTMLElement, id: string) => {
-  // @ts-ignore
+const setCurrentPlayer = (id: string) => {
   [...playersListEl.children].find((el: HTMLElement) => {
     if (el.dataset.id === id) {
       el.classList.add("you");
@@ -74,7 +72,7 @@ const ui: UI = {
   createPlayersList,
   // DialogWrapper,
   // PlayersIndicators,
-  // setCurrentPlayer,
+  setCurrentPlayer,
 };
 
 export { ui };

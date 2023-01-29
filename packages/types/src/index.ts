@@ -11,7 +11,8 @@ type GameInfo = {
 };
 
 type UI = {
-  createPlayersList: Function;
+  createPlayersList: (list: PlayersList) => void;
+  setCurrentPlayer: (id: string) => void;
 };
 
 type Game = {
