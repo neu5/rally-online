@@ -3,7 +3,9 @@ import type { Socket } from "socket.io-client";
 import type { Game, PlayersList, ServerToClientEvents } from "@neu5/types/src";
 
 const createSocketHandler = ({ game }: { game: Game }) => {
-  const socket: Socket<ServerToClientEvents> = io();
+  const socket: Socket<ServerToClientEvents> = io(window.location.host, {
+    autoConnect: false,
+  });
 
   socket.on("server:game-info", ({ socketId }) => {
     game.thisPlayerSocketId = socketId;
