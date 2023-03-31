@@ -1,4 +1,4 @@
-// import { DialogWrapper } from "./dialog";
+import { DialogWrapper } from "./dialog";
 import type { PlayersList, UI } from "@neu5/types/src";
 
 const playersListEl = document.getElementById("players-list") as HTMLElement;
@@ -70,7 +70,7 @@ const setCurrentPlayer = (id: string) => {
 
 const ui: UI = {
   createPlayersList,
-  // DialogWrapper,
+  DialogWrapper,
   // PlayersIndicators,
   setCurrentPlayer,
 };

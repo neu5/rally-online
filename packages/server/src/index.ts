@@ -24,11 +24,30 @@ const usersMap: UsersMap = new Map();
 //   isStarted: false,
 // };
 
-(async () => {
-  io.on("connection", (socket) => {
-    createSocketHandlers({ io, socket, usersMap });
+io.on("connection", (socket) => {
+  io.use((socket, next) => {
+    const username = socket.handshake.auth.username;
+
+    // Add username validation #159
+    if (!username) {
+      return next(new Error("invalid username"));
+    }
+
+    socket.username = username;
+    next();
   });
-})();
+
+  const users = [];
+  for (let [id, socket] of io.of("/").sockets) {
+    users.push({
+      userID: id,
+      username: socket.username,
+    });
+  }
+  // socket.emit("users", users);
+
+  // createSocketHandlers({ io, socket, usersMap });
+});
 
 app.use(express.static(distDir));
 

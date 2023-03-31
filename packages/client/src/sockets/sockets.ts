@@ -7,19 +7,31 @@ const createSocketHandler = ({ game }: { game: Game }) => {
     autoConnect: false,
   });
 
-  socket.on("server:game-info", ({ socketId }) => {
-    game.thisPlayerSocketId = socketId;
-
-    socket.emit("player:get-users-list");
+  socket.onAny((event, ...args) => {
+    console.log("onAny", event, args);
   });
 
-  socket.on("server:users-list-update", (playersList: PlayersList) => {
-    game.ui.createPlayersList(playersList);
-
-    if (game.thisPlayerSocketId) {
-      game.ui.setCurrentPlayer(game.thisPlayerSocketId);
+  socket.on("connect_error", (err) => {
+    if (err.message === "invalid username") {
+      game.usernameAlreadySelected = false;
     }
   });
+
+  return { socket };
+
+  // socket.on("server:game-info", ({ socketId }) => {
+  //   game.thisPlayerSocketId = socketId;
+
+  //   socket.emit("player:get-users-list");
+  // });
+
+  // socket.on("server:users-list-update", (playersList: PlayersList) => {
+  //   game.ui.createPlayersList(playersList);
+
+  //   if (game.thisPlayerSocketId) {
+  //     game.ui.setCurrentPlayer(game.thisPlayerSocketId);
+  //   }
+  // });
 };
 
 export { createSocketHandler };
