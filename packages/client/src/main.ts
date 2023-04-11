@@ -51,6 +51,8 @@ const game: Game = {
   // usersMap: new Map(),
 };
 
+const sessionID = localStorage.getItem("sessionID");
+
 const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
 
 (async () => {
@@ -79,19 +81,25 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
     });
   }
 
-  const labelName = document.createElement("label");
-  labelName.textContent = "Your display name (2-16 characters) ";
-  const inputName = document.createElement("input");
-  inputName.type = "text";
-  labelName.appendChild(inputName);
+  if (sessionID) {
+    game.usernameAlreadySelected = true;
+    socket.auth = { sessionID };
+    socket.connect();
+  } else {
+    const labelName = document.createElement("label");
+    labelName.textContent = "Your display name (2-16 characters) ";
+    const inputName = document.createElement("input");
+    inputName.type = "text";
+    labelName.appendChild(inputName);
 
-  const inputSubmit = document.createElement("input");
-  inputSubmit.type = "submit";
-  labelName.appendChild(inputSubmit);
+    const inputSubmit = document.createElement("input");
+    inputSubmit.type = "submit";
+    labelName.appendChild(inputSubmit);
 
-  dialog.show({
-    content: labelName,
-    inputToLook: inputName,
-    closeButtonVisibility: false,
-  });
+    dialog.show({
+      content: labelName,
+      inputToLook: inputName,
+      closeButtonVisibility: false,
+    });
+  }
 })();
