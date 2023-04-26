@@ -246,10 +246,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babylonjs/core@npm:^5.26.0":
-  version: 5.26.0
-  resolution: "@babylonjs/core@npm:5.26.0"
-  checksum: bada3317724d77cc471e36f72194325d34e3eb648ac58f8fd3696863379b888e59d624332dcd5aeb5987f4fffad748e271cd40158a290c0763e9c7435ef40d7b
+"@babylonjs/core@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@babylonjs/core@npm:6.0.0"
+  checksum: ecfa6e370bf7c16654189834370222cb611f0c9f32862c7565c7eb33bfbed468e0206643dedd05864bc2cbaea8d3f48ac89ff38ade63df4364a763d96d33ab92
   languageName: node
   linkType: hard
 
@@ -449,7 +449,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@neu5/client@workspace:packages/client"
   dependencies:
-    "@babylonjs/core": ^5.26.0
+    "@babylonjs/core": ^6.0.0
     "@neu5/types": 0.0.1
     "@parcel/config-default": ^2.6.0
     "@parcel/transformer-sass": ^2.6.0
