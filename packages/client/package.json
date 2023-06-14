@@ -7,7 +7,7 @@
   "license": "MIT",
   "packageManager": "yarn@3.1.1",
   "dependencies": {
-    "@babylonjs/core": "^5.26.0",
+    "@babylonjs/core": "^6.0.0",
     "@neu5/types": "0.0.1"
   },
   "devDependencies": {

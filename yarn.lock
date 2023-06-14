@@ -246,10 +246,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babylonjs/core@npm:^5.26.0":
-  version: 5.26.0
-  resolution: "@babylonjs/core@npm:5.26.0"
-  checksum: bada3317724d77cc471e36f72194325d34e3eb648ac58f8fd3696863379b888e59d624332dcd5aeb5987f4fffad748e271cd40158a290c0763e9c7435ef40d7b
+"@babylonjs/core@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@babylonjs/core@npm:6.0.0"
+  checksum: ecfa6e370bf7c16654189834370222cb611f0c9f32862c7565c7eb33bfbed468e0206643dedd05864bc2cbaea8d3f48ac89ff38ade63df4364a763d96d33ab92
   languageName: node
   linkType: hard
 
@@ -449,7 +449,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@neu5/client@workspace:packages/client"
   dependencies:
-    "@babylonjs/core": ^5.26.0
+    "@babylonjs/core": ^6.0.0
     "@neu5/types": 0.0.1
     "@parcel/config-default": ^2.6.0
     "@parcel/transformer-sass": ^2.6.0
@@ -2086,9 +2086,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001332":
-  version: 1.0.30001469
-  resolution: "caniuse-lite@npm:1.0.30001469"
-  checksum: 8e496509d7e9ff189c72205675b5db0c5f1b6a09917027441e835efae0848a468a8c4e7d2b409ffc202438fcd23ae53e017f976a03c22c04d12d3c0e1e33e5de
+  version: 1.0.30001477
+  resolution: "caniuse-lite@npm:1.0.30001477"
+  checksum: 22db0feccf43b0c16a46bb59b4e26ae05011f41c6947f1dd176d5056e0db58c3415a5ff7ee5a60903a6bda7311b71705d1d29fc4c43a8b8a1bdeef8c1d93f6a8
   languageName: node
   linkType: hard
 
@@ -3640,9 +3640,9 @@ __metadata:
   linkType: hard
 
 "http-cache-semantics@npm:^4.0.0, http-cache-semantics@npm:^4.1.0":
-  version: 4.1.0
-  resolution: "http-cache-semantics@npm:4.1.0"
-  checksum: 974de94a81c5474be07f269f9fd8383e92ebb5a448208223bfb39e172a9dbc26feff250192ecc23b9593b3f92098e010406b0f24bd4d588d631f80214648ed42
+  version: 4.1.1
+  resolution: "http-cache-semantics@npm:4.1.1"
+  checksum: 83ac0bc60b17a3a36f9953e7be55e5c8f41acc61b22583060e8dedc9dd5e3607c823a88d0926f9150e571f90946835c7fe150732801010845c72cd8bbff1a236
   languageName: node
   linkType: hard
 
