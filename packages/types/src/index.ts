@@ -10,13 +10,18 @@ type GameInfo = {
   socketId: string;
 };
 
+type Class = { new (...args: any[]): any };
+
 type UI = {
   createPlayersList: (list: PlayersList) => void;
   setCurrentPlayer: (id: string) => void;
+  DialogWrapper: Class;
 };
 
 type Game = {
   thisPlayerSocketId: string | null;
+  usernameAlreadySelected: boolean;
+  rootEl: HTMLElement | null;
   ui: UI;
 };
 

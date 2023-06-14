@@ -45,13 +45,61 @@ import { ui } from "./ui";
 
 const game: Game = {
   thisPlayerSocketId: null,
+  usernameAlreadySelected: false,
+  rootEl: document.getElementById("root"),
   ui,
   // usersMap: new Map(),
 };
+
+const sessionID = localStorage.getItem("sessionID");
+
+const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
 
 (async () => {
   // const engine = new Engine(canvas, true);
   // let scene: Scene = new Scene(engine);
 
-  createSocketHandler({ game });
+  const { socket } = createSocketHandler({ game });
+
+  if (game.rootEl) {
+    game.rootEl.addEventListener("setName", (ev) => {
+      const customEvent = ev as CustomEvent<string>;
+
+      if (customEvent.detail !== undefined) {
+        const username = customEvent.detail;
+        game.usernameAlreadySelected = true;
+        socket.auth = { username };
+        socket.connect();
+      }
+
+      // if (customEvent.detail !== undefined && currentPlayerId) {
+      //   socket.emit("player:set-name", {
+      //     id: currentPlayerId,
+      //     displayName: customEvent.detail,
+      //   });
+      // }
+    });
+  }
+
+  if (sessionID) {
+    game.usernameAlreadySelected = true;
+    socket.auth = { sessionID };
+    socket.connect();
+  } else {
+    const labelName = document.createElement("label");
+    labelName.textContent = "Your display name (2-16 characters) ";
+    const inputName = document.createElement("input");
+    inputName.type = "text";
+    labelName.appendChild(inputName);
+
+    const inputSubmit = document.createElement("input");
+    inputSubmit.type = "submit";
+    labelName.appendChild(inputSubmit);
+
+    dialog.show({
+      content: labelName,
+      inputToLook: inputName,
+      closeButtonVisibility: false,
+    });
+  }
 })();
