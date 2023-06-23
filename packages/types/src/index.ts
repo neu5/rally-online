@@ -40,3 +40,5 @@ interface ServerToClientEvents {
 }
 
 export type { Game, PlayersList, ServerToClientEvents, UI, UsersMap };
+
+export { FEATURES_NAMES, features } from "./features";

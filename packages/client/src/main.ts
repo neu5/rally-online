@@ -3,6 +3,7 @@
 // import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
 import type { Game } from "@neu5/types/src";
+import { FEATURES_NAMES, features } from "@neu5/types/src";
 
 import { createSocketHandler } from "./sockets/sockets";
 import { ui } from "./ui";
@@ -81,7 +82,7 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
     });
   }
 
-  if (sessionID) {
+  if (features[FEATURES_NAMES.PERSISTENS_SESSION] && sessionID) {
     game.usernameAlreadySelected = true;
     socket.auth = { sessionID };
     socket.connect();
