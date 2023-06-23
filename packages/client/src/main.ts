@@ -3,8 +3,8 @@
 // import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
 import type { Game } from "@neu5/types/src";
+import { FEATURES_NAMES, features } from "@neu5/types/src";
 
-import { FEATURES_NAMES, features } from "./features";
 import { createSocketHandler } from "./sockets/sockets";
 import { ui } from "./ui";
 // import { startRace } from "./scene/scene";
