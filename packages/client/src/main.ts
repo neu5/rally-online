@@ -52,7 +52,7 @@ const game: Game = {
   // usersMap: new Map(),
 };
 
-const sessionID = localStorage.getItem("sessionID");
+const sessionID = localStorage.getItem("rally-online");
 
 const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
 
