@@ -7,6 +7,7 @@ import { FEATURES_NAMES, features } from "@neu5/types/src";
 
 import { createSocketHandler } from "./sockets/sockets";
 import { ui } from "./ui";
+import { loginDialog } from "./ui/dialog-login";
 // import { startRace } from "./scene/scene";
 // import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 // import { TOAST_COLORS } from "./utils";
@@ -60,7 +61,7 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
   // const engine = new Engine(canvas, true);
   // let scene: Scene = new Scene(engine);
 
-  const { socket } = createSocketHandler({ game });
+  const { socket } = createSocketHandler({ dialog, game });
 
   if (game.rootEl) {
     game.rootEl.addEventListener("setName", (ev) => {
@@ -87,15 +88,7 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
     socket.auth = { sessionID };
     socket.connect();
   } else {
-    const labelName = document.createElement("label");
-    labelName.textContent = "Your display name (2-16 characters) ";
-    const inputName = document.createElement("input");
-    inputName.type = "text";
-    labelName.appendChild(inputName);
-
-    const inputSubmit = document.createElement("input");
-    inputSubmit.type = "submit";
-    labelName.appendChild(inputSubmit);
+    const { labelName, inputName } = loginDialog();
 
     dialog.show({
       content: labelName,

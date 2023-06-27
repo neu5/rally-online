@@ -90,6 +90,8 @@ io.on("connection", (socket) => {
     connected: true,
   });
 
+  socket.emit("server:close-dialog");
+
   // createSocketHandlers({ io, socket, usersMap });
   // notify users upon disconnection
   socket.on("disconnect", async () => {

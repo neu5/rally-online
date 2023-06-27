@@ -1,8 +1,15 @@
 import { io } from "socket.io-client";
 import type { Socket } from "socket.io-client";
-import type { Game, PlayersList, ServerToClientEvents } from "@neu5/types/src";
+import type { Game, ServerToClientEvents, UsersList } from "@neu5/types/src";
+import type { DialogWrapper } from "../ui/dialog";
 
-const createSocketHandler = ({ game }: { game: Game }) => {
+const createSocketHandler = ({
+  dialog,
+  game,
+}: {
+  dialog: typeof DialogWrapper;
+  game: Game;
+}) => {
   const socket: Socket<ServerToClientEvents> = io(window.location.host, {
     autoConnect: false,
   });
@@ -11,17 +18,24 @@ const createSocketHandler = ({ game }: { game: Game }) => {
     console.log("onAny", event, args);
   });
 
-  socket.on("session", ({ sessionID, userID }) => {
-    // attach the session ID to the next reconnection attempts
-    socket.auth = { sessionID };
-    // store it in the localStorage
-    localStorage.setItem("rally-online", sessionID);
-    // save the ID of the user
-    socket.userID = userID;
+  socket.on(
+    "session",
+    ({ sessionID, userID }: { sessionID: string; userID: string }) => {
+      // attach the session ID to the next reconnection attempts
+      socket.auth = { sessionID };
+      // store it in the localStorage
+      localStorage.setItem("rally-online", sessionID);
+      // save the ID of the user
+      socket.userID = userID;
+    }
+  );
+
+  socket.on("users", (users: UsersList) => {
+    game.ui.createPlayersList(users);
   });
 
-  socket.on("users", (users) => {
-    // implement logic after receiving users list
+  socket.on("server:close-dialog", () => {
+    dialog.close();
   });
 
   socket.on("connect_error", (err) => {

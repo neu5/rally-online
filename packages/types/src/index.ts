@@ -13,7 +13,7 @@ type GameInfo = {
 type Class = { new (...args: any[]): any };
 
 type UI = {
-  createPlayersList: (list: PlayersList) => void;
+  createPlayersList: (list: UsersList) => void;
   setCurrentPlayer: (id: string) => void;
   DialogWrapper: Class;
 };
@@ -25,9 +25,10 @@ type Game = {
   ui: UI;
 };
 
-type PlayersList = Array<{
-  socketId: string;
-  displayName: string;
+type UsersList = Array<{
+  connected: boolean;
+  userId: string;
+  username: string;
 }>;
 
 interface ServerToClientEvents {
@@ -36,9 +37,9 @@ interface ServerToClientEvents {
   "server:game-info": (data: GameInfo) => void;
   // "server:start-race": (data: Object) => void;
   // "server:stop-race": (data: Object) => void;
-  "server:users-list-update": (playersList: PlayersList) => void;
+  "server:users-list-update": (playersList: UsersList) => void;
 }
 
-export type { Game, PlayersList, ServerToClientEvents, UI, UsersMap };
+export type { Game, UsersList, ServerToClientEvents, UI, UsersMap };
 
 export { FEATURES_NAMES, features } from "./features";
