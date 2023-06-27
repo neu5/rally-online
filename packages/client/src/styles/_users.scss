@@ -1,0 +1,27 @@
+#users {
+  position: absolute;
+  top: 10;
+  left: 10;
+  color: white;
+
+  h2 {
+    font-size: 14px;
+  }
+
+  .you {
+    color: green;
+  }
+}
+#users-indicators {
+  width: 80%;
+  height: 80px;
+  margin: 0 auto;
+  display: block;
+  border: 1px solid #333;
+  display: flex;
+
+  .users-indicator {
+    width: 100%;
+    color: #fff;
+  }
+}
