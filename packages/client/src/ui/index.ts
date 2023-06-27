@@ -71,7 +71,7 @@ const setCurrentPlayer = (id: string) => {
 const ui: UI = {
   createPlayersList,
   DialogWrapper,
-  // PlayersIndicators,
+  PlayersIndicators,
   setCurrentPlayer,
 };
 
