@@ -12,6 +12,19 @@
     color: green;
   }
 }
+
+.users-list {
+  &__elem {
+    &::marker {
+      color: red;
+    }
+
+    &--connected::marker {
+      color: green;
+    }
+  }
+}
+
 #users-indicators {
   width: 80%;
   height: 80px;

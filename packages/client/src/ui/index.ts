@@ -1,21 +1,39 @@
 import { DialogWrapper } from "./dialog";
 import type { UI, UsersList } from "@neu5/types/src";
 
-const playersListEl = document.getElementById("users-list") as HTMLElement;
+const [usersListEl] = document.getElementsByClassName(
+  "users-list"
+) as HTMLCollectionOf<HTMLElement>;
 
-const createPlayersList = (list: UsersList) => {
+const createPlayersList = (usersList: UsersList) => {
   const fragment = new DocumentFragment();
 
-  list.forEach(({ username }: { username: string }) => {
-    const li = document.createElement("li");
-    li.textContent = username;
-    li.dataset.id = username;
+  usersList.forEach(
+    ({
+      connected,
+      userID,
+      username,
+    }: {
+      connected: boolean;
+      userID: string;
+      username: string;
+    }) => {
+      const li = document.createElement("li");
+      li.textContent = username;
+      li.dataset.id = userID;
 
-    fragment.appendChild(li);
-  });
+      li.classList.add("users-list__elem");
 
-  playersListEl.textContent = "";
-  playersListEl.appendChild(fragment);
+      if (connected) {
+        li.classList.add("users-list__elem--connected");
+      }
+
+      fragment.appendChild(li);
+    }
+  );
+
+  usersListEl.textContent = "";
+  usersListEl.appendChild(fragment);
 };
 
 const PlayersIndicators = (el: HTMLElement, playersMap: PlayersMap) => {
