@@ -1,3 +1,5 @@
+import type { User } from "@neu5/types/src";
+
 class InMemorySessionStore {
   sessions;
 
@@ -9,7 +11,7 @@ class InMemorySessionStore {
     return this.sessions.get(id);
   }
 
-  saveSession(id: string, session: string) {
+  saveSession(id: string, session: User) {
     this.sessions.set(id, session);
   }
 

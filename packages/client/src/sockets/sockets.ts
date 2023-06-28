@@ -1,16 +1,20 @@
 import { io } from "socket.io-client";
 import type { Socket } from "socket.io-client";
-import type { Game, ServerToClientEvents, UsersList } from "@neu5/types/src";
+import type { Game, UsersList } from "@neu5/types/src";
 import type { DialogWrapper } from "../ui/dialog";
+
+type ExtendedSocket = Socket & {
+  userID?: string;
+};
 
 const createSocketHandler = ({
   dialog,
   game,
 }: {
-  dialog: typeof DialogWrapper;
+  dialog: DialogWrapper;
   game: Game;
 }) => {
-  const socket: Socket<ServerToClientEvents> = io(window.location.host, {
+  const socket: ExtendedSocket = io(window.location.host, {
     autoConnect: false,
   });
 
@@ -19,7 +23,7 @@ const createSocketHandler = ({
   });
 
   socket.on(
-    "session",
+    "server:session",
     ({ sessionID, userID }: { sessionID: string; userID: string }) => {
       // attach the session ID to the next reconnection attempts
       socket.auth = { sessionID };
@@ -30,11 +34,11 @@ const createSocketHandler = ({
     }
   );
 
-  socket.on("users", (users: UsersList) => {
+  socket.on("server:send users", (users: UsersList) => {
     game.ui.createPlayersList(users);
   });
 
-  socket.on("server:close-dialog", () => {
+  socket.on("server:close dialog", () => {
     dialog.close();
   });
 

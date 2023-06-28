@@ -29,15 +29,15 @@ const io = new Server<ServerToClientEvents>(httpServer);
 //   isStarted: false,
 // };
 
-io.use((socket: Socket<ServerToClientEvents>, next) => {
+io.use((socket: Socket, next) => {
   const sessionID = socket.handshake.auth.sessionID;
   if (sessionID) {
     // find existing session
     const session = sessionStore.findSession(sessionID);
     if (session) {
-      socket.sessionID = sessionID;
-      socket.userID = session.userID;
-      socket.username = session.username;
+      socket.data.sessionID = sessionID;
+      socket.data.userID = session.userID;
+      socket.data.username = session.username;
       return next();
     }
   }
@@ -48,62 +48,64 @@ io.use((socket: Socket<ServerToClientEvents>, next) => {
     return next(new Error("invalid username"));
   }
   // create new session
-  socket.sessionID = randomId();
-  socket.userID = randomId();
-  socket.username = username;
+  socket.data.sessionID = randomId();
+  socket.data.userID = randomId();
+  socket.data.username = username;
+
   next();
 });
 
 io.on("connection", (socket) => {
   // persist session
-  sessionStore.saveSession(socket.sessionID, {
-    userID: socket.userID,
-    username: socket.username,
+  sessionStore.saveSession(socket.data.sessionID, {
+    userID: socket.data.userID,
+    username: socket.data.username,
     connected: true,
   });
 
   // emit session details
-  socket.emit("session", {
-    sessionID: socket.sessionID,
-    userID: socket.userID,
+  socket.emit("server:session", {
+    sessionID: socket.data.sessionID,
+    userID: socket.data.userID,
   });
 
   // join the "userID" room
-  socket.join(socket.userID);
+  socket.join(socket.data.userID);
 
   // fetch existing users
-  const users = [];
-  sessionStore.findAllSessions().forEach((session) => {
-    users.push({
-      userID: session.userID,
-      username: session.username,
-      connected: session.connected,
-    });
+  const users: { connected: boolean; userID: string; username: string }[] = [];
+
+  sessionStore.findAllSessions().forEach((userData) => {
+    if (userData.username !== undefined) {
+      users.push({ ...userData });
+    }
   });
 
-  socket.emit("users", users);
+  console.log({ users });
+
+  socket.emit("server:send users", users);
 
   // notify existing users
-  socket.broadcast.emit("user connected", {
-    userID: socket.userID,
-    username: socket.username,
+  socket.broadcast.emit("server:user connected", {
+    userID: socket.data.userID,
+    username: socket.data.username,
     connected: true,
   });
 
-  socket.emit("server:close-dialog");
+  socket.emit("server:close dialog");
 
   // createSocketHandlers({ io, socket, usersMap });
   // notify users upon disconnection
   socket.on("disconnect", async () => {
-    const matchingSockets = await io.in(socket.userID).allSockets();
+    const matchingSockets = await io.in(socket.data.userID).allSockets();
     const isDisconnected = matchingSockets.size === 0;
     if (isDisconnected) {
       // notify other users
-      socket.broadcast.emit("user disconnected", socket.userID);
+      socket.broadcast.emit("server:user disconnected", socket.data.userID);
       // update the connection status of the session
-      sessionStore.saveSession(socket.sessionID, {
-        userID: socket.userID,
-        username: socket.username,
+      sessionStore.saveSession(socket.data.sessionID, {
+        userID: socket.data.userID,
+        username: socket.data.username,
         connected: false,
       });
     }
