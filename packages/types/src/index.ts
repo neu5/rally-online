@@ -27,7 +27,7 @@ type Game = {
 
 type UsersList = Array<{
   connected: boolean;
-  userId: string;
+  userID: string;
   username: string;
 }>;
 
