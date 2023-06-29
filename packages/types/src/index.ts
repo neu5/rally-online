@@ -15,10 +15,11 @@ type UI = {
 };
 
 type Game = {
-  thisPlayerSocketId: string | null;
-  usernameAlreadySelected: boolean;
+  isDevelopment: boolean;
   rootEl: HTMLElement | null;
+  thisPlayerSocketId: string | null;
   ui: UI;
+  usernameAlreadySelected: boolean;
 };
 
 type User = {

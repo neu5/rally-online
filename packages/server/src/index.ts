@@ -81,8 +81,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  console.log({ users });
-
   socket.emit("server:send users", users);
 
   // notify existing users

@@ -46,10 +46,11 @@ import { loginDialog } from "./ui/dialog-login";
 // }, 1000);
 
 const game: Game = {
-  thisPlayerSocketId: null,
-  usernameAlreadySelected: false,
+  isDevelopment: process.env.NODE_ENV === "development",
   rootEl: document.getElementById("root"),
+  thisPlayerSocketId: null,
   ui,
+  usernameAlreadySelected: false,
   // usersMap: new Map(),
 };
 
