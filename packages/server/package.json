@@ -28,7 +28,7 @@
   "scripts": {
     "build": "tsc",
     "serve": "node --experimental-specifier-resolution=node dist/index.js",
-    "dev": "tsc --watch",
+    "dev": "NODE_ENV=development tsc --watch",
     "dev:serve": "nodemon --experimental-specifier-resolution=node dist/index.js",
     "test": "tsc --noEmit"
   }

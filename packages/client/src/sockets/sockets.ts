@@ -18,9 +18,11 @@ const createSocketHandler = ({
     autoConnect: false,
   });
 
-  socket.onAny((event, ...args) => {
-    console.log("onAny", event, args);
-  });
+  if (game.isDevelopment) {
+    socket.onAny((event, ...args) => {
+      console.log("onAny", event, args);
+    });
+  }
 
   socket.on(
     "server:session",
