@@ -29,6 +29,9 @@ const io = new Server<ServerToClientEvents>(httpServer);
 //   isStarted: false,
 // };
 
+// fetch existing users
+const users: { connected: boolean; userID: string; username: string }[] = [];
+
 io.use((socket: Socket, next) => {
   const sessionID = socket.handshake.auth.sessionID;
   if (sessionID) {
@@ -43,19 +46,51 @@ io.use((socket: Socket, next) => {
   }
   const username = socket.handshake.auth.username;
 
-  // Add username validation #159
   if (!username) {
     return next(new Error("invalid username"));
   }
+
   // create new session
   socket.data.sessionID = randomId();
   socket.data.userID = randomId();
+
+  if (
+    !(
+      typeof username === "string" &&
+      username.length >= 2 &&
+      username.length <= 16 &&
+      /^[\w]+$/.test(username)
+    )
+  ) {
+    socket.emit("server:show error", { message: "Wrong input" });
+    return next();
+  }
+
+  let isPlayerNameAlreadyTaken: boolean = false;
+
+  users.forEach((user) => {
+    if (user.username === username) {
+      isPlayerNameAlreadyTaken = true;
+    }
+  });
+
+  if (isPlayerNameAlreadyTaken) {
+    socket.emit("server:show error", {
+      message: "That name is already taken. Choose different name",
+    });
+    return next();
+  }
+
   socket.data.username = username;
 
   next();
 });
 
 io.on("connection", (socket) => {
+  if (socket.data.username === undefined) {
+    return;
+  }
+
   // persist session
   sessionStore.saveSession(socket.data.sessionID, {
     userID: socket.data.userID,
@@ -71,9 +106,6 @@ io.on("connection", (socket) => {
 
   // join the "userID" room
   socket.join(socket.data.userID);
-
-  // fetch existing users
-  const users: { connected: boolean; userID: string; username: string }[] = [];
 
   sessionStore.findAllSessions().forEach((userData) => {
     if (userData.username !== undefined) {
