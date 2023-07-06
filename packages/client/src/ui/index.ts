@@ -36,61 +36,61 @@ const createPlayersList = (usersList: UsersList) => {
   usersListEl.appendChild(fragment);
 };
 
-const PlayersIndicators = (el: HTMLElement, playersMap: PlayersMap) => {
-  el.textContent = "";
+// const PlayersIndicators = (el: HTMLElement, playersMap: PlayersMap) => {
+//   el.textContent = "";
 
-  const fragment = new DocumentFragment();
+//   const fragment = new DocumentFragment();
 
-  let indicators: HTMLElement[] = [];
+//   let indicators: HTMLElement[] = [];
 
-  for (let i = 0; i < 8; i++) {
-    const div = document.createElement("div");
-    div.classList.add("users-indicator");
+//   for (let i = 0; i < 8; i++) {
+//     const div = document.createElement("div");
+//     div.classList.add("users-indicator");
 
-    const divName = document.createElement("div");
-    divName.classList.add("users-indicator__name");
+//     const divName = document.createElement("div");
+//     divName.classList.add("users-indicator__name");
 
-    const divIndicator = document.createElement("div");
-    divIndicator.classList.add("users-indicator__indicator");
+//     const divIndicator = document.createElement("div");
+//     divIndicator.classList.add("users-indicator__indicator");
 
-    div.appendChild(divName);
-    div.appendChild(divIndicator);
+//     div.appendChild(divName);
+//     div.appendChild(divIndicator);
 
-    indicators.push(div);
-    fragment.appendChild(div);
-  }
+//     indicators.push(div);
+//     fragment.appendChild(div);
+//   }
 
-  let idx = 0;
-  playersMap.forEach((player) => {
-    const playerIndicator = indicators[idx];
+//   let idx = 0;
+//   playersMap.forEach((player) => {
+//     const playerIndicator = indicators[idx];
 
-    const nameEl = playerIndicator.children[0];
-    nameEl.textContent = player.displayName;
+//     const nameEl = playerIndicator.children[0];
+//     nameEl.textContent = player.displayName;
 
-    player.UIindicator = playerIndicator;
+//     player.UIindicator = playerIndicator;
 
-    idx = idx + 1;
-  });
+//     idx = idx + 1;
+//   });
 
-  el.appendChild(fragment);
-};
+//   el.appendChild(fragment);
+// };
 
-const setCurrentPlayer = (id: string) => {
-  [...playersListEl.children].find((el: HTMLElement) => {
-    if (el.dataset.id === id) {
-      el.classList.add("you");
-      return true;
-    }
+// const setCurrentPlayer = (id: string) => {
+//   [...playersListEl.children].find((el: HTMLElement) => {
+//     if (el.dataset.id === id) {
+//       el.classList.add("you");
+//       return true;
+//     }
 
-    return false;
-  });
-};
+//     return false;
+//   });
+// };
 
 const ui: UI = {
   createPlayersList,
   DialogWrapper,
-  PlayersIndicators,
-  setCurrentPlayer,
+  // PlayersIndicators,
+  // setCurrentPlayer,
 };
 
 export { ui };
