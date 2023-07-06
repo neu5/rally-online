@@ -34,9 +34,10 @@ const users: { connected: boolean; userID: string; username: string }[] = [];
 
 io.use((socket: Socket, next) => {
   const sessionID = socket.handshake.auth.sessionID;
+
   if (sessionID) {
-    // find existing session
     const session = sessionStore.findSession(sessionID);
+
     if (session) {
       socket.data.sessionID = sessionID;
       socket.data.userID = session.userID;
@@ -44,53 +45,46 @@ io.use((socket: Socket, next) => {
       return next();
     }
   }
+
   const username = socket.handshake.auth.username;
 
   if (!username) {
     return next(new Error("invalid username"));
   }
 
-  // create new session
   socket.data.sessionID = randomId();
   socket.data.userID = randomId();
-
-  if (
-    !(
-      typeof username === "string" &&
-      username.length >= 2 &&
-      username.length <= 16 &&
-      /^[\w]+$/.test(username)
-    )
-  ) {
-    socket.emit("server:show error", { message: "Wrong input" });
-    return next();
-  }
-
-  let isPlayerNameAlreadyTaken: boolean = false;
-
-  users.forEach((user) => {
-    if (user.username === username) {
-      isPlayerNameAlreadyTaken = true;
-    }
-  });
-
-  if (isPlayerNameAlreadyTaken) {
-    socket.emit("server:show error", {
-      message: "That name is already taken. Choose different name",
-    });
-    return next();
-  }
-
   socket.data.username = username;
-
   next();
 });
 
-io.on("connection", (socket) => {
-  if (socket.data.username === undefined) {
-    return;
-  }
+// validation
+// if (
+//   !(
+//     typeof username === "string" &&
+//     username.length >= 2 &&
+//     username.length <= 16 &&
+//     /^[\w]+$/.test(username)
+//   )
+// ) {
+//   socket.emit("server:show error", { message: "Wrong input" });
+// }
 
+// let isPlayerNameAlreadyTaken: boolean = false;
+
+// users.forEach((user) => {
+//   if (user.username === username) {
+//     isPlayerNameAlreadyTaken = true;
+//   }
+// });
+
+// if (isPlayerNameAlreadyTaken) {
+//   socket.emit("server:show error", {
+//     message: "That name is already taken. Choose different name",
+//   });
+// }
+
+io.on("connection", (socket) => {
   // persist session
   sessionStore.saveSession(socket.data.sessionID, {
     userID: socket.data.userID,

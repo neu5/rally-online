@@ -1,6 +1,7 @@
 node_modules/
 dist/
 packages/**/refactor.ts
+packages/client/**/scene/*.ts
 packages/server/**/scene/*.ts
 packages/server/**/sockets/*.ts
 packages/server/**/utils/*.ts
