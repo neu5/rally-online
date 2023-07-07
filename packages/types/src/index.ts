@@ -10,7 +10,7 @@ type Class = { new (...args: any[]): any };
 
 type UI = {
   createPlayersList: (list: UsersList) => void;
-  setCurrentPlayer: (id: string) => void;
+  // setCurrentPlayer: (id: string) => void;
   DialogWrapper: Class;
 };
 

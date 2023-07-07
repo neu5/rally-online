@@ -19,5 +19,6 @@
       "~/*": ["./*"]
     }
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/refactor.ts", "src/scene/*.ts"]
 }
