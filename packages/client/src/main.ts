@@ -71,8 +71,6 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
       if (customEvent.detail !== undefined) {
         const username = customEvent.detail;
         game.usernameAlreadySelected = true;
-        socket.auth = { username };
-        socket.connect();
       }
 
       // if (customEvent.detail !== undefined && currentPlayerId) {
@@ -87,7 +85,6 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
   if (features[FEATURES_NAMES.PERSISTENS_SESSION] && sessionID) {
     game.usernameAlreadySelected = true;
     socket.auth = { sessionID };
-    socket.connect();
   } else {
     const { labelName, inputName } = loginDialog();
 
@@ -97,4 +94,6 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
       closeButtonVisibility: false,
     });
   }
+
+  socket.connect();
 })();

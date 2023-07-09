@@ -30,7 +30,12 @@ const io = new Server<ServerToClientEvents>(httpServer);
 // };
 
 // fetch existing users
-const users: { connected: boolean; userID: string; username: string }[] = [];
+const users: {
+  connected: boolean;
+  isAuthorized: boolean;
+  userID: string;
+  username: string;
+}[] = [];
 
 io.use((socket: Socket, next) => {
   const sessionID = socket.handshake.auth.sessionID;
@@ -48,13 +53,9 @@ io.use((socket: Socket, next) => {
 
   const username = socket.handshake.auth.username;
 
-  if (!username) {
-    return next(new Error("invalid username"));
-  }
-
   socket.data.sessionID = randomId();
   socket.data.userID = randomId();
-  socket.data.username = username;
+  socket.data.username = username || "";
   next();
 });
 
@@ -107,6 +108,8 @@ io.on("connection", (socket) => {
     }
   });
 
+  console.log(users);
+
   socket.emit("server:send users", users);
 
   // notify existing users
@@ -117,6 +120,47 @@ io.on("connection", (socket) => {
   });
 
   socket.emit("server:close dialog");
+
+  socket.on("player:set-name", ({ id, username }) => {
+    console.log("player wants to set a name");
+    // const player = playersMap.get(id);
+
+    // if (!player) {
+    //   return;
+    // }
+
+    // if (
+    //   !(
+    //     typeof displayName === "string" &&
+    //     displayName.length >= 2 &&
+    //     displayName.length <= 16 &&
+    //     /^[\w]+$/.test(displayName)
+    //   )
+    // ) {
+    //   socket.emit("server:show-error", { message: "Wrong input" });
+    //   return;
+    // }
+
+    // let isPlayerNameAlreadyTaken: boolean = false;
+
+    // playersMap.forEach((p) => {
+    //   if (p.displayName === displayName) {
+    //     isPlayerNameAlreadyTaken = true;
+    //   }
+    // });
+
+    // if (isPlayerNameAlreadyTaken) {
+    //   socket.emit("server:show-error", {
+    //     message: "That name is already taken. Choose different name",
+    //   });
+    //   return;
+    // }
+
+    // player.displayName = displayName;
+
+    // socket.emit("server:close-dialog");
+    // io.emit("server:users-list-update", playersMapToArray(playersMap));
+  });
 
   // createSocketHandlers({ io, socket, usersMap });
   // notify users upon disconnection
