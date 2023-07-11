@@ -30,7 +30,11 @@ const io = new Server<ServerToClientEvents>(httpServer);
 // };
 
 // fetch existing users
-const users: { connected: boolean; userID: string; username: string }[] = [];
+const users: {
+  connected: boolean;
+  userID: string;
+  username: string;
+}[] = [];
 
 io.use((socket: Socket, next) => {
   const sessionID = socket.handshake.auth.sessionID;
@@ -48,48 +52,18 @@ io.use((socket: Socket, next) => {
 
   const username = socket.handshake.auth.username;
 
-  if (!username) {
-    return next(new Error("invalid username"));
-  }
-
   socket.data.sessionID = randomId();
   socket.data.userID = randomId();
   socket.data.username = username;
   next();
 });
 
-// validation
-// if (
-//   !(
-//     typeof username === "string" &&
-//     username.length >= 2 &&
-//     username.length <= 16 &&
-//     /^[\w]+$/.test(username)
-//   )
-// ) {
-//   socket.emit("server:show error", { message: "Wrong input" });
-// }
-
-// let isPlayerNameAlreadyTaken: boolean = false;
-
-// users.forEach((user) => {
-//   if (user.username === username) {
-//     isPlayerNameAlreadyTaken = true;
-//   }
-// });
-
-// if (isPlayerNameAlreadyTaken) {
-//   socket.emit("server:show error", {
-//     message: "That name is already taken. Choose different name",
-//   });
-// }
-
 io.on("connection", (socket) => {
   // persist session
   sessionStore.saveSession(socket.data.sessionID, {
+    connected: true,
     userID: socket.data.userID,
     username: socket.data.username,
-    connected: true,
   });
 
   // emit session details
@@ -102,21 +76,68 @@ io.on("connection", (socket) => {
   socket.join(socket.data.userID);
 
   sessionStore.findAllSessions().forEach((userData) => {
-    if (userData.username !== undefined) {
-      users.push({ ...userData });
+    // if (userData.username !== undefined) {
+    users.push({ ...userData });
+    // }
+  });
+
+  if (socket.data.username) {
+    // notify existing users
+    socket.broadcast.emit("server:user connected", {
+      connected: socket.data.connected,
+      userID: socket.data.userID,
+      username: socket.data.username,
+    });
+
+    io.emit(
+      "server:send users",
+      users.filter((u) => Boolean(u.username))
+    );
+    socket.emit("server:close dialog");
+  }
+
+  socket.on("client:set name", ({ username, userID }) => {
+    const user = users.find((u) => u.userID === userID);
+
+    if (!user) {
+      return;
     }
+
+    if (
+      !(
+        typeof username === "string" &&
+        username.length >= 3 &&
+        username.length <= 16 &&
+        /^[\w]+$/.test(username)
+      )
+    ) {
+      socket.emit("server:show error", { message: "Wrong input" });
+      return;
+    }
+
+    let isPlayerNameAlreadyTaken: boolean = false;
+
+    users.forEach((u) => {
+      if (u.username === username) {
+        isPlayerNameAlreadyTaken = true;
+      }
+    });
+
+    if (isPlayerNameAlreadyTaken) {
+      socket.emit("server:show error", {
+        message: "That name is already taken. Choose different name",
+      });
+      return;
+    }
+
+    user.username = username;
+
+    io.emit(
+      "server:send users",
+      users.filter((u) => Boolean(u.username))
+    );
+    socket.emit("server:close dialog");
   });
-
-  socket.emit("server:send users", users);
-
-  // notify existing users
-  socket.broadcast.emit("server:user connected", {
-    userID: socket.data.userID,
-    username: socket.data.username,
-    connected: true,
-  });
-
-  socket.emit("server:close dialog");
 
   // createSocketHandlers({ io, socket, usersMap });
   // notify users upon disconnection
@@ -128,9 +149,9 @@ io.on("connection", (socket) => {
       socket.broadcast.emit("server:user disconnected", socket.data.userID);
       // update the connection status of the session
       sessionStore.saveSession(socket.data.sessionID, {
+        connected: false,
         userID: socket.data.userID,
         username: socket.data.username,
-        connected: false,
       });
     }
   });

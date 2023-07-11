@@ -17,7 +17,7 @@ type UI = {
 type Game = {
   isDevelopment: boolean;
   rootEl: HTMLElement | null;
-  thisPlayerSocketId: string | null;
+  userID: string | null;
   ui: UI;
   usernameAlreadySelected: boolean;
 };
@@ -37,11 +37,13 @@ type SessionInfo = {
 
 interface ServerToClientEvents {
   "player:get-users-list": () => void;
+  "client:set name": (data: { userID: string; username: string }) => void;
   // "server:action": (data: Object) => void;
   // "server:game-info": (data: GameInfo) => void;
   "server:close dialog": () => void;
   "server:send users": (data: UsersList) => void;
   "server:session": (data: SessionInfo) => void;
+  "server:show error": (data: { message: string }) => void;
   // "server:start-race": (data: Object) => void;
   // "server:stop-race": (data: Object) => void;
   "server:user connected": (data: User) => void;

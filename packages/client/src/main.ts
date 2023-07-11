@@ -48,9 +48,9 @@ import { loginDialog } from "./ui/dialog-login";
 const game: Game = {
   isDevelopment: process.env.NODE_ENV === "development",
   rootEl: document.getElementById("root"),
-  thisPlayerSocketId: null,
   ui,
   usernameAlreadySelected: false,
+  userID: null,
   // usersMap: new Map(),
 };
 
@@ -69,25 +69,19 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
       const customEvent = ev as CustomEvent<string>;
 
       if (customEvent.detail !== undefined) {
-        const username = customEvent.detail;
-        game.usernameAlreadySelected = true;
-        socket.auth = { username };
-        socket.connect();
+        // const username = customEvent.detail;
+        // game.usernameAlreadySelected = true;
+        socket.emit("client:set name", {
+          userID: socket.userID,
+          username: customEvent.detail,
+        });
       }
-
-      // if (customEvent.detail !== undefined && currentPlayerId) {
-      //   socket.emit("player:set-name", {
-      //     id: currentPlayerId,
-      //     displayName: customEvent.detail,
-      //   });
-      // }
     });
   }
 
   if (features[FEATURES_NAMES.PERSISTENS_SESSION] && sessionID) {
     game.usernameAlreadySelected = true;
     socket.auth = { sessionID };
-    socket.connect();
   } else {
     const { labelName, inputName } = loginDialog();
 
@@ -97,4 +91,6 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
       closeButtonVisibility: false,
     });
   }
+
+  socket.connect();
 })();
