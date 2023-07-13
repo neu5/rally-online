@@ -76,8 +76,8 @@ const createPlayersList = (usersList: UsersList) => {
 // };
 
 const setCurrentPlayer = (id: string) => {
-  [...usersListEl.children].find((el: HTMLElement) => {
-    if (el.dataset.id === id) {
+  [...usersListEl.children].find((el: Element) => {
+    if (el instanceof HTMLElement && el.dataset.id === id) {
       el.classList.add("you");
       return true;
     }
