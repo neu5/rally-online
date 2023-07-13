@@ -50,8 +50,6 @@ const game: Game = {
   rootEl: document.getElementById("root"),
   ui,
   usernameAlreadySelected: false,
-  userID: null,
-  // usersMap: new Map(),
 };
 
 const sessionID = localStorage.getItem("rally-online");

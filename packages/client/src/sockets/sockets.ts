@@ -41,6 +41,10 @@ const createSocketHandler = ({
 
   socket.on("server:send users", (users: UsersList) => {
     game.ui.createPlayersList(users);
+
+    if (socket.userID) {
+      game.ui.setCurrentPlayer(socket.userID);
+    }
   });
 
   socket.on("server:show error", ({ message }: { message: string }) => {
@@ -67,20 +71,6 @@ const createSocketHandler = ({
   });
 
   return { socket };
-
-  // socket.on("server:game-info", ({ socketId }) => {
-  //   game.thisPlayerSocketId = socketId;
-
-  //   socket.emit("player:get-users-list");
-  // });
-
-  // socket.on("server:users-list-update", (playersList: PlayersList) => {
-  //   game.ui.createPlayersList(playersList);
-
-  //   if (game.thisPlayerSocketId) {
-  //     game.ui.setCurrentPlayer(game.thisPlayerSocketId);
-  //   }
-  // });
 };
 
 export { createSocketHandler };

@@ -75,22 +75,20 @@ const createPlayersList = (usersList: UsersList) => {
 //   el.appendChild(fragment);
 // };
 
-// const setCurrentPlayer = (id: string) => {
-//   [...playersListEl.children].find((el: HTMLElement) => {
-//     if (el.dataset.id === id) {
-//       el.classList.add("you");
-//       return true;
-//     }
-
-//     return false;
-//   });
-// };
+const setCurrentPlayer = (id: string) => {
+  [...usersListEl.children].find((el: HTMLElement) => {
+    if (el.dataset.id === id) {
+      el.classList.add("you");
+      return true;
+    }
+  });
+};
 
 const ui: UI = {
   createPlayersList,
   DialogWrapper,
   // PlayersIndicators,
-  // setCurrentPlayer,
+  setCurrentPlayer,
 };
 
 export { ui };
