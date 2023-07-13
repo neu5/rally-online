@@ -21,20 +21,6 @@ const randomId = () => randomBytes(8).toString("hex");
 const sessionStore = new InMemorySessionStore();
 
 const io = new Server<ServerToClientEvents>(httpServer);
-// const usersMap: UsersMap = new Map();
-
-// const playersMap: PlayersMap = new Map();
-
-// const race: Race = {
-//   isStarted: false,
-// };
-
-// fetch existing users
-const users: {
-  connected: boolean;
-  userID: string;
-  username: string;
-}[] = [];
 
 io.use((socket: Socket, next) => {
   const sessionID = socket.handshake.auth.sessionID;
@@ -75,12 +61,6 @@ io.on("connection", (socket) => {
   // join the "userID" room
   socket.join(socket.data.userID);
 
-  sessionStore.findAllSessions().forEach((userData) => {
-    // if (userData.username !== undefined) {
-    users.push({ ...userData });
-    // }
-  });
-
   if (socket.data.username) {
     // notify existing users
     socket.broadcast.emit("server:user connected", {
@@ -89,20 +69,18 @@ io.on("connection", (socket) => {
       username: socket.data.username,
     });
 
-    io.emit(
-      "server:send users",
-      users.filter((u) => Boolean(u.username))
-    );
+    io.emit("server:send users", sessionStore.getAuthorizedUsers());
     socket.emit("server:close dialog");
   }
 
   socket.on("client:set name", ({ username, userID }) => {
-    const user = users.find((u) => u.userID === userID);
+    const user = sessionStore
+      .findAllSessions()
+      .find((u) => u.userID === userID);
 
     if (!user) {
       return;
     }
-
     if (
       !(
         typeof username === "string" &&
@@ -114,28 +92,20 @@ io.on("connection", (socket) => {
       socket.emit("server:show error", { message: "Wrong input" });
       return;
     }
-
     let isPlayerNameAlreadyTaken: boolean = false;
-
-    users.forEach((u) => {
+    sessionStore.findAllSessions().forEach((u) => {
       if (u.username === username) {
         isPlayerNameAlreadyTaken = true;
       }
     });
-
     if (isPlayerNameAlreadyTaken) {
       socket.emit("server:show error", {
         message: "That name is already taken. Choose different name",
       });
       return;
     }
-
     user.username = username;
-
-    io.emit(
-      "server:send users",
-      users.filter((u) => Boolean(u.username))
-    );
+    io.emit("server:send users", sessionStore.getAuthorizedUsers());
     socket.emit("server:close dialog");
   });
 
@@ -145,14 +115,16 @@ io.on("connection", (socket) => {
     const matchingSockets = await io.in(socket.data.userID).allSockets();
     const isDisconnected = matchingSockets.size === 0;
     if (isDisconnected) {
-      // notify other users
-      socket.broadcast.emit("server:user disconnected", socket.data.userID);
       // update the connection status of the session
       sessionStore.saveSession(socket.data.sessionID, {
         connected: false,
         userID: socket.data.userID,
         username: socket.data.username,
       });
+      // notify other users
+      socket.broadcast.emit("server:user disconnected", socket.data.userID);
+
+      io.emit("server:send users", sessionStore.getAuthorizedUsers());
     }
   });
 });

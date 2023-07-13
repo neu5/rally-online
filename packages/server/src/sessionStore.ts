@@ -7,6 +7,10 @@ class InMemorySessionStore {
     this.sessions = new Map();
   }
 
+  getAuthorizedUsers() {
+    return [...this.sessions.values()].filter((user) => Boolean(user.username));
+  }
+
   findSession(id: string) {
     return this.sessions.get(id);
   }
