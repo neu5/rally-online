@@ -95,11 +95,13 @@ const createSocketHandlers = ({
     socket.join(RACE_ROOM_NAME);
 
     const socketsInTheRoom = await io.in(RACE_ROOM_NAME).fetchSockets();
-    const usersInTheRoom = socketsInTheRoom.map((s) =>
-      sessionStore.findSession(s.data.sessionID)
-    );
 
-    console.log(usersInTheRoom);
+    io.emit(
+      "server:send room users",
+      socketsInTheRoom.map((session) =>
+        sessionStore.findSession(session.data.sessionID)
+      )
+    );
   });
   // notify users upon disconnection
   socket.on("disconnect", async () => {

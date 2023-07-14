@@ -10,6 +10,7 @@ type Class = { new (...args: any[]): any };
 
 type UI = {
   createPlayersList: (list: UsersList) => void;
+  createRoomList: (list: RoomList) => void;
   setCurrentPlayer: (id: string) => void;
   DialogWrapper: Class;
 };
@@ -29,6 +30,11 @@ type User = {
 
 type UsersList = Array<User>;
 
+type RoomUser = {
+  username: string;
+};
+type RoomList = Array<RoomUser>;
+
 type SessionInfo = {
   sessionID: string;
   userID: string;
@@ -41,6 +47,7 @@ interface ServerToClientEvents {
   // "server:game-info": (data: GameInfo) => void;
   "server:close dialog": () => void;
   "server:send users": (data: UsersList) => void;
+  "server:send room users": (data: RoomList) => void;
   "server:session": (data: SessionInfo) => void;
   "server:show error": (data: { message: string }) => void;
   // "server:start-race": (data: Object) => void;
@@ -50,6 +57,14 @@ interface ServerToClientEvents {
   "server:users-list-update": (playersList: UsersList) => void;
 }
 
-export type { Game, User, UsersList, ServerToClientEvents, UI, UsersMap };
+export type {
+  Game,
+  RoomList,
+  User,
+  UsersList,
+  ServerToClientEvents,
+  UI,
+  UsersMap,
+};
 
 export { FEATURES_NAMES, features } from "./features";
