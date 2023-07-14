@@ -35,7 +35,7 @@ type SessionInfo = {
 };
 
 interface ServerToClientEvents {
-  "player:get-users-list": () => void;
+  "client:join race room": () => void;
   "client:set name": (data: { userID: string; username: string }) => void;
   // "server:action": (data: Object) => void;
   // "server:game-info": (data: GameInfo) => void;

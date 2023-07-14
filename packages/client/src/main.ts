@@ -20,6 +20,10 @@ import { loginDialog } from "./ui/dialog-login";
 //   ServerToClientEvents,
 // } from "@neu5/types/src";
 
+const joinRaceRoomBtn = document.getElementById(
+  "join-race-room-btn"
+) as HTMLAnchorElement;
+
 // const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 // const FPSEl = document.getElementById("fps") as HTMLElement;
 // const startRaceBtn = document.getElementById(
@@ -76,6 +80,10 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
       }
     });
   }
+
+  joinRaceRoomBtn.addEventListener("click", async () => {
+    socket.emit("client:join race room");
+  });
 
   if (features[FEATURES_NAMES.PERSISTENS_SESSION] && sessionID) {
     game.usernameAlreadySelected = true;
