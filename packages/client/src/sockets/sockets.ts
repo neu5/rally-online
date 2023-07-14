@@ -3,7 +3,7 @@ import Toastify from "toastify-js";
 import { TOAST_COLORS } from "../utils";
 
 import type { Socket } from "socket.io-client";
-import type { Game, UsersList } from "@neu5/types/src";
+import type { Game, RoomList, UsersList } from "@neu5/types/src";
 import type { DialogWrapper } from "../ui/dialog";
 
 type ExtendedSocket = Socket & {
@@ -45,6 +45,10 @@ const createSocketHandler = ({
     if (socket.userID) {
       game.ui.setCurrentPlayer(socket.userID);
     }
+  });
+
+  socket.on("server:send room users", (roomUsers: RoomList) => {
+    game.ui.createRoomList(roomUsers);
   });
 
   socket.on("server:show error", ({ message }: { message: string }) => {

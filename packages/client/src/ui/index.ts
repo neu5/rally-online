@@ -1,8 +1,12 @@
 import { DialogWrapper } from "./dialog";
-import type { UI, UsersList } from "@neu5/types/src";
+import type { RoomList, UI, UsersList } from "@neu5/types/src";
 
 const [usersListEl] = document.getElementsByClassName(
   "users-list"
+) as HTMLCollectionOf<HTMLElement>;
+
+const [roomListEl] = document.getElementsByClassName(
+  "room-list"
 ) as HTMLCollectionOf<HTMLElement>;
 
 const createPlayersList = (usersList: UsersList) => {
@@ -34,6 +38,22 @@ const createPlayersList = (usersList: UsersList) => {
 
   usersListEl.textContent = "";
   usersListEl.appendChild(fragment);
+};
+
+const createRoomList = (roomList: RoomList) => {
+  const fragment = new DocumentFragment();
+
+  roomList.forEach(({ username }: { username: string }) => {
+    const li = document.createElement("li");
+    li.textContent = username;
+
+    li.classList.add("room-list__elem");
+
+    fragment.appendChild(li);
+  });
+
+  roomListEl.textContent = "";
+  roomListEl.appendChild(fragment);
 };
 
 // const PlayersIndicators = (el: HTMLElement, playersMap: PlayersMap) => {
@@ -86,6 +106,7 @@ const setCurrentPlayer = (id: string) => {
 
 const ui: UI = {
   createPlayersList,
+  createRoomList,
   DialogWrapper,
   // PlayersIndicators,
   setCurrentPlayer,

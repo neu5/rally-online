@@ -13,10 +13,5 @@
     "types": ["node", "express"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "src/refactor.ts",
-    "src/scene/*.ts",
-    "src/sockets/*.ts",
-    "src/utils/*.ts"
-  ]
+  "exclude": ["src/refactor.ts", "src/scene/*.ts", "src/utils/*.ts"]
 }
