@@ -41,6 +41,7 @@ io.use((socket: Socket, next) => {
   socket.data.sessionID = randomId();
   socket.data.userID = randomId();
   socket.data.username = username;
+
   next();
 });
 

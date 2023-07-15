@@ -16,6 +16,23 @@ import type { InMemorySessionStore } from "../sessionStore";
 
 const RACE_ROOM_NAME = "race room 1" as const;
 
+const emitRoomInfo = async ({
+  io,
+  sessionStore,
+}: {
+  io: Server<ServerToClientEvents>;
+  sessionStore: InMemorySessionStore;
+}) => {
+  const socketsInTheRoom = await io.in(RACE_ROOM_NAME).fetchSockets();
+
+  io.emit(
+    "server:send room users",
+    socketsInTheRoom.map((session) =>
+      sessionStore.findSession(session.data.sessionID)
+    )
+  );
+};
+
 const createSocketHandlers = ({
   io,
   sessionStore,
@@ -88,31 +105,29 @@ const createSocketHandlers = ({
     });
 
     io.emit("server:send users", sessionStore.getAuthorizedUsers());
+    emitRoomInfo({ io, sessionStore });
     socket.emit("server:close dialog");
   });
 
   socket.on("client:join race room", async () => {
     socket.join(RACE_ROOM_NAME);
 
-    const socketsInTheRoom = await io.in(RACE_ROOM_NAME).fetchSockets();
-
-    io.emit(
-      "server:send room users",
-      socketsInTheRoom.map((session) =>
-        sessionStore.findSession(session.data.sessionID)
-      )
-    );
+    emitRoomInfo({ io, sessionStore });
   });
   // notify users upon disconnection
   socket.on("disconnect", async () => {
     const matchingSockets = await io.in(socket.data.userID).allSockets();
     const isDisconnected = matchingSockets.size === 0;
+
+    const user: User = sessionStore
+      .findAllSessions()
+      .find((u) => u.userID === socket.data.userID);
+
     if (isDisconnected) {
       // update the connection status of the session
       sessionStore.saveSession(socket.data.sessionID, {
+        ...user,
         connected: false,
-        userID: socket.data.userID,
-        username: socket.data.username,
       });
       // notify other users
       socket.broadcast.emit("server:user disconnected", socket.data.userID);
