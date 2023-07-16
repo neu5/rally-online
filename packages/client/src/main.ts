@@ -74,7 +74,6 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
         // const username = customEvent.detail;
         // game.usernameAlreadySelected = true;
         socket.emit("client:set name", {
-          userID: socket.userID,
           username: customEvent.detail,
         });
       }

@@ -6,6 +6,7 @@ import type {
   // UsersMap,
 } from "@neu5/types/src";
 import type { InMemorySessionStore } from "../sessionStore";
+import { Room } from "../room";
 
 // const usersMapToArray = (usersMap: UsersMap): PlayersList =>
 //   Array.from(usersMap).map(([id, { displayName, socketId }]) => ({
@@ -14,22 +15,22 @@ import type { InMemorySessionStore } from "../sessionStore";
 //     socketId,
 //   }));
 
-const RACE_ROOM_NAME = "race room 1" as const;
+const roomRace = new Room();
 
 const emitRoomInfo = async ({
   io,
+  room,
   sessionStore,
 }: {
   io: Server<ServerToClientEvents>;
+  room: Room;
   sessionStore: InMemorySessionStore;
 }) => {
-  const socketsInTheRoom = await io.in(RACE_ROOM_NAME).fetchSockets();
+  const socketsInTheRoom = room.getMembers();
 
   io.emit(
     "server:send room users",
-    socketsInTheRoom.map((session) =>
-      sessionStore.findSession(session.data.sessionID)
-    )
+    socketsInTheRoom.map((sessionID) => sessionStore.findSession(sessionID))
   );
 };
 
@@ -67,10 +68,8 @@ const createSocketHandlers = ({
     socket.emit("server:close dialog");
   }
 
-  socket.on("client:set name", ({ username, userID }) => {
-    const user: User = sessionStore
-      .findAllSessions()
-      .find((u) => u.userID === userID);
+  socket.on("client:set name", ({ username }) => {
+    const user: User = sessionStore.findSession(socket.data.sessionID);
 
     if (!user) {
       return;
@@ -105,23 +104,21 @@ const createSocketHandlers = ({
     });
 
     io.emit("server:send users", sessionStore.getAuthorizedUsers());
-    emitRoomInfo({ io, sessionStore });
+    emitRoomInfo({ io, room: roomRace, sessionStore });
     socket.emit("server:close dialog");
   });
 
   socket.on("client:join race room", async () => {
-    socket.join(RACE_ROOM_NAME);
+    roomRace.join(socket.data.sessionID);
 
-    emitRoomInfo({ io, sessionStore });
+    emitRoomInfo({ io, room: roomRace, sessionStore });
   });
   // notify users upon disconnection
   socket.on("disconnect", async () => {
     const matchingSockets = await io.in(socket.data.userID).allSockets();
     const isDisconnected = matchingSockets.size === 0;
 
-    const user: User = sessionStore
-      .findAllSessions()
-      .find((u) => u.userID === socket.data.userID);
+    const user: User = sessionStore.findSession(socket.data.sessionID);
 
     if (isDisconnected) {
       // update the connection status of the session
