@@ -50,7 +50,6 @@ const createSocketHandlers = ({
     username: socket.data.username,
   });
 
-  // emit session details
   socket.emit("server:session", {
     sessionID: socket.data.sessionID,
     userID: socket.data.userID,

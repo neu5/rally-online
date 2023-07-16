@@ -87,15 +87,15 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
   if (features[FEATURES_NAMES.PERSISTENS_SESSION] && sessionID) {
     game.usernameAlreadySelected = true;
     socket.auth = { sessionID };
-  } else {
-    const { labelName, inputName } = loginDialog();
-
-    dialog.show({
-      content: labelName,
-      inputToLook: inputName,
-      closeButtonVisibility: false,
-    });
   }
+
+  const { labelName, inputName } = loginDialog();
+
+  dialog.show({
+    content: labelName,
+    inputToLook: inputName,
+    closeButtonVisibility: false,
+  });
 
   socket.connect();
 })();

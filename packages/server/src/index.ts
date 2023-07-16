@@ -25,25 +25,25 @@ const io = new Server<ServerToClientEvents>(httpServer);
 
 io.use((socket: Socket, next) => {
   const sessionID = socket.handshake.auth.sessionID;
+  const session = sessionStore.findSession(sessionID);
 
-  if (sessionID) {
-    const session = sessionStore.findSession(sessionID);
+  if (!sessionID || !session) {
+    socket.data.sessionID = randomId();
+    socket.data.userID = randomId();
 
-    if (session) {
-      socket.data.sessionID = sessionID;
-      socket.data.userID = session.userID;
-      socket.data.username = session.username;
-      return next();
-    }
+    return next();
   }
 
-  const username = socket.handshake.auth.username;
+  if (session.username) {
+    socket.data.sessionID = sessionID;
+    socket.data.userID = session.userID;
+    socket.data.username = session.username;
+  } else {
+    socket.data.sessionID = sessionID;
+    socket.data.userID = randomId();
+  }
 
-  socket.data.sessionID = randomId();
-  socket.data.userID = randomId();
-  socket.data.username = username;
-
-  next();
+  return next();
 });
 
 io.on("connection", (socket) => {
