@@ -52,6 +52,7 @@ interface ServerToClientEvents {
   "server:show error": (data: { message: string }) => void;
   // "server:start-race": (data: Object) => void;
   // "server:stop-race": (data: Object) => void;
+  "server:user can leave the room": () => void;
   "server:user connected": (data: User) => void;
   "server:user disconnected": (data: { userID: string }) => void;
   "server:users-list-update": (playersList: UsersList) => void;

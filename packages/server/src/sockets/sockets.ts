@@ -111,6 +111,7 @@ const createSocketHandlers = ({
     roomRace.join(socket.data.sessionID);
 
     emitRoomInfo({ io, room: roomRace, sessionStore });
+    socket.emit("server:user can leave the room");
   });
   // notify users upon disconnection
   socket.on("disconnect", async () => {
