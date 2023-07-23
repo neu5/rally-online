@@ -104,6 +104,11 @@ const createSocketHandlers = ({
 
     io.emit("server:send users", sessionStore.getAuthorizedUsers());
     emitRoomInfo({ io, room: roomRace, sessionStore });
+
+    // if (!game.isRaceStarted) {
+    socket.emit("server:user can join the room");
+    // }
+
     socket.emit("server:close dialog");
   });
 
@@ -113,6 +118,14 @@ const createSocketHandlers = ({
     emitRoomInfo({ io, room: roomRace, sessionStore });
     socket.emit("server:user can leave the room");
   });
+
+  socket.on("client:leave race room", async () => {
+    roomRace.leave(socket.data.sessionID);
+
+    emitRoomInfo({ io, room: roomRace, sessionStore });
+    socket.emit("server:user can join the room");
+  });
+
   // notify users upon disconnection
   socket.on("disconnect", async () => {
     const matchingSockets = await io.in(socket.data.userID).allSockets();

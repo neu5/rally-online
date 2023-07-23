@@ -23,6 +23,9 @@ import { loginDialog } from "./ui/dialog-login";
 const joinRaceRoomBtn = document.getElementById(
   "join-race-room-btn"
 ) as HTMLAnchorElement;
+const leaveRaceRoomBtn = document.getElementById(
+  "leave-race-room-btn"
+) as HTMLAnchorElement;
 
 // const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 // const FPSEl = document.getElementById("fps") as HTMLElement;
@@ -50,6 +53,10 @@ const joinRaceRoomBtn = document.getElementById(
 // }, 1000);
 
 const game: Game = {
+  elements: {
+    joinRaceRoomBtn,
+    leaveRaceRoomBtn,
+  },
   isDevelopment: process.env.NODE_ENV === "development",
   rootEl: document.getElementById("root"),
   ui,
@@ -82,6 +89,9 @@ const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
 
   joinRaceRoomBtn.addEventListener("click", async () => {
     socket.emit("client:join race room");
+  });
+  leaveRaceRoomBtn.addEventListener("click", async () => {
+    socket.emit("client:leave race room");
   });
 
   if (features[FEATURES_NAMES.PERSISTENS_SESSION] && sessionID) {

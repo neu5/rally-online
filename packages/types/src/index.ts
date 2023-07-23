@@ -11,11 +11,17 @@ type Class = { new (...args: any[]): any };
 type UI = {
   createPlayersList: (list: UsersList) => void;
   createRoomList: (list: RoomList) => void;
+  hideElement: (element: HTMLElement) => void;
   setCurrentPlayer: (id: string) => void;
+  showElement: (element: HTMLElement) => void;
   DialogWrapper: Class;
 };
 
 type Game = {
+  elements: {
+    joinRaceRoomBtn: HTMLElement;
+    leaveRaceRoomBtn: HTMLElement;
+  };
   isDevelopment: boolean;
   rootEl: HTMLElement | null;
   ui: UI;
@@ -42,6 +48,7 @@ type SessionInfo = {
 
 interface ServerToClientEvents {
   "client:join race room": () => void;
+  "client:leave race room": () => void;
   "client:set name": (data: { userID: string; username: string }) => void;
   // "server:action": (data: Object) => void;
   // "server:game-info": (data: GameInfo) => void;
@@ -52,6 +59,7 @@ interface ServerToClientEvents {
   "server:show error": (data: { message: string }) => void;
   // "server:start-race": (data: Object) => void;
   // "server:stop-race": (data: Object) => void;
+  "server:user can join the room": () => void;
   "server:user can leave the room": () => void;
   "server:user connected": (data: User) => void;
   "server:user disconnected": (data: { userID: string }) => void;

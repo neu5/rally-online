@@ -56,6 +56,13 @@ const createRoomList = (roomList: RoomList) => {
   roomListEl.appendChild(fragment);
 };
 
+const hideElement = (el: HTMLElement) => {
+  el.classList.add("hide");
+};
+const showElement = (el: HTMLElement) => {
+  el.classList.remove("hide");
+};
+
 // const PlayersIndicators = (el: HTMLElement, playersMap: PlayersMap) => {
 //   el.textContent = "";
 
@@ -107,9 +114,11 @@ const setCurrentPlayer = (id: string) => {
 const ui: UI = {
   createPlayersList,
   createRoomList,
+  hideElement,
+  setCurrentPlayer,
+  showElement,
   DialogWrapper,
   // PlayersIndicators,
-  setCurrentPlayer,
 };
 
 export { ui };
