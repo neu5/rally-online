@@ -51,6 +51,20 @@ const createSocketHandler = ({
     game.ui.createRoomList(roomUsers);
   });
 
+  socket.on("server:user can join the room", () => {
+    game.ui.showElement(game.elements.joinRaceRoomBtn);
+    game.ui.hideElement(game.elements.leaveRaceRoomBtn);
+  });
+
+  socket.on("server:user can leave the room", () => {
+    game.ui.hideElement(game.elements.joinRaceRoomBtn);
+    game.ui.showElement(game.elements.leaveRaceRoomBtn);
+  });
+
+  socket.on("server:close dialog", () => {
+    dialog.close();
+  });
+
   socket.on("server:show error", ({ message }: { message: string }) => {
     Toastify({
       text: message,
@@ -62,10 +76,6 @@ const createSocketHandler = ({
         background: TOAST_COLORS.RED,
       },
     }).showToast();
-  });
-
-  socket.on("server:close dialog", () => {
-    dialog.close();
   });
 
   socket.on("connect_error", (err) => {
