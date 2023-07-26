@@ -29,9 +29,9 @@ const leaveRaceRoomBtn = document.getElementById(
 
 // const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 // const FPSEl = document.getElementById("fps") as HTMLElement;
-// const startRaceBtn = document.getElementById(
-//   "start-race-btn"
-// ) as HTMLAnchorElement;
+const startRaceBtn = document.getElementById(
+  "start-race-btn"
+) as HTMLAnchorElement;
 // const playersListEl = document.getElementById("players-list") as HTMLElement;
 
 // const throttle = (func: Function, timeFrame: number = 0) => {
@@ -53,6 +53,7 @@ const game: Game = {
   elements: {
     joinRaceRoomBtn,
     leaveRaceRoomBtn,
+    startRaceBtn,
   },
   isDevelopment: process.env.NODE_ENV === "development",
   rootEl: document.getElementById("root"),

@@ -10,6 +10,17 @@ type ExtendedSocket = Socket & {
   userID?: string;
 };
 
+const toggleStartRaceBtns = (
+  startRaceBtn: HTMLElement,
+  canStartTheRace: boolean
+) => {
+  if (canStartTheRace) {
+    startRaceBtn.removeAttribute("disabled");
+  } else {
+    startRaceBtn.setAttribute("disabled", "disabled");
+  }
+};
+
 const createSocketHandler = ({
   dialog,
   game,
@@ -59,6 +70,14 @@ const createSocketHandler = ({
   socket.on("server:user can leave the room", () => {
     game.ui.hideElement(game.elements.joinRaceRoomBtn);
     game.ui.showElement(game.elements.leaveRaceRoomBtn);
+  });
+
+  socket.on("server:user can start the race", () => {
+    toggleStartRaceBtns(game.elements.startRaceBtn, true);
+  });
+
+  socket.on("server:user cannot start the race", () => {
+    toggleStartRaceBtns(game.elements.startRaceBtn, false);
   });
 
   socket.on("server:close dialog", () => {
