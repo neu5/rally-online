@@ -21,6 +21,7 @@ type Game = {
   elements: {
     joinRaceRoomBtn: HTMLElement;
     leaveRaceRoomBtn: HTMLElement;
+    startRaceBtn: HTMLElement;
   };
   isDevelopment: boolean;
   rootEl: HTMLElement | null;
@@ -61,6 +62,8 @@ interface ServerToClientEvents {
   // "server:stop-race": (data: Object) => void;
   "server:user can join the room": () => void;
   "server:user can leave the room": () => void;
+  "server:user can start the race": () => void;
+  "server:user cannot start the race": () => void;
   "server:user connected": (data: User) => void;
   "server:user disconnected": (data: { userID: string }) => void;
   "server:users-list-update": (playersList: UsersList) => void;
