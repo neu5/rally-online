@@ -32,9 +32,6 @@ const leaveRaceRoomBtn = document.getElementById(
 // const startRaceBtn = document.getElementById(
 //   "start-race-btn"
 // ) as HTMLAnchorElement;
-// const stopRaceBtn = document.getElementById(
-//   "stop-race-btn"
-// ) as HTMLAnchorElement;
 // const playersListEl = document.getElementById("players-list") as HTMLElement;
 
 // const throttle = (func: Function, timeFrame: number = 0) => {
