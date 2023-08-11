@@ -44,6 +44,13 @@ export class DialogWrapper {
 
     this.inputToLook = null;
 
+    dialogContent.addEventListener("keydown", (el, ev: KeyboardEvent) => {
+      console.log({ ev });
+      if (ev.key === "Enter") {
+        console.log("its submit");
+      }
+    });
+
     dialogContent.addEventListener("click", (ev: Event) => {
       const element = ev.target as HTMLButtonElement;
 
