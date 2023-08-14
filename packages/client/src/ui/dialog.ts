@@ -44,10 +44,14 @@ export class DialogWrapper {
 
     this.inputToLook = null;
 
-    dialogContent.addEventListener("keydown", (el, ev: KeyboardEvent) => {
-      console.log({ ev });
-      if (ev.key === "Enter") {
-        console.log("its submit");
+    dialogContent.addEventListener("keydown", (ev) => {
+      // @ts-ignore
+      if (ev.key === "Enter" && this.inputToLook && rootEl) {
+        const event = new CustomEvent("setName", {
+          detail: this.inputToLook.value,
+        });
+
+        rootEl.dispatchEvent(event);
       }
     });
 
