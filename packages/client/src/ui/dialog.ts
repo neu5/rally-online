@@ -1,24 +1,10 @@
+import { EVENTS } from "../events/events";
+
 const DIALOG_WRAPPER_CLASSNAME = "dialog-wrapper";
 const DIALOG_CLASSNAME = "dialog";
 const DIALOG_CLOSE_BUTTON_CLASSNAME = "dialog-header__close-button";
 const DIALOG_CONTENT_CLASSNAME = "dialog-content";
 const DIALOG_FOOTER_CLASSNAME = "dialog-footer";
-
-const EVENTS = {
-  setName: ({
-    input,
-    rootEl,
-  }: {
-    input: HTMLInputElement;
-    rootEl: HTMLElement;
-  }) => {
-    const event = new CustomEvent("setName", {
-      detail: input.value,
-    });
-
-    rootEl.dispatchEvent(event);
-  },
-} as const;
 
 export class DialogWrapper {
   dialogWrapper: Element;
