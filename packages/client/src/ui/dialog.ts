@@ -1,3 +1,5 @@
+import { EVENTS } from "../events/events";
+
 const DIALOG_WRAPPER_CLASSNAME = "dialog-wrapper";
 const DIALOG_CLASSNAME = "dialog";
 const DIALOG_CLOSE_BUTTON_CLASSNAME = "dialog-header__close-button";
@@ -47,11 +49,7 @@ export class DialogWrapper {
     dialogContent.addEventListener("keydown", (ev) => {
       // @ts-ignore
       if (ev.key === "Enter" && this.inputToLook && rootEl) {
-        const event = new CustomEvent("setName", {
-          detail: this.inputToLook.value,
-        });
-
-        rootEl.dispatchEvent(event);
+        EVENTS.setName({ input: this.inputToLook, rootEl });
       }
     });
 
@@ -59,11 +57,7 @@ export class DialogWrapper {
       const element = ev.target as HTMLButtonElement;
 
       if (element?.type === "submit" && this.inputToLook && rootEl) {
-        const event = new CustomEvent("setName", {
-          detail: this.inputToLook.value,
-        });
-
-        rootEl.dispatchEvent(event);
+        EVENTS.setName({ input: this.inputToLook, rootEl });
       }
     });
   }
