@@ -1,17 +1,37 @@
 import { Body, Plane, Vec3, World } from "cannon-es";
 import { addRigidVehicle, getMapWalls } from "../utils";
 
-import type { Game, PlayersMap } from "../index";
+import type { Game } from "../index";
 
 const FRAME_IN_MS = 1000 / 30; // 30 FPS
 let loop = setInterval(() => {}, FRAME_IN_MS);
 
+const ACCELERATE = "accelerate";
+const BRAKE = "brake";
+const LEFT = "left";
+const RIGHT = "right";
+
+interface Actions {
+  [ACCELERATE]: boolean;
+  [BRAKE]: boolean;
+  [LEFT]: boolean;
+  [RIGHT]: boolean;
+}
+const actions: Actions = {
+  [ACCELERATE]: false,
+  [BRAKE]: false,
+  [LEFT]: false,
+  [RIGHT]: false,
+} as const;
+
 const startRace = async ({
   game,
-  playersMap,
+  // playersMap,
+  room,
+  sessionStore,
 }: {
   game: Game;
-  playersMap: PlayersMap;
+  // playersMap: PlayersMap;
 }) => {
   clearInterval(loop);
   game.objects = [];
@@ -42,6 +62,20 @@ const startRace = async ({
       });
     });
   }
+
+  const socketsInTheRoom = room.getMembers();
+  const playersMap = socketsInTheRoom
+    .map((sessionID: string) => sessionStore.findSession(sessionID))
+    .map((player) => ({
+      accelerateTimeMS: 0,
+      turnTimeMS: 0,
+      actions: { ...actions },
+      vehicle: {},
+      vehicleSteering: 0,
+      vehicleTemplate: {},
+      startingPos: {},
+      ...player,
+    }));
 
   playersMap.forEach((player) => {
     const vehicle = addRigidVehicle({
@@ -101,7 +135,7 @@ const startRace = async ({
     });
   }, FRAME_IN_MS);
 
-  return loop;
+  return { loop, playersMap };
 };
 
 export { startRace };

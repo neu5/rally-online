@@ -29,6 +29,18 @@ type Game = {
   usernameAlreadySelected: boolean;
 };
 
+type Position = {
+  x: number;
+  y: number;
+  z: number;
+};
+
+type GameConfig = {
+  width: number;
+  height: number;
+  depth: number;
+};
+
 type User = {
   connected: boolean;
   userID: string;
@@ -51,6 +63,7 @@ interface ServerToClientEvents {
   "client:join race room": () => void;
   "client:leave race room": () => void;
   "client:set name": (data: { userID: string; username: string }) => void;
+  "client:start the race": () => void;
   // "server:action": (data: Object) => void;
   // "server:game-info": (data: GameInfo) => void;
   "server:close dialog": () => void;
@@ -71,6 +84,8 @@ interface ServerToClientEvents {
 
 export type {
   Game,
+  GameConfig,
+  Position,
   RoomList,
   User,
   UsersList,

@@ -23,6 +23,49 @@ const sessionStore = new InMemorySessionStore();
 
 const io = new Server<ServerToClientEvents>(httpServer);
 
+type Position = {
+  x: number;
+  y: number;
+  z: number;
+};
+
+type GameQuaternion = {
+  x: number;
+  y: number;
+  z: number;
+  w: number;
+};
+
+type GameConfig = {
+  width: number;
+  height: number;
+  depth: number;
+};
+
+type GameObject = {
+  name: string;
+  isWall: boolean;
+  position: Position;
+  quaternion: GameQuaternion;
+  width: number;
+  height: number;
+  depth: number;
+};
+
+export type Game = {
+  config: GameConfig;
+  objects: GameObject[];
+};
+
+let game: Game = {
+  config: {
+    width: 0,
+    height: 0,
+    depth: 0,
+  },
+  objects: [],
+};
+
 io.use((socket: Socket, next) => {
   const sessionID = socket.handshake.auth.sessionID;
   const session = sessionStore.findSession(sessionID);
@@ -47,7 +90,7 @@ io.use((socket: Socket, next) => {
 });
 
 io.on("connection", (socket) => {
-  createSocketHandlers({ io, sessionStore, socket });
+  createSocketHandlers({ game, io, sessionStore, socket });
 });
 
 app.use(express.static(distDir));

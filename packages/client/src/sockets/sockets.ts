@@ -60,6 +60,9 @@ const createSocketHandler = ({
 
   socket.on("server:send room users", (roomUsers: RoomList) => {
     game.ui.createRoomList(roomUsers);
+    game.roomUsers = roomUsers;
+
+    console.log(roomUsers, socket.userID);
   });
 
   socket.on("server:user can join the room", () => {
