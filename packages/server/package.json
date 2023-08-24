@@ -29,7 +29,7 @@
     "build": "tsc",
     "serve": "node --experimental-specifier-resolution=node dist/index.js",
     "dev": "NODE_ENV=development tsc --watch",
-    "dev:serve": "nodemon --experimental-specifier-resolution=node dist/index.js",
+    "dev:serve": "NODE_ENV=development nodemon --experimental-specifier-resolution=node dist/index.js",
     "test": "tsc --noEmit"
   }
 }

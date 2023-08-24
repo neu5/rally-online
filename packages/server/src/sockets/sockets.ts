@@ -5,8 +5,10 @@ import type {
   User,
   // UsersMap,
 } from "@neu5/types/src";
+import type { Game } from "../index";
 import type { InMemorySessionStore } from "../sessionStore";
 import { Room } from "../room";
+import { startRace } from "../scene/scene";
 
 // const usersMapToArray = (usersMap: UsersMap): PlayersList =>
 //   Array.from(usersMap).map(([id, { displayName, socketId }]) => ({
@@ -15,7 +17,30 @@ import { Room } from "../room";
 //     socketId,
 //   }));
 
+const ACCELERATE = "accelerate";
+const BRAKE = "brake";
+const LEFT = "left";
+const RIGHT = "right";
+
+let raceLoop: NodeJS.Timer | null = null;
+
+let playersMap = null;
+
 const roomRace = new Room();
+
+const playersMapToArray = (list: PlayersMap) =>
+  list.map(({ username, userID, vehicle }) => ({
+    username,
+    userID,
+    ...(vehicle
+      ? {
+          vehicle: {
+            body: vehicle?.body,
+            wheels: vehicle?.wheels,
+          },
+        }
+      : undefined),
+  }));
 
 const emitRoomInfo = async ({
   io,
@@ -35,10 +60,12 @@ const emitRoomInfo = async ({
 };
 
 const createSocketHandlers = ({
+  game,
   io,
   sessionStore,
   socket,
 }: {
+  game: Game;
   io: Server<ServerToClientEvents>;
   sessionStore: InMemorySessionStore;
   socket: Socket<ServerToClientEvents>;
@@ -112,18 +139,86 @@ const createSocketHandlers = ({
     socket.emit("server:close dialog");
   });
 
+  socket.on(
+    "client:action",
+    ({ playerActions, id }: { playerActions: ActionTypes[]; id: string }) => {
+      if (playersMap === null) {
+        return;
+      }
+
+      const player = playersMap.find((p) => p.userID === id);
+
+      if (!player || playerActions.length === 0) {
+        return;
+      }
+      playerActions.forEach((playerAction) => {
+        player.actions[playerAction] = true;
+        if (playerAction === ACCELERATE) {
+          player.accelerateTimeMS = Date.now();
+          player.actions[BRAKE] = false;
+        } else if (playerAction === BRAKE) {
+          player.accelerateTimeMS = Date.now();
+          player.actions[ACCELERATE] = false;
+        }
+        if (playerAction === LEFT) {
+          player.turnTimeMS = Date.now();
+          player.actions[RIGHT] = false;
+        } else if (playerAction === RIGHT) {
+          player.turnTimeMS = Date.now();
+          player.actions[LEFT] = false;
+        }
+      });
+    }
+  );
+
   socket.on("client:join race room", async () => {
     roomRace.join(socket.data.sessionID);
 
     emitRoomInfo({ io, room: roomRace, sessionStore });
+
     socket.emit("server:user can leave the room");
+    socket.emit("server:user can start the race");
   });
 
   socket.on("client:leave race room", async () => {
     roomRace.leave(socket.data.sessionID);
 
     emitRoomInfo({ io, room: roomRace, sessionStore });
+
     socket.emit("server:user can join the room");
+    socket.emit("server:user cannot start the race");
+  });
+
+  socket.on("client:start the race", async () => {
+    // race.isStarted = true;
+    game.config = {
+      width: 100,
+      height: 100,
+      depth: 0.1,
+    };
+
+    const a = await startRace({ game, room: roomRace, sessionStore });
+    raceLoop = a.loop;
+    playersMap = a.playersMap;
+
+    io.emit("server:start-race", {
+      playersList: playersMapToArray(playersMap),
+      // race,
+      config: game.config,
+      objects: game.objects.map(({ isWall, name, position, quaternion }) => ({
+        name,
+        isWall,
+        position,
+        quaternion,
+        ...game.config,
+      })),
+    });
+  });
+
+  socket.on("client-dev:stop the race", async () => {
+    if (process.env.NODE_ENV === "development") {
+      clearInterval(raceLoop);
+    }
   });
 
   // notify users upon disconnection
@@ -145,6 +240,42 @@ const createSocketHandlers = ({
       io.emit("server:send users", sessionStore.getAuthorizedUsers());
     }
   });
+
+  setInterval(() => {
+    const now = Date.now();
+
+    if (playersMap === null) {
+      return;
+    }
+
+    playersMap.forEach((player) => {
+      const dtAcceleration = now - player.accelerateTimeMS;
+      const dtTurning = now - player.turnTimeMS;
+
+      let newActions = { ...player.actions };
+
+      if (dtAcceleration > 250) {
+        player.accelerateTimeMS = now;
+        newActions = {
+          ...newActions,
+          [ACCELERATE]: false,
+          [BRAKE]: false,
+        };
+      }
+      if (dtTurning > 250) {
+        player.turnTimeMS = now;
+        newActions = {
+          ...newActions,
+          [LEFT]: false,
+          [RIGHT]: false,
+        };
+      }
+
+      player.actions = { ...newActions };
+    });
+
+    io.emit("server:action", playersMapToArray(playersMap));
+  }, 50);
 };
 
 export { createSocketHandlers };
