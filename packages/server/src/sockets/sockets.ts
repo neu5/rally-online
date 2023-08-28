@@ -29,7 +29,8 @@ let playersMap = null;
 const roomRace = new Room();
 
 const playersMapToArray = (list: PlayersMap) =>
-  list.map(({ username, userID, vehicle }) => ({
+  list.map(({ color, username, userID, vehicle }) => ({
+    color,
     username,
     userID,
     ...(vehicle
