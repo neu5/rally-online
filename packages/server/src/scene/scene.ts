@@ -24,6 +24,48 @@ const actions: Actions = {
   [RIGHT]: false,
 } as const;
 
+type PlayerNumbers = Array<{
+  idx: number;
+  isFree: boolean;
+}>;
+const playerNumbers: PlayerNumbers = [
+  {
+    idx: 0,
+    isFree: true,
+  },
+  {
+    idx: 1,
+    isFree: true,
+  },
+  {
+    idx: 2,
+    isFree: true,
+  },
+  {
+    idx: 3,
+    isFree: true,
+  },
+];
+
+const vehicles = [
+  {
+    color: "BlueMaterial",
+    startingPos: { x: 0, y: 5, z: 0 },
+  },
+  {
+    color: "RedMaterial",
+    startingPos: { x: 10, y: 5, z: 0 },
+  },
+  {
+    color: "GreenMaterial",
+    startingPos: { x: -10, y: 5, z: 0 },
+  },
+  {
+    color: "YellowMaterial",
+    startingPos: { x: 15, y: 5, z: 0 },
+  },
+];
+
 const startRace = async ({
   game,
   // playersMap,
@@ -66,16 +108,27 @@ const startRace = async ({
   const socketsInTheRoom = room.getMembers();
   const playersMap = socketsInTheRoom
     .map((sessionID: string) => sessionStore.findSession(sessionID))
-    .map((player) => ({
-      accelerateTimeMS: 0,
-      turnTimeMS: 0,
-      actions: { ...actions },
-      vehicle: {},
-      vehicleSteering: 0,
-      vehicleTemplate: {},
-      startingPos: {},
-      ...player,
-    }));
+    .map((player) => {
+      const playerNumber = playerNumbers.find(({ isFree }) => isFree);
+
+      if (!playerNumber) {
+        return;
+      }
+
+      const vehiclesTemplate = vehicles[playerNumber.idx];
+      playerNumber.isFree = false;
+
+      return {
+        accelerateTimeMS: 0,
+        actions: { ...actions },
+        vehicle: {},
+        turnTimeMS: 0,
+        vehicleSteering: 0,
+        playerNumber: playerNumber?.idx,
+        ...player,
+        ...vehiclesTemplate,
+      };
+    });
 
   playersMap.forEach((player) => {
     const vehicle = addRigidVehicle({
