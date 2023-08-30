@@ -97,7 +97,7 @@ const startEngineLoop = ({ engine, scene, playersMap, roomUsers }) => {
     }
 
     dataFromServer.forEach((playerFromServer: PlayerFromServer) => {
-      const player = playersMap.find((roomUsers) => roomUsers.userID);
+      const player = playersMap.find((player) => player.userID === playerFromServer.userID);
 
       if (!player || !playerFromServer.vehicle) {
         return;
