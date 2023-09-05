@@ -39,21 +39,6 @@ const stopRaceBtn = document.getElementById(
 ) as HTMLAnchorElement;
 // const playersListEl = document.getElementById("players-list") as HTMLElement;
 
-// const throttle = (func: Function, timeFrame: number = 0) => {
-//   var lastTime = 0;
-//   return function (...args: any) {
-//     var now = Date.now();
-//     if (now - lastTime >= timeFrame) {
-//       func(...args);
-//       lastTime = now;
-//     }
-//   };
-// };
-
-// const log = throttle((...args: Array<any>) => {
-//   console.log(...args);
-// }, 1000);
-
 const game: Game = {
   elements: {
     joinRaceRoomBtn,
@@ -243,4 +228,11 @@ const startEngineLoop = ({ engine, scene, playersMap, roomUsers }) => {
       });
     }
   );
+
+  window.addEventListener("resize", () => {
+    engine.resize();
+  
+    // updateWindowSize();
+    // updateControls();
+  });
 })();
