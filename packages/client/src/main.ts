@@ -10,7 +10,7 @@ import { ui } from "./ui";
 import { loginDialog } from "./ui/dialog-login";
 import { startRace } from "./scene/scene";
 // import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
-// import { TOAST_COLORS } from "./utils";
+import { debounce } from "./utils";
 
 // import type {
 //   GameConfig,
@@ -38,21 +38,6 @@ const stopRaceBtn = document.getElementById(
   "stop-race-btn"
 ) as HTMLAnchorElement;
 // const playersListEl = document.getElementById("players-list") as HTMLElement;
-
-// const throttle = (func: Function, timeFrame: number = 0) => {
-//   var lastTime = 0;
-//   return function (...args: any) {
-//     var now = Date.now();
-//     if (now - lastTime >= timeFrame) {
-//       func(...args);
-//       lastTime = now;
-//     }
-//   };
-// };
-
-// const log = throttle((...args: Array<any>) => {
-//   console.log(...args);
-// }, 1000);
 
 const game: Game = {
   elements: {
@@ -243,4 +228,15 @@ const startEngineLoop = ({ engine, scene, playersMap, roomUsers }) => {
       });
     }
   );
+
+  const resizeDebounced = debounce(() => {
+    engine.resize();
+  });
+
+  window.addEventListener("resize", () => {
+    resizeDebounced();
+  
+    // updateWindowSize();
+    // updateControls();
+  });
 })();

@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 import Toastify from "toastify-js";
-import { TOAST_COLORS } from "../utils";
+import { log, TOAST_COLORS } from "../utils";
 
 import type { Socket } from "socket.io-client";
 import type { Game, RoomList, UsersList } from "@neu5/types/src";
@@ -34,7 +34,7 @@ const createSocketHandler = ({
 
   if (game.isDevelopment) {
     socket.onAny((event, ...args) => {
-      console.log("onAny", event, args);
+      log("onAny", event, args);
     });
   }
 
