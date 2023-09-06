@@ -196,10 +196,26 @@ const TOAST_COLORS = {
   RED: "linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))",
 };
 
+const debounce = (func: Function, timeFrame: number = 500) => {
+  let timeoutId: ReturnType<typeof setTimeout>;
+
+  return (...args: Array<any>) => {
+      if (timeoutId) {
+          clearTimeout(timeoutId);
+      }
+      
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, timeFrame);
+  };
+};
+
 const throttle = (func: Function, timeFrame: number = 0) => {
-  var lastTime = 0;
+  let lastTime = 0;
+
   return function (...args: any) {
-    var now = Date.now();
+    let now = Date.now();
+
     if (now - lastTime >= timeFrame) {
       func(...args);
       lastTime = now;
@@ -217,6 +233,7 @@ export {
   addPlane,
   addSphere,
   addRigidVehicle,
+  debounce,
   log,
   TOAST_COLORS,
 };

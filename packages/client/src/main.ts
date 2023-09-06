@@ -10,7 +10,7 @@ import { ui } from "./ui";
 import { loginDialog } from "./ui/dialog-login";
 import { startRace } from "./scene/scene";
 // import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
-// import { TOAST_COLORS } from "./utils";
+import { debounce } from "./utils";
 
 // import type {
 //   GameConfig,
@@ -229,8 +229,12 @@ const startEngineLoop = ({ engine, scene, playersMap, roomUsers }) => {
     }
   );
 
-  window.addEventListener("resize", () => {
+  const resizeDebounced = debounce(() => {
     engine.resize();
+  });
+
+  window.addEventListener("resize", () => {
+    resizeDebounced();
   
     // updateWindowSize();
     // updateControls();
