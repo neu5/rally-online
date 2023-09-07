@@ -12,7 +12,7 @@ import { addBox, addColors, addPlane, addRigidVehicle } from "../utils";
 
 import type { Engine } from "@babylonjs/core";
 import type { PlayersMap } from "../main";
-import type { ActionTypes, GameQuaternion, Position } from "@neu5/types/src";
+import type { ActionTypes, GameConfig, GameObject } from "@neu5/types/src";
 // import { UIPlayersIndicators } from "../ui";
 
 // const speedometerEl = document.getElementById("speedometer") as HTMLElement;
@@ -102,21 +102,6 @@ const keyup = (event: KeyboardEvent) => {
       actions.right = false;
       break;
   }
-};
-
-type GameObject = {
-  name: string;
-  position: Position;
-  quaternion: GameQuaternion;
-  width: number;
-  height: number;
-  depth: number;
-};
-
-type GameConfig = {
-  width: number;
-  height: number;
-  depth: number;
 };
 
 const startRace = async ({

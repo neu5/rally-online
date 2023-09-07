@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 import Toastify from "toastify-js";
-import { log, TOAST_COLORS } from "../utils";
+import { TOAST_COLORS, log } from "../utils";
 
 import type { Socket } from "socket.io-client";
 import type { Game, RoomList, UsersList } from "@neu5/types/src";

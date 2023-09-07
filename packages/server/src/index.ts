@@ -6,7 +6,7 @@ import { createServer } from "http";
 import type { Socket } from "socket.io";
 import { Server } from "socket.io";
 
-import type { ServerToClientEvents /*UsersMap*/ } from "@neu5/types/src";
+import type { GameConfig, GameObject, ServerToClientEvents /*UsersMap*/ } from "@neu5/types/src";
 
 import { InMemorySessionStore } from "./sessionStore";
 import { createSocketHandlers } from "./sockets/sockets";
@@ -22,35 +22,6 @@ const randomId = () => randomBytes(8).toString("hex");
 const sessionStore = new InMemorySessionStore();
 
 const io = new Server<ServerToClientEvents>(httpServer);
-
-type Position = {
-  x: number;
-  y: number;
-  z: number;
-};
-
-type GameQuaternion = {
-  x: number;
-  y: number;
-  z: number;
-  w: number;
-};
-
-type GameConfig = {
-  width: number;
-  height: number;
-  depth: number;
-};
-
-type GameObject = {
-  name: string;
-  isWall: boolean;
-  position: Position;
-  quaternion: GameQuaternion;
-  width: number;
-  height: number;
-  depth: number;
-};
 
 export type Game = {
   config: GameConfig;

@@ -55,7 +55,7 @@ const sessionID = localStorage.getItem("rally-online");
 
 const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
 
-const startEngineLoop = ({ engine, scene, playersMap, roomUsers }) => {
+const startEngineLoop = ({ engine, scene, playersMap }) => {
   const camera = new ArcRotateCamera(
     "camera",
     -Math.PI / 2,
@@ -82,7 +82,7 @@ const startEngineLoop = ({ engine, scene, playersMap, roomUsers }) => {
     }
 
     dataFromServer.forEach((playerFromServer: PlayerFromServer) => {
-      const player = playersMap.find((player) => player.userID === playerFromServer.userID);
+      const player = playersMap.find((currentPlayer) => currentPlayer.userID === playerFromServer.userID);
 
       if (!player || !playerFromServer.vehicle) {
         return;
@@ -195,11 +195,11 @@ const startEngineLoop = ({ engine, scene, playersMap, roomUsers }) => {
       playersList,
       config,
       objects,
-      race,
+      // race,
     }: {
       config: GameConfig;
       objects: GameObject[];
-      race: Race;
+      // race: Race;
     }) => {
       scene.dispose();
       engine.stopRenderLoop();

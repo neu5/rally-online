@@ -1,3 +1,15 @@
+const ACCELERATE = "accelerate";
+const BRAKE = "brake";
+const LEFT = "left";
+const RIGHT = "right";
+
+type ActionTypes = {
+  [ACCELERATE]: "accelerate";
+  [BRAKE]: "brake";
+  [LEFT]: "left";
+  [RIGHT]: "right";
+};
+
 type UsersMap = Map<
   string,
   {
@@ -47,6 +59,23 @@ type User = {
   username: string;
 };
 
+type GameQuaternion = {
+  x: number;
+  y: number;
+  z: number;
+  w: number;
+};
+
+type GameObject = {
+  name: string;
+  isWall: boolean;
+  position: Position;
+  quaternion: GameQuaternion;
+  width: number;
+  height: number;
+  depth: number;
+};
+
 type UsersList = Array<User>;
 
 type RoomUser = {
@@ -60,6 +89,7 @@ type SessionInfo = {
 };
 
 interface ServerToClientEvents {
+  "client:action": ({ playerActions, id }: { playerActions: ActionTypes[]; id: string }) => void;
   "client:join race room": () => void;
   "client:leave race room": () => void;
   "client:set name": (data: { userID: string; username: string }) => void;
@@ -83,8 +113,10 @@ interface ServerToClientEvents {
 }
 
 export type {
+  ActionTypes,
   Game,
   GameConfig,
+  GameObject,
   Position,
   RoomList,
   User,
