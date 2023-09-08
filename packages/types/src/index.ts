@@ -36,6 +36,7 @@ type Game = {
     startRaceBtn: HTMLElement;
   };
   isDevelopment: boolean;
+  roomUsers: RoomList;
   rootEl: HTMLElement | null;
   ui: UI;
   usernameAlreadySelected: boolean;
@@ -117,6 +118,7 @@ export type {
   Game,
   GameConfig,
   GameObject,
+  GameQuaternion,
   Position,
   RoomList,
   User,

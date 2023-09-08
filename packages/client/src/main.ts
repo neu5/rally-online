@@ -1,8 +1,5 @@
-// import type { Quaternion } from "@babylonjs/core";
 import { ArcRotateCamera, Engine, Scene, Vector3 } from "@babylonjs/core";
-// import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
-import type { Game } from "@neu5/types/src";
 import { FEATURES_NAMES, features } from "@neu5/types/src";
 
 import { createSocketHandler } from "./sockets/sockets";
@@ -11,6 +8,8 @@ import { loginDialog } from "./ui/dialog-login";
 import { startRace } from "./scene/scene";
 // import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 import { debounce } from "./utils";
+import type { Game } from "@neu5/types/src";
+import type { Quaternion } from "@babylonjs/core";
 
 // import type {
 //   GameConfig,
@@ -26,6 +25,16 @@ const joinRaceRoomBtn = document.getElementById(
 const leaveRaceRoomBtn = document.getElementById(
   "leave-race-room-btn"
 ) as HTMLAnchorElement;
+
+type PlayerFromServer = {
+  id: string;
+  vehicle: {
+    body: { position: Vector3; quaternion: Quaternion };
+    wheels: Array<{ position: Vector3; quaternion: Quaternion }>;
+  };
+};
+
+type PlayersFromServer = Array<PlayerFromServer>;
 
 let dataFromServer: PlayersFromServer = [];
 
@@ -46,6 +55,7 @@ const game: Game = {
     startRaceBtn,
   },
   isDevelopment: process.env.NODE_ENV === "development",
+  roomUsers: [],
   rootEl: document.getElementById("root"),
   ui,
   usernameAlreadySelected: false,

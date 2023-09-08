@@ -144,7 +144,14 @@ const startRace = async ({
   }
 
   setInterval(() => {
-    playersMap.forEach((player) => {
+    playersMap.forEach((player: {
+      color: string;
+      displayName: string;
+      isCurrentPlayer: boolean;
+      socketId: string;
+      vehicle: any;
+    }) => {
+      console.log(player);
       if (player.isCurrentPlayer) {
         sendAction(
           Object.entries(actions)
