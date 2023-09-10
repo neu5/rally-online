@@ -36,6 +36,7 @@ type Game = {
     startRaceBtn: HTMLElement;
   };
   isDevelopment: boolean;
+  playersMap: Array<any>;
   roomUsers: RoomList;
   rootEl: HTMLElement | null;
   ui: UI;

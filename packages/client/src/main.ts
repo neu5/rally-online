@@ -8,7 +8,7 @@ import { loginDialog } from "./ui/dialog-login";
 import { startRace } from "./scene/scene";
 // import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 import { debounce } from "./utils";
-import type { Game } from "@neu5/types/src";
+import type { GameConfig, GameObject, Position, Game } from "@neu5/types/src";
 import type { Quaternion } from "@babylonjs/core";
 
 // import type {
@@ -19,22 +19,30 @@ import type { Quaternion } from "@babylonjs/core";
 //   ServerToClientEvents,
 // } from "@neu5/types/src";
 
+type PlayerFromServer = {
+  color: string;
+  userID: string;
+  username: string;
+  vehicle: {
+    body: { position: Vector3; rotationQuaternion: Quaternion; quaternion: Quaternion };
+    wheels: Array<{ position: Vector3; rotationQuaternion: Quaternion; quaternion: Quaternion }>;
+  };
+};
+
+export type Player = PlayerFromServer & {
+    isCurrentPlayer: boolean;
+  }
+
+export type PlayersMap = Array<Player>;
+
+type PlayersFromServer = Array<PlayerFromServer>;
+
 const joinRaceRoomBtn = document.getElementById(
   "join-race-room-btn"
 ) as HTMLAnchorElement;
 const leaveRaceRoomBtn = document.getElementById(
   "leave-race-room-btn"
 ) as HTMLAnchorElement;
-
-type PlayerFromServer = {
-  id: string;
-  vehicle: {
-    body: { position: Vector3; quaternion: Quaternion };
-    wheels: Array<{ position: Vector3; quaternion: Quaternion }>;
-  };
-};
-
-type PlayersFromServer = Array<PlayerFromServer>;
 
 let dataFromServer: PlayersFromServer = [];
 
@@ -55,6 +63,7 @@ const game: Game = {
     startRaceBtn,
   },
   isDevelopment: process.env.NODE_ENV === "development",
+  playersMap: [],
   roomUsers: [],
   rootEl: document.getElementById("root"),
   ui,
@@ -65,7 +74,7 @@ const sessionID = localStorage.getItem("rally-online");
 
 const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
 
-const startEngineLoop = ({ engine, scene, playersMap }) => {
+const startEngineLoop = ({ engine, playersMap, scene }: { engine: Engine, playersMap: PlayersMap; scene: Scene }) => {
   const camera = new ArcRotateCamera(
     "camera",
     -Math.PI / 2,
@@ -136,7 +145,7 @@ const startEngineLoop = ({ engine, scene, playersMap }) => {
   const engine = new Engine(canvas, true);
   let scene: Scene = new Scene(engine);
 
-  const { socket } = createSocketHandler({ dialog, engine, game, scene });
+  const { socket } = createSocketHandler({ dialog, game });
 
   if (game.rootEl) {
     game.rootEl.addEventListener("setName", (ev) => {
@@ -193,10 +202,15 @@ const startEngineLoop = ({ engine, scene, playersMap }) => {
   });
 
   const sendAction = (playerActions: string[]) => {
-    socket.emit("client:action", {
-      id: game.playersMap.find((player) => player.isCurrentPlayer).userID,
-      playerActions,
-    });
+    const player = game.playersMap.find((player) => player.isCurrentPlayer);
+    const id = player?.userID;
+
+    if (id) {
+      socket.emit("client:action", {
+        id,
+        playerActions,
+      });
+    }
   };
 
   socket.on(
@@ -207,6 +221,7 @@ const startEngineLoop = ({ engine, scene, playersMap }) => {
       objects,
       // race,
     }: {
+      playersList: PlayersMap;
       config: GameConfig;
       objects: GameObject[];
       // race: Race;
@@ -220,7 +235,7 @@ const startEngineLoop = ({ engine, scene, playersMap }) => {
         engine,
         gameConfig: config,
         gameObjects: objects,
-        playersMap: playersList.map((player) => ({
+        playersMap: playersList.map((player: Player) => ({
           ...player,
           isCurrentPlayer: player.userID === socket.userID,
         })),
@@ -233,8 +248,7 @@ const startEngineLoop = ({ engine, scene, playersMap }) => {
       startEngineLoop({
         engine,
         scene,
-        playersMap: game.playersMap,
-        roomUsers: game.roomUsers,
+        playersMap: game.playersMap
       });
     }
   );

@@ -11,8 +11,8 @@ import {
 import { addBox, addColors, addPlane, addRigidVehicle } from "../utils";
 
 import type { Engine } from "@babylonjs/core";
-import type { PlayersMap } from "../main";
 import type { ActionTypes, GameConfig, GameObject } from "@neu5/types/src";
+import type { Player, PlayersMap } from '../main';
 // import { UIPlayersIndicators } from "../ui";
 
 // const speedometerEl = document.getElementById("speedometer") as HTMLElement;
@@ -144,14 +144,8 @@ const startRace = async ({
   }
 
   setInterval(() => {
-    playersMap.forEach((player: {
-      color: string;
-      displayName: string;
-      isCurrentPlayer: boolean;
-      socketId: string;
-      vehicle: any;
-    }) => {
-      console.log(player);
+    playersMap.forEach((player: Player) => {
+      console.log({player});
       if (player.isCurrentPlayer) {
         sendAction(
           Object.entries(actions)
