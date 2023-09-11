@@ -8,7 +8,7 @@ import { loginDialog } from "./ui/dialog-login";
 import { startRace } from "./scene/scene";
 // import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 import { debounce } from "./utils";
-import type { GameConfig, GameObject, Position, Game } from "@neu5/types/src";
+import type { Game, GameConfig, GameObject, Position } from "@neu5/types/src";
 import type { Quaternion } from "@babylonjs/core";
 
 // import type {
@@ -30,8 +30,8 @@ type PlayerFromServer = {
 };
 
 export type Player = PlayerFromServer & {
-    isCurrentPlayer: boolean;
-  }
+  isCurrentPlayer: boolean;
+};
 
 export type PlayersMap = Array<Player>;
 
@@ -202,7 +202,7 @@ const startEngineLoop = ({ engine, playersMap, scene }: { engine: Engine, player
   });
 
   const sendAction = (playerActions: string[]) => {
-    const player = game.playersMap.find((player) => player.isCurrentPlayer);
+    const player = game.playersMap.find((currentPlayer) => currentPlayer.isCurrentPlayer);
     const id = player?.userID;
 
     if (id) {
@@ -259,7 +259,7 @@ const startEngineLoop = ({ engine, playersMap, scene }: { engine: Engine, player
 
   window.addEventListener("resize", () => {
     resizeDebounced();
-  
+
     // updateWindowSize();
     // updateControls();
   });
