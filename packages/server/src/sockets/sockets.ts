@@ -24,22 +24,83 @@ const RIGHT = "right";
 
 let raceLoop: NodeJS.Timer | null = null;
 
-let playersMap = null;
+let playersMap = {};
 
 const roomRace = new Room();
 
-const playersMapToArray = (list: PlayersMap) =>
+interface Actions {
+  [ACCELERATE]: boolean;
+  [BRAKE]: boolean;
+  [LEFT]: boolean;
+  [RIGHT]: boolean;
+}
+
+type VehicleTemplate = {
+  wheels: Array<{
+    position: any;
+    quaternion: any;
+    rotationQuaternion?: any;
+  }>;
+  body: {
+    position: any;
+    quaternion?: any;
+    rotationQuaternion?: any;
+  };
+  physicalVehicle: any;
+};
+
+type PlayersMap = Map<
+  string,
+  {
+    accelerateTimeMS: number;
+    actions: Actions;
+    vehicle?: VehicleTemplate;
+    turnTimeMS: number;
+    vehicleSteering: number;
+
+    color: string;
+    connected: boolean;
+    socketId: string;
+    displayName: string;
+
+    playerNumber?: number;
+
+    startingPos?: Position;
+  }
+>;
+
+type Position = {
+  x: number;
+  y: number;
+  z: number;
+};
+
+type PlayersList = Array<{
+  accelerateTimeMS: number;
+  actions: Actions;
+  vehicle: VehicleTemplate;
+  turnTimeMS: number;
+  vehicleSteering: number;
+  playerNumber: number;
+  connected: boolean;
+  userID: string;
+  username: string;
+  color: string;
+  startingPos: Position;
+}>;
+
+const playersMapToArray = (list: PlayersList) =>
   list.map(({ color, username, userID, vehicle }) => ({
     color,
     username,
     userID,
     ...(vehicle
       ? {
-          vehicle: {
-            body: vehicle?.body,
-            wheels: vehicle?.wheels,
-          },
-        }
+        vehicle: {
+          body: vehicle?.body,
+          wheels: vehicle?.wheels,
+        },
+      }
       : undefined),
   }));
 
