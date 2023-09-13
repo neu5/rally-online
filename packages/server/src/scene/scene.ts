@@ -2,9 +2,11 @@ import { Body, Plane, Vec3, World } from "cannon-es";
 import { addRigidVehicle, getMapWalls } from "../utils";
 
 import type { Game } from "../index";
+import type { Room } from "../room";
+import type { InMemorySessionStore } from "../sessionStore";
 
 const FRAME_IN_MS = 1000 / 30; // 30 FPS
-let loop = setInterval(() => {}, FRAME_IN_MS);
+let loop = setInterval(() => { }, FRAME_IN_MS);
 
 const ACCELERATE = "accelerate";
 const BRAKE = "brake";
@@ -68,12 +70,12 @@ const vehicles = [
 
 const startRace = async ({
   game,
-  // playersMap,
   room,
   sessionStore,
 }: {
   game: Game;
-  // playersMap: PlayersMap;
+  room: Room;
+  sessionStore: InMemorySessionStore;
 }) => {
   clearInterval(loop);
   game.objects = [];

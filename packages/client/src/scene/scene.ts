@@ -11,11 +11,23 @@ import {
 import { addBox, addColors, addPlane, addRigidVehicle } from "../utils";
 
 import type { Engine } from "@babylonjs/core";
-import type { ActionTypes, GameConfig, GameObject } from "@neu5/types/src";
+import type { GameConfig, GameObject } from "@neu5/types/src";
 import type { Player, PlayersMap } from '../main';
 // import { UIPlayersIndicators } from "../ui";
 
 // const speedometerEl = document.getElementById("speedometer") as HTMLElement;
+
+const ACCELERATE = "accelerate";
+const BRAKE = "brake";
+const LEFT = "left";
+const RIGHT = "right";
+
+type ActionTypes = {
+  [ACCELERATE]: "accelerate";
+  [BRAKE]: "brake";
+  [LEFT]: "left";
+  [RIGHT]: "right";
+};
 
 let actions = {
   accelerate: false,
@@ -23,21 +35,6 @@ let actions = {
   left: false,
   right: false,
 };
-
-// const throttle = (func: Function, timeFrame: number = 0) => {
-//   var lastTime = 0;
-//   return function (...args: any) {
-//     var now = Date.now();
-//     if (now - lastTime >= timeFrame) {
-//       func(...args);
-//       lastTime = now;
-//     }
-//   };
-// };
-
-// const log = throttle((...args: Array<any>) => {
-//   console.log(...args);
-// }, 1000);
 
 // const playersIndicatorsEl = document.getElementById(
 //   "players-indicators"
@@ -145,7 +142,6 @@ const startRace = async ({
 
   setInterval(() => {
     playersMap.forEach((player: Player) => {
-      console.log({player});
       if (player.isCurrentPlayer) {
         sendAction(
           Object.entries(actions)

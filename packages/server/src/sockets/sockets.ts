@@ -1,21 +1,13 @@
 import type { Server, Socket } from "socket.io";
 import type {
-  // PlayersList,
+  ActionTypes,
   ServerToClientEvents,
   User,
-  // UsersMap,
 } from "@neu5/types/src";
 import type { Game } from "../index";
 import type { InMemorySessionStore } from "../sessionStore";
 import { Room } from "../room";
 import { startRace } from "../scene/scene";
-
-// const usersMapToArray = (usersMap: UsersMap): PlayersList =>
-//   Array.from(usersMap).map(([id, { displayName, socketId }]) => ({
-//     displayName,
-//     id,
-//     socketId,
-//   }));
 
 const ACCELERATE = "accelerate";
 const BRAKE = "brake";
@@ -24,22 +16,63 @@ const RIGHT = "right";
 
 let raceLoop: NodeJS.Timer | null = null;
 
-let playersMap = null;
+let playersMap: PlayersList | null = null;
 
 const roomRace = new Room();
 
-const playersMapToArray = (list: PlayersMap) =>
+interface Actions {
+  [ACCELERATE]: boolean;
+  [BRAKE]: boolean;
+  [LEFT]: boolean;
+  [RIGHT]: boolean;
+}
+
+type VehicleTemplate = {
+  wheels: Array<{
+    position: any;
+    quaternion: any;
+    rotationQuaternion?: any;
+  }>;
+  body: {
+    position: any;
+    quaternion?: any;
+    rotationQuaternion?: any;
+  };
+  physicalVehicle: any;
+};
+
+type Position = {
+  x: number;
+  y: number;
+  z: number;
+};
+
+type PlayersList = Array<{
+  accelerateTimeMS: number;
+  actions: Actions;
+  vehicle: VehicleTemplate;
+  turnTimeMS: number;
+  vehicleSteering: number;
+  playerNumber: number;
+  connected: boolean;
+  userID: string;
+  username: string;
+  color: string;
+  startingPos: Position;
+}>;
+
+const playersMapToArray = (list: PlayersList) =>
   list.map(({ color, username, userID, vehicle }) => ({
     color,
     username,
     userID,
     ...(vehicle
       ? {
-          vehicle: {
-            body: vehicle?.body,
-            wheels: vehicle?.wheels,
-          },
-        }
+        vehicle: {
+          body: vehicle?.body,
+          wheels: vehicle?.wheels,
+        },
+      }
       : undefined),
   }));
 
@@ -142,7 +175,7 @@ const createSocketHandlers = ({
 
   socket.on(
     "client:action",
-    ({ playerActions, id }: { playerActions: ActionTypes[]; id: string }) => {
+    ({ playerActions, id }: { playerActions: Array<ActionTypes>; id: string }) => {
       if (playersMap === null) {
         return;
       }
@@ -217,7 +250,7 @@ const createSocketHandlers = ({
   });
 
   socket.on("client-dev:stop the race", async () => {
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development" && raceLoop) {
       clearInterval(raceLoop);
     }
   });
