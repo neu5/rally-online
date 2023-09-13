@@ -1,6 +1,7 @@
 import type { Server, Socket } from "socket.io";
 import type {
   // PlayersList,
+  ActionTypes,
   ServerToClientEvents,
   User,
   // UsersMap,
@@ -24,7 +25,7 @@ const RIGHT = "right";
 
 let raceLoop: NodeJS.Timer | null = null;
 
-let playersMap = {};
+let playersMap: PlayersList | null = null;
 
 const roomRace = new Room();
 
@@ -49,25 +50,25 @@ type VehicleTemplate = {
   physicalVehicle: any;
 };
 
-type PlayersMap = Map<
-  string,
-  {
-    accelerateTimeMS: number;
-    actions: Actions;
-    vehicle?: VehicleTemplate;
-    turnTimeMS: number;
-    vehicleSteering: number;
+// type PlayersMap = Map<
+//   string,
+//   {
+//     accelerateTimeMS: number;
+//     actions: Actions;
+//     vehicle?: VehicleTemplate;
+//     turnTimeMS: number;
+//     vehicleSteering: number;
 
-    color: string;
-    connected: boolean;
-    socketId: string;
-    displayName: string;
+//     color: string;
+//     connected: boolean;
+//     socketId: string;
+//     displayName: string;
 
-    playerNumber?: number;
+//     playerNumber?: number;
 
-    startingPos?: Position;
-  }
->;
+//     startingPos?: Position;
+//   }
+// >;
 
 type Position = {
   x: number;
@@ -203,7 +204,7 @@ const createSocketHandlers = ({
 
   socket.on(
     "client:action",
-    ({ playerActions, id }: { playerActions: ActionTypes[]; id: string }) => {
+    ({ playerActions, id }: { playerActions: Array<ActionTypes>; id: string }) => {
       if (playersMap === null) {
         return;
       }
@@ -278,7 +279,7 @@ const createSocketHandlers = ({
   });
 
   socket.on("client-dev:stop the race", async () => {
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development" && raceLoop) {
       clearInterval(raceLoop);
     }
   });

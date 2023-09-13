@@ -1,15 +1,3 @@
-const ACCELERATE = "accelerate";
-const BRAKE = "brake";
-const LEFT = "left";
-const RIGHT = "right";
-
-type ActionTypes = {
-  [ACCELERATE]: "accelerate";
-  [BRAKE]: "brake";
-  [LEFT]: "left";
-  [RIGHT]: "right";
-};
-
 type UsersMap = Map<
   string,
   {
@@ -18,7 +6,7 @@ type UsersMap = Map<
   }
 >;
 
-type Class = { new (...args: any[]): any };
+type Class = { new(...args: any[]): any };
 
 type UI = {
   createPlayersList: (list: UsersList) => void;
@@ -90,20 +78,23 @@ type SessionInfo = {
   userID: string;
 };
 
+type ActionTypes = "accelerate" | "brake" | "left" | "right";
+
 interface ServerToClientEvents {
-  "client:action": ({ playerActions, id }: { playerActions: ActionTypes[]; id: string }) => void;
+  "client-dev:stop the race": () => void;
+  "client:action": (data: { playerActions: Array<ActionTypes>, id: string }) => void;
   "client:join race room": () => void;
   "client:leave race room": () => void;
   "client:set name": (data: { userID: string; username: string }) => void;
   "client:start the race": () => void;
-  // "server:action": (data: Object) => void;
+  "server:action": (data: Object) => void;
   // "server:game-info": (data: GameInfo) => void;
   "server:close dialog": () => void;
   "server:send users": (data: UsersList) => void;
   "server:send room users": (data: RoomList) => void;
   "server:session": (data: SessionInfo) => void;
   "server:show error": (data: { message: string }) => void;
-  // "server:start-race": (data: Object) => void;
+  "server:start-race": (data: Object) => void;
   // "server:stop-race": (data: Object) => void;
   "server:user can join the room": () => void;
   "server:user can leave the room": () => void;
