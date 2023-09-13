@@ -1,22 +1,13 @@
 import type { Server, Socket } from "socket.io";
 import type {
-  // PlayersList,
   ActionTypes,
   ServerToClientEvents,
   User,
-  // UsersMap,
 } from "@neu5/types/src";
 import type { Game } from "../index";
 import type { InMemorySessionStore } from "../sessionStore";
 import { Room } from "../room";
 import { startRace } from "../scene/scene";
-
-// const usersMapToArray = (usersMap: UsersMap): PlayersList =>
-//   Array.from(usersMap).map(([id, { displayName, socketId }]) => ({
-//     displayName,
-//     id,
-//     socketId,
-//   }));
 
 const ACCELERATE = "accelerate";
 const BRAKE = "brake";
@@ -49,26 +40,6 @@ type VehicleTemplate = {
   };
   physicalVehicle: any;
 };
-
-// type PlayersMap = Map<
-//   string,
-//   {
-//     accelerateTimeMS: number;
-//     actions: Actions;
-//     vehicle?: VehicleTemplate;
-//     turnTimeMS: number;
-//     vehicleSteering: number;
-
-//     color: string;
-//     connected: boolean;
-//     socketId: string;
-//     displayName: string;
-
-//     playerNumber?: number;
-
-//     startingPos?: Position;
-//   }
-// >;
 
 type Position = {
   x: number;

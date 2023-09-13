@@ -70,14 +70,12 @@ const vehicles = [
 
 const startRace = async ({
   game,
-  // playersMap,
   room,
   sessionStore,
 }: {
   game: Game;
   room: Room;
   sessionStore: InMemorySessionStore;
-  // playersMap: PlayersMap;
 }) => {
   clearInterval(loop);
   game.objects = [];
