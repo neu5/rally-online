@@ -166,9 +166,9 @@ const createSocketHandlers = ({
     io.emit("server:send users", sessionStore.getAuthorizedUsers());
     emitRoomInfo({ io, room: roomRace, sessionStore });
 
-    // if (!game.isRaceStarted) {
-    socket.emit("server:user can join the room");
-    // }
+    if (!game.race.isStarted) {
+      socket.emit("server:user can join the room");
+    }
 
     socket.emit("server:close dialog");
   });
@@ -224,20 +224,20 @@ const createSocketHandlers = ({
   });
 
   socket.on("client:start the race", async () => {
-    // race.isStarted = true;
+    game.race.isStarted = true;
     game.config = {
       width: 100,
       height: 100,
       depth: 0.1,
     };
 
-    const a = await startRace({ game, room: roomRace, sessionStore });
-    raceLoop = a.loop;
-    playersMap = a.playersMap;
+    const race = await startRace({ game, room: roomRace, sessionStore });
+    raceLoop = race.loop;
+    playersMap = race.playersMap;
 
     io.emit("server:start-race", {
       playersList: playersMapToArray(playersMap),
-      // race,
+      isRaceStarted: game.race.isStarted,
       config: game.config,
       objects: game.objects.map(({ isWall, name, position, quaternion }) => ({
         name,
