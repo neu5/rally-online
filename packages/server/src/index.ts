@@ -26,6 +26,9 @@ const io = new Server<ServerToClientEvents>(httpServer);
 export type Game = {
   config: GameConfig;
   objects: GameObject[];
+  race: {
+    isStarted: boolean
+  }
 };
 
 let game: Game = {
@@ -35,6 +38,9 @@ let game: Game = {
     depth: 0,
   },
   objects: [],
+  race: {
+    isStarted: false
+  }
 };
 
 io.use((socket: Socket, next) => {

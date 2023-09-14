@@ -200,13 +200,13 @@ const debounce = (func: Function, timeFrame: number = 500) => {
   let timeoutId: ReturnType<typeof setTimeout>;
 
   return (...args: Array<any>) => {
-      if (timeoutId) {
-          clearTimeout(timeoutId);
-      }
-      
-      timeoutId = setTimeout(() => {
-        func.apply(null, args);
-      }, timeFrame);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    timeoutId = setTimeout(() => {
+      func.apply(null, args);
+    }, timeFrame);
   };
 };
 
@@ -227,6 +227,17 @@ const log = throttle((...args: Array<any>) => {
   console.log(...args);
 }, 1000);
 
+const toggleStartRaceBtns = (
+  startRaceBtn: HTMLElement,
+  canStartTheRace: boolean
+) => {
+  if (canStartTheRace) {
+    startRaceBtn.removeAttribute("disabled");
+  } else {
+    startRaceBtn.setAttribute("disabled", "disabled");
+  }
+};
+
 export {
   addBox,
   addColors,
@@ -235,5 +246,6 @@ export {
   addRigidVehicle,
   debounce,
   log,
+  toggleStartRaceBtns,
   TOAST_COLORS,
 };

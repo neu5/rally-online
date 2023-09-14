@@ -7,7 +7,7 @@ import { ui } from "./ui";
 import { loginDialog } from "./ui/dialog-login";
 import { startRace } from "./scene/scene";
 // import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
-import { debounce } from "./utils";
+import { debounce, toggleStartRaceBtns } from "./utils";
 import type { Game, GameConfig, GameObject, Position } from "@neu5/types/src";
 import type { Quaternion } from "@babylonjs/core";
 
@@ -216,20 +216,20 @@ const startEngineLoop = ({ engine, playersMap, scene }: { engine: Engine, player
   socket.on(
     "server:start-race",
     async ({
-      playersList,
       config,
+      isRaceStarted,
       objects,
-      // race,
+      playersList
     }: {
-      playersList: PlayersMap;
       config: GameConfig;
+      isRaceStarted: boolean;
       objects: GameObject[];
-      // race: Race;
+      playersList: PlayersMap;
     }) => {
       scene.dispose();
       engine.stopRenderLoop();
 
-      // toggleRaceBtns(race.isStarted);
+      toggleStartRaceBtns(game.elements.startRaceBtn, !isRaceStarted);
 
       const newScene = await startRace({
         engine,
