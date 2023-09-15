@@ -229,6 +229,11 @@ const startEngineLoop = ({ engine, playersMap, scene }: { engine: Engine, player
       scene.dispose();
       engine.stopRenderLoop();
 
+      if (isRaceStarted) {
+        game.ui.hideElement(game.elements.joinRaceRoomBtn);
+        game.ui.hideElement(game.elements.leaveRaceRoomBtn);
+      }
+
       toggleStartRaceBtns(game.elements.startRaceBtn, !isRaceStarted);
 
       const newScene = await startRace({
