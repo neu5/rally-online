@@ -206,6 +206,11 @@ const createSocketHandlers = ({
   );
 
   socket.on("client:join race room", async () => {
+    if (game.race.isStarted) {
+      socket.emit("server:show error", { message: "The race is already going on! You can't join the room now." });
+      return;
+    }
+
     roomRace.join(socket.data.sessionID);
 
     emitRoomInfo({ io, room: roomRace, sessionStore });
@@ -224,6 +229,11 @@ const createSocketHandlers = ({
   });
 
   socket.on("client:start the race", async () => {
+    if (game.race.isStarted) {
+      socket.emit("server:show error", { message: "The race is already going on!" });
+      return;
+    }
+
     game.race.isStarted = true;
     game.config = {
       width: 100,
