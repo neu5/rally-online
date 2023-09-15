@@ -1,52 +1,55 @@
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="./styles/styles.scss" />
-    <title>Rally Online</title>
-  </head>
-  <body>
-    <canvas id="canvas"></canvas>
-    <div id="root">
-      <div id="speedometer">0</div>
-      <div id="fps">0</div>
-      <div class="mobile-controls acceleration hide">
-        <button data-type="accelerate">accelerate</button>
-        <button data-type="brake">brake</button>
-      </div>
-      <div class="mobile-controls turning hide">
-        <button data-type="left">left</button>
-        <button data-type="right">right</button>
-      </div>
-      <aside class="users-wrapper">
-        <section id="users">
-          <button id="start-race-btn" disabled>start</button>
-          <button id="stop-race-btn" class="hide">stop</button>
-          <h2>Users</h2>
-          <ul class="users-list"></ul>
-        </section>
-        <sections class="rooms">
-          <h2>Rooms</h2>
-          <button id="join-race-room-btn" class="hide">
-            Join the race room
-          </button>
-          <button id="leave-race-room-btn" class="hide">
-            Leave the race room
-          </button>
-          <ul class="room-list"></ul>
-        </sections>
-      </aside>
-      <section id="users-indicators"></section>
-      <div class="dialog-wrapper hide">
-        <div class="dialog">
-          <div class="dialog-header">
-            <button class="dialog-header__close-button">close</button>
-          </div>
-          <div class="dialog-content">content</div>
-          <div class="dialog-footer">footer</div>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./styles/styles.scss" />
+  <title>Rally Online</title>
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+  <div id="root">
+    <div id="speedometer">0</div>
+    <div id="fps">0</div>
+    <div class="mobile-controls acceleration hide">
+      <button data-type="accelerate">accelerate</button>
+      <button data-type="brake">brake</button>
+    </div>
+    <div class="mobile-controls turning hide">
+      <button data-type="left">left</button>
+      <button data-type="right">right</button>
+    </div>
+    <aside class="users-wrapper">
+      <section id="users">
+        <button id="start-race-btn" disabled>start</button>
+        <button id="stop-race-btn" class="hide">stop</button>
+        <h2>Users</h2>
+        <ul class="users-list"></ul>
+      </section>
+      <sections class="rooms">
+        <h2>Rooms</h2>
+        <button id="join-race-room-btn" class="hide">
+          Join the race room
+        </button>
+        <button id="leave-race-room-btn" class="hide">
+          Leave the race room
+        </button>
+        <ul class="room-list"></ul>
+      </sections>
+    </aside>
+    <section id="users-indicators"></section>
+    <div class="dialog-wrapper hide">
+      <div class="dialog">
+        <div class="dialog-header">
+          <button class="dialog-header__close-button">close</button>
         </div>
+        <div class="dialog-content">content</div>
+        <div class="dialog-footer">footer</div>
       </div>
     </div>
-    <script type="module" src="main.ts"></script>
-  </body>
+  </div>
+  <script type="module" src="main.ts"></script>
+</body>
+
 </html>

@@ -11,14 +11,6 @@ import { debounce, toggleStartRaceBtns } from "./utils";
 import type { Game, GameConfig, GameObject, Position } from "@neu5/types/src";
 import type { Quaternion } from "@babylonjs/core";
 
-// import type {
-//   GameConfig,
-//   GameObject,
-//   Player,
-//   Position,
-//   ServerToClientEvents,
-// } from "@neu5/types/src";
-
 type PlayerFromServer = {
   color: string;
   userID: string;
