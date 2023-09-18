@@ -8,26 +8,18 @@ import { loginDialog } from "./ui/dialog-login";
 import { startRace } from "./scene/scene";
 // import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 import { debounce, toggleStartRaceBtns } from "./utils";
-import type { Game, GameConfig, GameObject, Position } from "@neu5/types/src";
+import type { Game, GameConfig, GameObject, PlayerFromServer, PlayersFromServer, Position } from "@neu5/types/src";
 import type { Quaternion } from "@babylonjs/core";
 
-type PlayerFromServer = {
-  color: string;
-  userID: string;
-  username: string;
+export type Player = PlayerFromServer & {
+  isCurrentPlayer: boolean;
   vehicle: {
     body: { position: Vector3; rotationQuaternion: Quaternion; quaternion: Quaternion };
     wheels: Array<{ position: Vector3; rotationQuaternion: Quaternion; quaternion: Quaternion }>;
   };
 };
 
-export type Player = PlayerFromServer & {
-  isCurrentPlayer: boolean;
-};
-
 export type PlayersMap = Array<Player>;
-
-type PlayersFromServer = Array<PlayerFromServer>;
 
 const joinRaceRoomBtn = document.getElementById(
   "join-race-room-btn"

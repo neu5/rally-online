@@ -1,5 +1,17 @@
 type Class = { new(...args: any[]): any };
 
+type PlayerFromServer = {
+    color: string;
+    userID: string;
+    username: string;
+    vehicle: {
+        body: { position: any; rotationQuaternion: any; quaternion: any };
+        wheels: Array<{ position: any; rotationQuaternion: any; quaternion: any }>;
+    };
+};
+
+type PlayersFromServer = Array<PlayerFromServer>;
+
 type RoomUser = {
     username: string;
 };
@@ -23,4 +35,4 @@ type UI = {
     DialogWrapper: Class;
 };
 
-export type { RoomList, User, UsersList, UI };
+export type { PlayerFromServer, PlayersFromServer, RoomList, User, UsersList, UI };

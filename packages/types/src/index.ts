@@ -1,4 +1,4 @@
-import type { RoomList, UI, User, UsersList } from "./client";
+import type { PlayerFromServer, PlayersFromServer, RoomList, UI, User, UsersList } from "./client";
 
 type Game = {
   elements: {
@@ -79,6 +79,8 @@ export type {
   GameConfig,
   GameObject,
   GameQuaternion,
+  PlayerFromServer,
+  PlayersFromServer,
   Position,
   RoomList,
   UI,
