@@ -1,3 +1,7 @@
+import type { RoomList, UsersList } from './shared';
+
+type ActionTypes = "accelerate" | "brake" | "left" | "right";
+
 type Class = { new(...args: any[]): any };
 
 type PlayerFromServer = {
@@ -12,20 +16,6 @@ type PlayerFromServer = {
 
 type PlayersFromServer = Array<PlayerFromServer>;
 
-type RoomUser = {
-    username: string;
-};
-
-type RoomList = Array<RoomUser>;
-
-type User = {
-    connected: boolean;
-    userID: string;
-    username: string;
-};
-
-type UsersList = Array<User>;
-
 type UI = {
     createPlayersList: (list: UsersList) => void;
     createRoomList: (list: RoomList) => void;
@@ -35,4 +25,13 @@ type UI = {
     DialogWrapper: Class;
 };
 
-export type { PlayerFromServer, PlayersFromServer, RoomList, User, UsersList, UI };
+interface ClientEvents {
+    "client-dev:stop the race": () => void;
+    "client:action": (data: { playerActions: Array<ActionTypes>, id: string }) => void;
+    "client:join race room": () => void;
+    "client:leave race room": () => void;
+    "client:set name": (data: { userID: string; username: string }) => void;
+    "client:start the race": () => void;
+}
+
+export type { ActionTypes, ClientEvents, PlayerFromServer, PlayersFromServer, UI };
