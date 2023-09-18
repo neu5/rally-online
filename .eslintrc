@@ -10,11 +10,22 @@
   "parserOptions": {
     "ecmaVersion": 2021,
     "requireConfigFile": false,
-    "project": ["packages/**/tsconfig.json"]
+    "project": [
+      "packages/**/tsconfig.json"
+    ]
   },
-  "plugins": ["import", "@typescript-eslint"],
-  "extends": ["airbnb-typescript"],
+  "plugins": [
+    "import",
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "airbnb-typescript"
+  ],
   "rules": {
+    "eol-last": [
+      "error",
+      "always"
+    ],
     "import/no-unresolved": 2,
     "import/no-commonjs": 2,
     "no-console": 0,
@@ -27,15 +38,33 @@
         "ts": "never"
       }
     ],
-    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
-    "no-param-reassign": ["error", { "props": false }],
-    "sort-imports": ["error", { "ignoreDeclarationSort": true }],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true
+      }
+    ],
+    "no-param-reassign": [
+      "error",
+      {
+        "props": false
+      }
+    ],
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": true
+      }
+    ],
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/quotes": "off",
     "@typescript-eslint/comma-dangle": "off",
     "@typescript-eslint/consistent-type-imports": [
       "error",
-      { "prefer": "type-imports", "disallowTypeAnnotations": true }
+      {
+        "prefer": "type-imports",
+        "disallowTypeAnnotations": true
+      }
     ],
     "react/jsx-filename-extension": "off"
   }

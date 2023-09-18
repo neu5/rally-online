@@ -162,25 +162,25 @@ const startRace = async ({
   loop = setInterval(() => {
     physicsWorld.fixedStep();
 
-    playersMap.forEach(({ actions, vehicle }) => {
+    playersMap.forEach(({ actions: playersActions, vehicle }) => {
       if (!vehicle) {
         return;
       }
 
-      if (actions.accelerate) {
+      if (playersActions.accelerate) {
         vehicle.physicalVehicle.setWheelForce(maxForce, 2);
         vehicle.physicalVehicle.setWheelForce(maxForce, 3);
-      } else if (actions.brake) {
+      } else if (playersActions.brake) {
         vehicle.physicalVehicle.setWheelForce(-maxForce / 2, 2);
         vehicle.physicalVehicle.setWheelForce(-maxForce / 2, 3);
       } else {
         vehicle.physicalVehicle.setWheelForce(0, 2);
         vehicle.physicalVehicle.setWheelForce(0, 3);
       }
-      if (actions.left) {
+      if (playersActions.left) {
         vehicle.physicalVehicle.setSteeringValue(maxSteerVal, 0);
         vehicle.physicalVehicle.setSteeringValue(maxSteerVal, 1);
-      } else if (actions.right) {
+      } else if (playersActions.right) {
         vehicle.physicalVehicle.setSteeringValue(-maxSteerVal, 0);
         vehicle.physicalVehicle.setSteeringValue(-maxSteerVal, 1);
       } else {

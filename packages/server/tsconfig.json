@@ -10,8 +10,15 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "types": ["node", "express"]
+    "types": [
+      "node",
+      "express"
+    ]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["src/refactor.ts", "src/scene/*.ts", "src/utils/*.ts"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/refactor.ts"
+  ]
 }
