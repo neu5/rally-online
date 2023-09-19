@@ -1,7 +1,5 @@
 import { Body, Plane, Vec3, World } from "cannon-es";
-import type {
-  Actions,
-} from "@neu5/types/src";
+import type { Actions } from "@neu5/types/src";
 import { addRigidVehicle, getMapWalls } from "../utils";
 
 import type { Game } from "../index";
@@ -9,7 +7,7 @@ import type { Room } from "../room";
 import type { InMemorySessionStore } from "../sessionStore";
 
 const FRAME_IN_MS = 1000 / 30; // 30 FPS
-let loop = setInterval(() => { }, FRAME_IN_MS);
+let loop = setInterval(() => {}, FRAME_IN_MS);
 
 const ACCELERATE = "accelerate";
 const BRAKE = "brake";

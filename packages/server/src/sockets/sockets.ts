@@ -19,7 +19,7 @@ const ACTIONS = {
   [ACCELERATE]: ACCELERATE,
   [BRAKE]: BRAKE,
   [LEFT]: LEFT,
-  [RIGHT]: RIGHT
+  [RIGHT]: RIGHT,
 };
 
 let raceLoop: NodeJS.Timer | null = null;
@@ -69,11 +69,11 @@ const playersMapToArray = (list: PlayersList) =>
     userID,
     ...(vehicle
       ? {
-        vehicle: {
-          body: vehicle?.body,
-          wheels: vehicle?.wheels,
-        },
-      }
+          vehicle: {
+            body: vehicle?.body,
+            wheels: vehicle?.wheels,
+          },
+        }
       : undefined),
   }));
 
@@ -176,7 +176,13 @@ const createSocketHandlers = ({
 
   socket.on(
     "client:action",
-    ({ playerActions, id }: { playerActions: Array<ActionTypes>; id: string }) => {
+    ({
+      playerActions,
+      id,
+    }: {
+      playerActions: Array<ActionTypes>;
+      id: string;
+    }) => {
       if (playersMap === null) {
         return;
       }
@@ -208,7 +214,9 @@ const createSocketHandlers = ({
 
   socket.on("client:join race room", async () => {
     if (game.race.isStarted) {
-      socket.emit("server:show error", { message: "The race is already going on! You can't join the room now." });
+      socket.emit("server:show error", {
+        message: "The race is already going on! You can't join the room now.",
+      });
       return;
     }
 
@@ -231,7 +239,9 @@ const createSocketHandlers = ({
 
   socket.on("client:start the race", async () => {
     if (game.race.isStarted) {
-      socket.emit("server:show error", { message: "The race is already going on!" });
+      socket.emit("server:show error", {
+        message: "The race is already going on!",
+      });
       return;
     }
 
