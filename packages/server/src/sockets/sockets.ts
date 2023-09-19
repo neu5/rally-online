@@ -1,7 +1,7 @@
 import type { Server, Socket } from "socket.io";
 import type {
-  Actions,
   ActionTypes,
+  Actions,
   ServerToClientEvents,
   User,
 } from "@neu5/types/src";
@@ -14,13 +14,6 @@ const ACCELERATE = "accelerate";
 const BRAKE = "brake";
 const LEFT = "left";
 const RIGHT = "right";
-
-const ACTIONS = {
-  [ACCELERATE]: ACCELERATE,
-  [BRAKE]: BRAKE,
-  [LEFT]: LEFT,
-  [RIGHT]: RIGHT,
-};
 
 let raceLoop: NodeJS.Timer | null = null;
 
@@ -194,19 +187,19 @@ const createSocketHandlers = ({
       }
       playerActions.forEach((playerAction) => {
         player.actions[playerAction] = true;
-        if (playerAction === ACTIONS[ACCELERATE]) {
+        if (playerAction === ACCELERATE) {
           player.accelerateTimeMS = Date.now();
-          player.actions[ACTIONS[BRAKE]] = false;
-        } else if (playerAction === ACTIONS[BRAKE]) {
+          player.actions[BRAKE] = false;
+        } else if (playerAction === BRAKE) {
           player.accelerateTimeMS = Date.now();
-          player.actions[ACTIONS[ACCELERATE]] = false;
+          player.actions[ACCELERATE] = false;
         }
-        if (playerAction === ACTIONS[LEFT]) {
+        if (playerAction === LEFT) {
           player.turnTimeMS = Date.now();
-          player.actions[ACTIONS[RIGHT]] = false;
-        } else if (playerAction === ACTIONS[RIGHT]) {
+          player.actions[RIGHT] = false;
+        } else if (playerAction === RIGHT) {
           player.turnTimeMS = Date.now();
-          player.actions[ACTIONS[LEFT]] = false;
+          player.actions[LEFT] = false;
         }
       });
     }

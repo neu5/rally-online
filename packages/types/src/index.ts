@@ -1,51 +1,24 @@
-import type { Actions, RoomList, User, UsersList } from './shared';
-import type { ActionTypes, ClientEvents, PlayerFromServer, PlayersFromServer, UI } from "./client";
-import type { ServerEvents } from './server';
+import type {
+  Actions,
+  GameConfig,
+  GameObject,
+  GameQuaternion,
+  Position,
+  RoomList,
+  User,
+  UsersList,
+} from "./shared";
+import type {
+  ActionTypes,
+  ClientEvents,
+  Game,
+  PlayerFromServer,
+  PlayersFromServer,
+  UI,
+} from "./client";
+import type { ServerEvents } from "./server";
 
-type Game = {
-  elements: {
-    joinRaceRoomBtn: HTMLElement;
-    leaveRaceRoomBtn: HTMLElement;
-    startRaceBtn: HTMLElement;
-  };
-  isDevelopment: boolean;
-  playersMap: Array<any>;
-  roomUsers: RoomList;
-  rootEl: HTMLElement | null;
-  ui: UI;
-  usernameAlreadySelected: boolean;
-};
-
-type Position = {
-  x: number;
-  y: number;
-  z: number;
-};
-
-type GameConfig = {
-  width: number;
-  height: number;
-  depth: number;
-};
-
-type GameQuaternion = {
-  x: number;
-  y: number;
-  z: number;
-  w: number;
-};
-
-type GameObject = {
-  name: string;
-  isWall: boolean;
-  position: Position;
-  quaternion: GameQuaternion;
-  width: number;
-  height: number;
-  depth: number;
-};
-
-interface ServerToClientEvents extends ClientEvents, ServerEvents { }
+interface ServerToClientEvents extends ClientEvents, ServerEvents {}
 
 export type {
   Actions,
@@ -61,7 +34,7 @@ export type {
   UI,
   User,
   UsersList,
-  ServerToClientEvents
+  ServerToClientEvents,
 };
 
 export { FEATURES_NAMES, features } from "./features";
