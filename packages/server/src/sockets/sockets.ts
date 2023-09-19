@@ -1,5 +1,6 @@
 import type { Server, Socket } from "socket.io";
 import type {
+  Actions,
   ActionTypes,
   ServerToClientEvents,
   User,
@@ -14,18 +15,18 @@ const BRAKE = "brake";
 const LEFT = "left";
 const RIGHT = "right";
 
+const ACTIONS = {
+  [ACCELERATE]: ACCELERATE,
+  [BRAKE]: BRAKE,
+  [LEFT]: LEFT,
+  [RIGHT]: RIGHT
+};
+
 let raceLoop: NodeJS.Timer | null = null;
 
 let playersMap: PlayersList | null = null;
 
 const roomRace = new Room();
-
-interface Actions {
-  [ACCELERATE]: boolean;
-  [BRAKE]: boolean;
-  [LEFT]: boolean;
-  [RIGHT]: boolean;
-}
 
 type VehicleTemplate = {
   wheels: Array<{
@@ -187,19 +188,19 @@ const createSocketHandlers = ({
       }
       playerActions.forEach((playerAction) => {
         player.actions[playerAction] = true;
-        if (playerAction === ACCELERATE) {
+        if (playerAction === ACTIONS[ACCELERATE]) {
           player.accelerateTimeMS = Date.now();
-          player.actions[BRAKE] = false;
-        } else if (playerAction === BRAKE) {
+          player.actions[ACTIONS[BRAKE]] = false;
+        } else if (playerAction === ACTIONS[BRAKE]) {
           player.accelerateTimeMS = Date.now();
-          player.actions[ACCELERATE] = false;
+          player.actions[ACTIONS[ACCELERATE]] = false;
         }
-        if (playerAction === LEFT) {
+        if (playerAction === ACTIONS[LEFT]) {
           player.turnTimeMS = Date.now();
-          player.actions[RIGHT] = false;
-        } else if (playerAction === RIGHT) {
+          player.actions[ACTIONS[RIGHT]] = false;
+        } else if (playerAction === ACTIONS[RIGHT]) {
           player.turnTimeMS = Date.now();
-          player.actions[LEFT] = false;
+          player.actions[ACTIONS[LEFT]] = false;
         }
       });
     }

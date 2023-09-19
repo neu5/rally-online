@@ -1,3 +1,14 @@
+const ACCELERATE = "accelerate";
+const BRAKE = "brake";
+const LEFT = "left";
+const RIGHT = "right";
+
+interface Actions {
+    [ACCELERATE]: boolean;
+    [BRAKE]: boolean;
+    [LEFT]: boolean;
+    [RIGHT]: boolean;
+}
 
 type RoomUser = {
     username: string;
@@ -13,4 +24,4 @@ type User = {
 
 type UsersList = Array<User>;
 
-export type { RoomList, User, UsersList };
+export type { Actions, RoomList, User, UsersList };

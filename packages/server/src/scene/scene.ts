@@ -1,4 +1,7 @@
 import { Body, Plane, Vec3, World } from "cannon-es";
+import type {
+  Actions,
+} from "@neu5/types/src";
 import { addRigidVehicle, getMapWalls } from "../utils";
 
 import type { Game } from "../index";
@@ -13,12 +16,6 @@ const BRAKE = "brake";
 const LEFT = "left";
 const RIGHT = "right";
 
-interface Actions {
-  [ACCELERATE]: boolean;
-  [BRAKE]: boolean;
-  [LEFT]: boolean;
-  [RIGHT]: boolean;
-}
 const actions: Actions = {
   [ACCELERATE]: false,
   [BRAKE]: false,

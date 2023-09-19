@@ -1,4 +1,4 @@
-import type { RoomList, User, UsersList } from './shared';
+import type { Actions, RoomList, User, UsersList } from './shared';
 import type { ActionTypes, ClientEvents, PlayerFromServer, PlayersFromServer, UI } from "./client";
 import type { ServerEvents } from './server';
 
@@ -48,6 +48,7 @@ type GameObject = {
 interface ServerToClientEvents extends ClientEvents, ServerEvents { }
 
 export type {
+  Actions,
   ActionTypes,
   Game,
   GameConfig,
