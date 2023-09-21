@@ -1,10 +1,12 @@
 import type { Server, Socket } from "socket.io";
 import type {
   ActionTypes,
+  GameServer,
+  PlayersList,
   ServerToClientEvents,
   User,
 } from "@neu5/types/src";
-import type { Game } from "../index";
+
 import type { InMemorySessionStore } from "../sessionStore";
 import { Room } from "../room";
 import { startRace } from "../scene/scene";
@@ -20,47 +22,6 @@ let playersMap: PlayersList | null = null;
 
 const roomRace = new Room();
 
-interface Actions {
-  [ACCELERATE]: boolean;
-  [BRAKE]: boolean;
-  [LEFT]: boolean;
-  [RIGHT]: boolean;
-}
-
-type VehicleTemplate = {
-  wheels: Array<{
-    position: any;
-    quaternion: any;
-    rotationQuaternion?: any;
-  }>;
-  body: {
-    position: any;
-    quaternion?: any;
-    rotationQuaternion?: any;
-  };
-  physicalVehicle: any;
-};
-
-type Position = {
-  x: number;
-  y: number;
-  z: number;
-};
-
-type PlayersList = Array<{
-  accelerateTimeMS: number;
-  actions: Actions;
-  vehicle: VehicleTemplate;
-  turnTimeMS: number;
-  vehicleSteering: number;
-  playerNumber: number;
-  connected: boolean;
-  userID: string;
-  username: string;
-  color: string;
-  startingPos: Position;
-}>;
-
 const playersMapToArray = (list: PlayersList) =>
   list.map(({ color, username, userID, vehicle }) => ({
     color,
@@ -68,11 +29,11 @@ const playersMapToArray = (list: PlayersList) =>
     userID,
     ...(vehicle
       ? {
-        vehicle: {
-          body: vehicle?.body,
-          wheels: vehicle?.wheels,
-        },
-      }
+          vehicle: {
+            body: vehicle?.body,
+            wheels: vehicle?.wheels,
+          },
+        }
       : undefined),
   }));
 
@@ -99,7 +60,7 @@ const createSocketHandlers = ({
   sessionStore,
   socket,
 }: {
-  game: Game;
+  game: GameServer;
   io: Server<ServerToClientEvents>;
   sessionStore: InMemorySessionStore;
   socket: Socket<ServerToClientEvents>;
@@ -175,7 +136,13 @@ const createSocketHandlers = ({
 
   socket.on(
     "client:action",
-    ({ playerActions, id }: { playerActions: Array<ActionTypes>; id: string }) => {
+    ({
+      playerActions,
+      id,
+    }: {
+      playerActions: Array<ActionTypes>;
+      id: string;
+    }) => {
       if (playersMap === null) {
         return;
       }
@@ -207,7 +174,9 @@ const createSocketHandlers = ({
 
   socket.on("client:join race room", async () => {
     if (game.race.isStarted) {
-      socket.emit("server:show error", { message: "The race is already going on! You can't join the room now." });
+      socket.emit("server:show error", {
+        message: "The race is already going on! You can't join the room now.",
+      });
       return;
     }
 
@@ -230,7 +199,9 @@ const createSocketHandlers = ({
 
   socket.on("client:start the race", async () => {
     if (game.race.isStarted) {
-      socket.emit("server:show error", { message: "The race is already going on!" });
+      socket.emit("server:show error", {
+        message: "The race is already going on!",
+      });
       return;
     }
 

@@ -1,24 +1,18 @@
 import { Body, Plane, Vec3, World } from "cannon-es";
 import { addRigidVehicle, getMapWalls } from "../utils";
 
-import type { Game } from "../index";
+import type { Actions, GameServer } from "@neu5/types/src";
 import type { Room } from "../room";
 import type { InMemorySessionStore } from "../sessionStore";
 
 const FRAME_IN_MS = 1000 / 30; // 30 FPS
-let loop = setInterval(() => { }, FRAME_IN_MS);
+let loop = setInterval(() => {}, FRAME_IN_MS);
 
 const ACCELERATE = "accelerate";
 const BRAKE = "brake";
 const LEFT = "left";
 const RIGHT = "right";
 
-interface Actions {
-  [ACCELERATE]: boolean;
-  [BRAKE]: boolean;
-  [LEFT]: boolean;
-  [RIGHT]: boolean;
-}
 const actions: Actions = {
   [ACCELERATE]: false,
   [BRAKE]: false,
@@ -73,7 +67,7 @@ const startRace = async ({
   room,
   sessionStore,
 }: {
-  game: Game;
+  game: GameServer;
   room: Room;
   sessionStore: InMemorySessionStore;
 }) => {

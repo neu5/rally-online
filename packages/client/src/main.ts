@@ -8,14 +8,29 @@ import { loginDialog } from "./ui/dialog-login";
 import { startRace } from "./scene/scene";
 // import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
 import { debounce, toggleStartRaceBtns } from "./utils";
-import type { Game, GameConfig, GameObject, PlayerFromServer, PlayersFromServer, Position } from "@neu5/types/src";
+import type {
+  GameClient,
+  GameConfig,
+  GameObject,
+  PlayerFromServer,
+  PlayersFromServer,
+  Position,
+} from "@neu5/types/src";
 import type { Quaternion } from "@babylonjs/core";
 
 export type Player = PlayerFromServer & {
   isCurrentPlayer: boolean;
   vehicle: {
-    body: { position: Vector3; rotationQuaternion: Quaternion; quaternion: Quaternion };
-    wheels: Array<{ position: Vector3; rotationQuaternion: Quaternion; quaternion: Quaternion }>;
+    body: {
+      position: Vector3;
+      rotationQuaternion: Quaternion;
+      quaternion: Quaternion;
+    };
+    wheels: Array<{
+      position: Vector3;
+      rotationQuaternion: Quaternion;
+      quaternion: Quaternion;
+    }>;
   };
 };
 
@@ -40,7 +55,7 @@ const stopRaceBtn = document.getElementById(
 ) as HTMLAnchorElement;
 // const playersListEl = document.getElementById("players-list") as HTMLElement;
 
-const game: Game = {
+const game: GameClient = {
   elements: {
     joinRaceRoomBtn,
     leaveRaceRoomBtn,
@@ -58,7 +73,15 @@ const sessionID = localStorage.getItem("rally-online");
 
 const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
 
-const startEngineLoop = ({ engine, playersMap, scene }: { engine: Engine, playersMap: PlayersMap; scene: Scene }) => {
+const startEngineLoop = ({
+  engine,
+  playersMap,
+  scene,
+}: {
+  engine: Engine;
+  playersMap: PlayersMap;
+  scene: Scene;
+}) => {
   const camera = new ArcRotateCamera(
     "camera",
     -Math.PI / 2,
@@ -85,7 +108,9 @@ const startEngineLoop = ({ engine, playersMap, scene }: { engine: Engine, player
     }
 
     dataFromServer.forEach((playerFromServer: PlayerFromServer) => {
-      const player = playersMap.find((currentPlayer) => currentPlayer.userID === playerFromServer.userID);
+      const player = playersMap.find(
+        (currentPlayer) => currentPlayer.userID === playerFromServer.userID
+      );
 
       if (!player || !playerFromServer.vehicle) {
         return;
@@ -186,7 +211,9 @@ const startEngineLoop = ({ engine, playersMap, scene }: { engine: Engine, player
   });
 
   const sendAction = (playerActions: string[]) => {
-    const player = game.playersMap.find((currentPlayer) => currentPlayer.isCurrentPlayer);
+    const player = game.playersMap.find(
+      (currentPlayer) => currentPlayer.isCurrentPlayer
+    );
     const id = player?.userID;
 
     if (id) {
@@ -203,7 +230,7 @@ const startEngineLoop = ({ engine, playersMap, scene }: { engine: Engine, player
       config,
       isRaceStarted,
       objects,
-      playersList
+      playersList,
     }: {
       config: GameConfig;
       isRaceStarted: boolean;
@@ -237,7 +264,7 @@ const startEngineLoop = ({ engine, playersMap, scene }: { engine: Engine, player
       startEngineLoop({
         engine,
         scene,
-        playersMap: game.playersMap
+        playersMap: game.playersMap,
       });
     }
   );
