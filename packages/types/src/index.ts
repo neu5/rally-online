@@ -3,6 +3,7 @@ import type {
   GameConfig,
   GameObject,
   GameQuaternion,
+  Game as GameServer,
   Position,
   RoomList,
   User,
@@ -11,22 +12,24 @@ import type {
 import type {
   ActionTypes,
   ClientEvents,
-  Game,
+  Game as GameClient,
   PlayerFromServer,
   PlayersFromServer,
   UI,
 } from "./client";
-import type { ServerEvents } from "./server";
+import type { PlayersList, ServerEvents } from "./server";
 
 interface ServerToClientEvents extends ClientEvents, ServerEvents {}
 
 export type {
   Actions,
   ActionTypes,
-  Game,
+  GameClient,
+  GameServer,
   GameConfig,
   GameObject,
   GameQuaternion,
+  PlayersList,
   PlayerFromServer,
   PlayersFromServer,
   Position,

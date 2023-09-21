@@ -33,6 +33,14 @@ type GameObject = {
   depth: number;
 };
 
+type Game = {
+  config: GameConfig;
+  objects: GameObject[];
+  race: {
+    isStarted: boolean;
+  };
+};
+
 type Position = {
   x: number;
   y: number;
@@ -55,6 +63,7 @@ type UsersList = Array<User>;
 
 export type {
   Actions,
+  Game,
   GameConfig,
   GameObject,
   GameQuaternion,

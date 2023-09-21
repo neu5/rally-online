@@ -3,7 +3,7 @@ import Toastify from "toastify-js";
 import { TOAST_COLORS, log, toggleStartRaceBtns } from "../utils";
 
 import type { Socket } from "socket.io-client";
-import type { Game, RoomList, UsersList } from "@neu5/types/src";
+import type { GameClient, RoomList, UsersList } from "@neu5/types/src";
 import type { DialogWrapper } from "../ui/dialog";
 
 type ExtendedSocket = Socket & {
@@ -15,7 +15,7 @@ const createSocketHandler = ({
   game,
 }: {
   dialog: DialogWrapper;
-  game: Game;
+  game: GameClient;
 }) => {
   const socket: ExtendedSocket = io(window.location.host, {
     autoConnect: false,

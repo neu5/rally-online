@@ -1,11 +1,12 @@
 import type { Server, Socket } from "socket.io";
 import type {
   ActionTypes,
-  Actions,
+  GameServer,
+  PlayersList,
   ServerToClientEvents,
   User,
 } from "@neu5/types/src";
-import type { Game } from "../index";
+
 import type { InMemorySessionStore } from "../sessionStore";
 import { Room } from "../room";
 import { startRace } from "../scene/scene";
@@ -20,40 +21,6 @@ let raceLoop: NodeJS.Timer | null = null;
 let playersMap: PlayersList | null = null;
 
 const roomRace = new Room();
-
-type VehicleTemplate = {
-  wheels: Array<{
-    position: any;
-    quaternion: any;
-    rotationQuaternion?: any;
-  }>;
-  body: {
-    position: any;
-    quaternion?: any;
-    rotationQuaternion?: any;
-  };
-  physicalVehicle: any;
-};
-
-type Position = {
-  x: number;
-  y: number;
-  z: number;
-};
-
-type PlayersList = Array<{
-  accelerateTimeMS: number;
-  actions: Actions;
-  vehicle: VehicleTemplate;
-  turnTimeMS: number;
-  vehicleSteering: number;
-  playerNumber: number;
-  connected: boolean;
-  userID: string;
-  username: string;
-  color: string;
-  startingPos: Position;
-}>;
 
 const playersMapToArray = (list: PlayersList) =>
   list.map(({ color, username, userID, vehicle }) => ({
@@ -93,7 +60,7 @@ const createSocketHandlers = ({
   sessionStore,
   socket,
 }: {
-  game: Game;
+  game: GameServer;
   io: Server<ServerToClientEvents>;
   sessionStore: InMemorySessionStore;
   socket: Socket<ServerToClientEvents>;

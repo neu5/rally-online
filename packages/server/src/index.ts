@@ -6,7 +6,7 @@ import { createServer } from "http";
 import type { Socket } from "socket.io";
 import { Server } from "socket.io";
 
-import type { GameConfig, GameObject, ServerToClientEvents } from "@neu5/types/src";
+import type { GameServer, ServerToClientEvents } from "@neu5/types/src";
 
 import { InMemorySessionStore } from "./sessionStore";
 import { createSocketHandlers } from "./sockets/sockets";
@@ -23,15 +23,7 @@ const sessionStore = new InMemorySessionStore();
 
 const io = new Server<ServerToClientEvents>(httpServer);
 
-export type Game = {
-  config: GameConfig;
-  objects: GameObject[];
-  race: {
-    isStarted: boolean
-  }
-};
-
-let game: Game = {
+let game: GameServer = {
   config: {
     width: 0,
     height: 0,
@@ -39,8 +31,8 @@ let game: Game = {
   },
   objects: [],
   race: {
-    isStarted: false
-  }
+    isStarted: false,
+  },
 };
 
 io.use((socket: Socket, next) => {

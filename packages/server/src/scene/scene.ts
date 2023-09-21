@@ -1,8 +1,7 @@
 import { Body, Plane, Vec3, World } from "cannon-es";
-import type { Actions } from "@neu5/types/src";
 import { addRigidVehicle, getMapWalls } from "../utils";
 
-import type { Game } from "../index";
+import type { Actions, GameServer } from "@neu5/types/src";
 import type { Room } from "../room";
 import type { InMemorySessionStore } from "../sessionStore";
 
@@ -68,7 +67,7 @@ const startRace = async ({
   room,
   sessionStore,
 }: {
-  game: Game;
+  game: GameServer;
   room: Room;
   sessionStore: InMemorySessionStore;
 }) => {
