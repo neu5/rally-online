@@ -53,6 +53,9 @@ const startRaceBtn = document.getElementById(
 const stopRaceBtn = document.getElementById(
   "stop-race-btn"
 ) as HTMLAnchorElement;
+const [...mobileControlsEls] = document.getElementsByClassName(
+  "mobile-controls"
+) as HTMLCollectionOf<HTMLElement>;
 // const playersListEl = document.getElementById("players-list") as HTMLElement;
 
 const game: GameClient = {
@@ -72,6 +75,42 @@ const game: GameClient = {
 const sessionID = localStorage.getItem("rally-online");
 
 const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
+
+type WindowSize = {
+  width: number;
+  height: number;
+};
+let windowSize: WindowSize = { width: Infinity, height: Infinity };
+
+const isTouchDevice = () => "ontouchstart" in window;
+
+const updateWindowSize = () => {
+  windowSize = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+};
+
+const pEl = document.createElement("p");
+pEl.textContent =
+  "The game may be more playable if you rotate the screen horizontally";
+
+const updateControls = () => {
+  if (isTouchDevice()) {
+    mobileControlsEls.forEach((el) => el.classList.remove("hide"));
+  } else {
+    mobileControlsEls.forEach((el) => el.classList.add("hide"));
+  }
+
+  if (isTouchDevice() && windowSize.width / windowSize.height < 1) {
+    dialog.show({
+      content: pEl,
+    });
+  }
+};
+
+updateWindowSize();
+updateControls();
 
 const startEngineLoop = ({
   engine,
@@ -276,7 +315,7 @@ const startEngineLoop = ({
   window.addEventListener("resize", () => {
     resizeDebounced();
 
-    // updateWindowSize();
-    // updateControls();
+    updateWindowSize();
+    updateControls();
   });
 })();
