@@ -43,8 +43,6 @@ const leaveRaceRoomBtn = document.getElementById(
   "leave-race-room-btn"
 ) as HTMLAnchorElement;
 
-let dataFromServer: PlayersFromServer = [];
-
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
 const startRaceBtn = document.getElementById(
@@ -53,7 +51,12 @@ const startRaceBtn = document.getElementById(
 const stopRaceBtn = document.getElementById(
   "stop-race-btn"
 ) as HTMLAnchorElement;
+const [...mobileControlsEls] = document.getElementsByClassName(
+  "mobile-controls"
+) as HTMLCollectionOf<HTMLElement>;
 // const playersListEl = document.getElementById("players-list") as HTMLElement;
+
+let dataFromServer: PlayersFromServer = [];
 
 const game: GameClient = {
   elements: {
@@ -67,11 +70,18 @@ const game: GameClient = {
   rootEl: document.getElementById("root"),
   ui,
   usernameAlreadySelected: false,
+  windowSize: {
+    width: Infinity,
+    height: Infinity,
+  },
 };
 
 const sessionID = localStorage.getItem("rally-online");
 
 const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
+
+ui.MobileControls.updateWindowSize(game);
+ui.MobileControls.updateControls({ dialog, game, mobileControlsEls });
 
 const startEngineLoop = ({
   engine,
@@ -276,7 +286,7 @@ const startEngineLoop = ({
   window.addEventListener("resize", () => {
     resizeDebounced();
 
-    // updateWindowSize();
-    // updateControls();
+    ui.MobileControls.updateWindowSize(game);
+    ui.MobileControls.updateControls({ dialog, game, mobileControlsEls });
   });
 })();

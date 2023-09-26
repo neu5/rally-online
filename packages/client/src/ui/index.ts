@@ -1,4 +1,6 @@
 import { DialogWrapper } from "./dialog";
+import { MobileControls } from "./mobileControls";
+
 import type { RoomList, UI, UsersList } from "@neu5/types/src";
 
 const [usersListEl] = document.getElementsByClassName(
@@ -118,6 +120,7 @@ const ui: UI = {
   setCurrentPlayer,
   showElement,
   DialogWrapper,
+  MobileControls,
   // PlayersIndicators,
 };
 

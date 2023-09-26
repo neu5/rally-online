@@ -4,6 +4,11 @@ type ActionTypes = "accelerate" | "brake" | "left" | "right";
 
 type Class = { new (...args: any[]): any };
 
+type WindowSize = {
+  width: number;
+  height: number;
+};
+
 type Game = {
   elements: {
     joinRaceRoomBtn: HTMLElement;
@@ -16,6 +21,7 @@ type Game = {
   rootEl: HTMLElement | null;
   ui: UI;
   usernameAlreadySelected: boolean;
+  windowSize: WindowSize;
 };
 
 type PlayerFromServer = {
@@ -37,6 +43,10 @@ type UI = {
   setCurrentPlayer: (id: string) => void;
   showElement: (element: HTMLElement) => void;
   DialogWrapper: Class;
+  MobileControls: {
+    updateControls: Function;
+    updateWindowSize: Function;
+  };
 };
 
 interface ClientEvents {
