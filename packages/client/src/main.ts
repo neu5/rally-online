@@ -43,8 +43,6 @@ const leaveRaceRoomBtn = document.getElementById(
   "leave-race-room-btn"
 ) as HTMLAnchorElement;
 
-let dataFromServer: PlayersFromServer = [];
-
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const FPSEl = document.getElementById("fps") as HTMLElement;
 const startRaceBtn = document.getElementById(
@@ -58,6 +56,8 @@ const [...mobileControlsEls] = document.getElementsByClassName(
 ) as HTMLCollectionOf<HTMLElement>;
 // const playersListEl = document.getElementById("players-list") as HTMLElement;
 
+let dataFromServer: PlayersFromServer = [];
+
 const game: GameClient = {
   elements: {
     joinRaceRoomBtn,
@@ -70,47 +70,18 @@ const game: GameClient = {
   rootEl: document.getElementById("root"),
   ui,
   usernameAlreadySelected: false,
+  windowSize: {
+    width: Infinity,
+    height: Infinity,
+  },
 };
 
 const sessionID = localStorage.getItem("rally-online");
 
 const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
 
-type WindowSize = {
-  width: number;
-  height: number;
-};
-let windowSize: WindowSize = { width: Infinity, height: Infinity };
-
-const isTouchDevice = () => "ontouchstart" in window;
-
-const updateWindowSize = () => {
-  windowSize = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-  };
-};
-
-const pEl = document.createElement("p");
-pEl.textContent =
-  "The game may be more playable if you rotate the screen horizontally";
-
-const updateControls = () => {
-  if (isTouchDevice()) {
-    mobileControlsEls.forEach((el) => el.classList.remove("hide"));
-  } else {
-    mobileControlsEls.forEach((el) => el.classList.add("hide"));
-  }
-
-  if (isTouchDevice() && windowSize.width / windowSize.height < 1) {
-    dialog.show({
-      content: pEl,
-    });
-  }
-};
-
-updateWindowSize();
-updateControls();
+ui.MobileControls.updateWindowSize(game);
+ui.MobileControls.updateControls({ dialog, game, mobileControlsEls });
 
 const startEngineLoop = ({
   engine,
@@ -315,7 +286,7 @@ const startEngineLoop = ({
   window.addEventListener("resize", () => {
     resizeDebounced();
 
-    updateWindowSize();
-    updateControls();
+    ui.MobileControls.updateWindowSize(game);
+    ui.MobileControls.updateControls({ dialog, game, mobileControlsEls });
   });
 })();
