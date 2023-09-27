@@ -112,7 +112,7 @@ export class DialogWrapper {
     this.dialogs.push({ content, footer, inputToLook, closeButtonVisibility });
 
     if (this.isDialogHidden()) {
-      this.render({ content, footer, inputToLook, closeButtonVisibility });
+      this.render(this.dialogs[0]);
     }
   }
 
