@@ -6,10 +6,19 @@ const DIALOG_CLOSE_BUTTON_CLASSNAME = "dialog-header__close-button";
 const DIALOG_CONTENT_CLASSNAME = "dialog-content";
 const DIALOG_FOOTER_CLASSNAME = "dialog-footer";
 
+type Dialog = {
+  content: Node;
+  footer?: Node;
+  inputToLook?: HTMLInputElement;
+  closeButtonVisibility: boolean;
+};
+
 export class DialogWrapper {
   dialogWrapper: Element;
 
   dialog: Element;
+
+  dialogs: Array<Dialog>;
 
   dialogCloseButton: Element;
 
@@ -36,6 +45,7 @@ export class DialogWrapper {
 
     this.dialogWrapper = dialogWrapper;
     this.dialog = dialog;
+    this.dialogs = [];
     this.dialogCloseButton = dialogCloseButton;
     this.dialogContent = dialogContent;
     this.dialogFooter = dialogFooter;
@@ -64,6 +74,14 @@ export class DialogWrapper {
 
   close() {
     this.dialogWrapper.classList.add("hide");
+
+    if (this.dialogs.length > 0) {
+      this.render(this.dialogs[0]);
+    }
+  }
+
+  isDialogHidden() {
+    return this.dialogWrapper.classList.contains("hide");
   }
 
   private setContent(content: Node) {
@@ -90,17 +108,17 @@ export class DialogWrapper {
     }
   }
 
-  show({
-    content,
-    footer,
-    inputToLook,
-    closeButtonVisibility = true,
-  }: {
-    content: Node;
-    footer?: Node;
-    inputToLook?: HTMLInputElement;
-    closeButtonVisibility?: boolean;
-  }) {
+  show({ content, footer, inputToLook, closeButtonVisibility = true }: Dialog) {
+    this.dialogs.push({ content, footer, inputToLook, closeButtonVisibility });
+
+    if (this.isDialogHidden()) {
+      this.render({ content, footer, inputToLook, closeButtonVisibility });
+    }
+  }
+
+  render({ content, footer, inputToLook, closeButtonVisibility }: Dialog) {
+    this.dialogs.shift();
+
     this.setCloseButtonVisibility(closeButtonVisibility);
     this.setContent(content);
     this.setFooter(footer);
