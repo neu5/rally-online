@@ -10,7 +10,7 @@ type Dialog = {
   content: Node;
   footer?: Node;
   inputToLook?: HTMLInputElement;
-  closeButtonVisibility: boolean;
+  closeButtonVisibility?: boolean;
 };
 
 export class DialogWrapper {
@@ -116,7 +116,12 @@ export class DialogWrapper {
     }
   }
 
-  render({ content, footer, inputToLook, closeButtonVisibility }: Dialog) {
+  render({
+    content,
+    footer,
+    inputToLook,
+    closeButtonVisibility = true,
+  }: Dialog) {
     this.dialogs.shift();
 
     this.setCloseButtonVisibility(closeButtonVisibility);
