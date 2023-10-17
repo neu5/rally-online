@@ -1,19 +1,31 @@
 import {
+  ArcRotateCamera,
+  // Color3,
   Engine,
-  FreeCamera,
   HavokPlugin,
   HemisphericLight,
   MeshBuilder,
   PhysicsAggregate,
+  PhysicsBody,
+  PhysicsMotionType,
+  PhysicsShapeMesh,
   PhysicsShapeType,
   Scene,
+  StandardMaterial,
   Vector3,
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
 
 async function getInitializedHavok() {
-  return await HavokPhysics();
+  try {
+    return await HavokPhysics();
+  } catch (e) {
+    return e;
+  }
 }
+
+const groundSize = 100;
+let groundPhysicsMaterial = { friction: 0.2, restitution: 0.3 };
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const engine = new Engine(canvas, true, {
@@ -21,12 +33,64 @@ const engine = new Engine(canvas, true, {
   stencil: true,
   disableWebGL2Support: false,
 });
+
+function createHeightmap({
+  scene,
+  material,
+}: {
+  scene: Scene;
+  material: StandardMaterial;
+}) {
+  console.log("create heightmap");
+  var ground = MeshBuilder.CreateGroundFromHeightMap(
+    "ground",
+    "assets/heightMap.png",
+    {
+      width: groundSize,
+      height: groundSize,
+      subdivisions: groundSize / 2,
+      maxHeight: groundSize / 2,
+      onReady: (mesh) => {
+        // meshesToDispose.push(mesh);
+        mesh.material = new StandardMaterial("heightmapMaterial");
+        // matsToDispose.push(mesh.material);
+        // mesh.material.emissiveColor = Color3.Green();
+        // mesh.material.wireframe = true;
+
+        var groundShape = new PhysicsShapeMesh(ground, scene);
+        // shapesToDispose.push(groundShape);
+
+        const body = new PhysicsBody(
+          ground,
+          PhysicsMotionType.STATIC,
+          false,
+          scene
+        );
+        // bodiesToDispose.push(body);
+        groundShape.material = material;
+        body.shape = groundShape;
+        body.setMassProperties({
+          mass: 0,
+        });
+        console.log("finish creating heightmap");
+      },
+    },
+    scene
+  );
+}
+
 const createScene = async function () {
   // This creates a basic Babylon Scene object (non-mesh)
   const scene = new Scene(engine);
 
   // This creates and positions a free camera (non-mesh)
-  const camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);
+  const camera = new ArcRotateCamera(
+    "camera1",
+    -Math.PI / 2,
+    0.8,
+    200,
+    new Vector3(0, 0, 0)
+  );
 
   // This targets the camera to scene origin
   camera.setTarget(Vector3.Zero());
@@ -48,12 +112,12 @@ const createScene = async function () {
   );
 
   // Move the sphere upward at 4 units
-  sphere.position.y = 4;
+  sphere.position.y = 60;
 
   // Our built-in 'ground' shape.
   const ground = MeshBuilder.CreateGround(
     "ground",
-    { width: 10, height: 10 },
+    { width: groundSize, height: groundSize },
     scene
   );
 
@@ -65,6 +129,7 @@ const createScene = async function () {
   scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
 
   // Create a sphere shape and the associated body. Size will be determined automatically.
+  // eslint-disable-next-line
   const sphereAggregate = new PhysicsAggregate(
     sphere,
     PhysicsShapeType.SPHERE,
@@ -73,12 +138,18 @@ const createScene = async function () {
   );
 
   // Create a static box shape.
+  // eslint-disable-next-line
   const groundAggregate = new PhysicsAggregate(
     ground,
     PhysicsShapeType.BOX,
     { mass: 0 },
     scene
   );
+
+  createHeightmap({
+    scene,
+    material: groundPhysicsMaterial,
+  });
 
   return scene;
 };

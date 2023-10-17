@@ -262,6 +262,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babylonjs/materials@npm:^6.24.0":
+  version: 6.24.0
+  resolution: "@babylonjs/materials@npm:6.24.0"
+  peerDependencies:
+    "@babylonjs/core": ^6.0.0
+  checksum: 13059a1a678acf6211afb97592b8ee0dd544586081bb0d973197a6e0ea909e732c87a3ace53e9c4464a6037222987522f80ce73140e18eb99d70b92587fae6e4
+  languageName: node
+  linkType: hard
+
 "@cspotcode/source-map-support@npm:^0.8.0":
   version: 0.8.1
   resolution: "@cspotcode/source-map-support@npm:0.8.1"
@@ -460,6 +469,7 @@ __metadata:
   dependencies:
     "@babylonjs/core": ^6.22.0
     "@babylonjs/havok": ^1.2.1
+    "@babylonjs/materials": ^6.24.0
     "@neu5/types": 0.0.1
     "@parcel/config-default": ^2.6.0
     "@parcel/transformer-sass": ^2.6.0
