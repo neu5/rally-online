@@ -9,6 +9,7 @@
   "dependencies": {
     "@babylonjs/core": "^6.22.0",
     "@babylonjs/havok": "^1.2.1",
+    "@babylonjs/materials": "^6.24.0",
     "@neu5/types": "0.0.1"
   },
   "devDependencies": {
