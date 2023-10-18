@@ -44,12 +44,12 @@ function createHeightmap({
   console.log("create heightmap");
   var ground = MeshBuilder.CreateGroundFromHeightMap(
     "ground",
-    "assets/heightMap.png",
+    "assets/heightmap.png",
     {
       width: groundSize,
       height: groundSize,
-      subdivisions: groundSize / 2,
-      maxHeight: groundSize / 2,
+      subdivisions: 100,
+      maxHeight: 10,
       onReady: (mesh) => {
         // meshesToDispose.push(mesh);
         mesh.material = new StandardMaterial("heightmapMaterial");
