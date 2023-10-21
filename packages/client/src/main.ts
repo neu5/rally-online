@@ -1,167 +1,292 @@
-import {
-  ArcRotateCamera,
-  // Color3,
-  Engine,
-  HavokPlugin,
-  HemisphericLight,
-  MeshBuilder,
-  PhysicsAggregate,
-  PhysicsBody,
-  PhysicsMotionType,
-  PhysicsShapeMesh,
-  PhysicsShapeType,
-  Scene,
-  StandardMaterial,
-  Vector3,
-} from "@babylonjs/core";
-import HavokPhysics from "@babylonjs/havok";
+import { ArcRotateCamera, Engine, Scene, Vector3 } from "@babylonjs/core";
+import "toastify-js/src/toastify.css";
+import { FEATURES_NAMES, features } from "@neu5/types/src";
 
-async function getInitializedHavok() {
-  try {
-    return await HavokPhysics();
-  } catch (e) {
-    return e;
-  }
-}
+import { createSocketHandler } from "./sockets/sockets";
+import { ui } from "./ui";
+import { loginDialog } from "./ui/dialog-login";
+import { startRace } from "./scene/scene";
+// import { UIDialogWrapper, UIcreatePlayersList, UIsetCurrentPlayer } from "./ui";
+import { debounce, toggleStartRaceBtns } from "./utils";
+import type {
+  GameClient,
+  GameConfig,
+  GameObject,
+  PlayerFromServer,
+  PlayersFromServer,
+  Position,
+} from "@neu5/types/src";
+import type { Quaternion } from "@babylonjs/core";
 
-const groundSize = 100;
-let groundPhysicsMaterial = { friction: 0.2, restitution: 0.3 };
-
-const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-const engine = new Engine(canvas, true, {
-  preserveDrawingBuffer: true,
-  stencil: true,
-  disableWebGL2Support: false,
-});
-
-function createHeightmap({
-  scene,
-  material,
-}: {
-  scene: Scene;
-  material: StandardMaterial;
-}) {
-  console.log("create heightmap");
-  var ground = MeshBuilder.CreateGroundFromHeightMap(
-    "ground",
-    "assets/heightmap.png",
-    {
-      width: groundSize,
-      height: groundSize,
-      subdivisions: 100,
-      maxHeight: 10,
-      onReady: (mesh) => {
-        // meshesToDispose.push(mesh);
-        mesh.material = new StandardMaterial("heightmapMaterial");
-        // matsToDispose.push(mesh.material);
-        // mesh.material.emissiveColor = Color3.Green();
-        // mesh.material.wireframe = true;
-
-        var groundShape = new PhysicsShapeMesh(ground, scene);
-        // shapesToDispose.push(groundShape);
-
-        const body = new PhysicsBody(
-          ground,
-          PhysicsMotionType.STATIC,
-          false,
-          scene
-        );
-        // bodiesToDispose.push(body);
-        groundShape.material = material;
-        body.shape = groundShape;
-        body.setMassProperties({
-          mass: 0,
-        });
-        console.log("finish creating heightmap");
-      },
-    },
-    scene
-  );
-}
-
-const createScene = async function () {
-  // This creates a basic Babylon Scene object (non-mesh)
-  const scene = new Scene(engine);
-
-  // This creates and positions a free camera (non-mesh)
-  const camera = new ArcRotateCamera(
-    "camera1",
-    -Math.PI / 2,
-    0.8,
-    200,
-    new Vector3(0, 0, 0)
-  );
-
-  // This targets the camera to scene origin
-  camera.setTarget(Vector3.Zero());
-
-  // This attaches the camera to the canvas
-  camera.attachControl(canvas, true);
-
-  // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-  const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
-
-  // Default intensity is 1. Let's dim the light a small amount
-  light.intensity = 0.7;
-
-  // Our built-in 'sphere' shape.
-  const sphere = MeshBuilder.CreateSphere(
-    "sphere",
-    { diameter: 2, segments: 32 },
-    scene
-  );
-
-  // Move the sphere upward at 4 units
-  sphere.position.y = 60;
-
-  // Our built-in 'ground' shape.
-  const ground = MeshBuilder.CreateGround(
-    "ground",
-    { width: groundSize, height: groundSize },
-    scene
-  );
-
-  // initialize plugin
-  const havokInstance = await getInitializedHavok();
-  // pass the engine to the plugin
-  const hk = new HavokPlugin(true, havokInstance);
-  // enable physics in the scene with a gravity
-  scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
-
-  // Create a sphere shape and the associated body. Size will be determined automatically.
-  // eslint-disable-next-line
-  const sphereAggregate = new PhysicsAggregate(
-    sphere,
-    PhysicsShapeType.SPHERE,
-    { mass: 1, restitution: 0.75 },
-    scene
-  );
-
-  // Create a static box shape.
-  // eslint-disable-next-line
-  const groundAggregate = new PhysicsAggregate(
-    ground,
-    PhysicsShapeType.BOX,
-    { mass: 0 },
-    scene
-  );
-
-  createHeightmap({
-    scene,
-    material: groundPhysicsMaterial,
-  });
-
-  return scene;
+export type Player = PlayerFromServer & {
+  isCurrentPlayer: boolean;
+  vehicle: {
+    body: {
+      position: Vector3;
+      rotationQuaternion: Quaternion;
+      quaternion: Quaternion;
+    };
+    wheels: Array<{
+      position: Vector3;
+      rotationQuaternion: Quaternion;
+      quaternion: Quaternion;
+    }>;
+  };
 };
 
-createScene().then((scene) => {
-  engine.runRenderLoop(function () {
-    if (scene) {
-      scene.render();
+export type PlayersMap = Array<Player>;
+
+const joinRaceRoomBtn = document.getElementById(
+  "join-race-room-btn"
+) as HTMLAnchorElement;
+const leaveRaceRoomBtn = document.getElementById(
+  "leave-race-room-btn"
+) as HTMLAnchorElement;
+
+const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+const FPSEl = document.getElementById("fps") as HTMLElement;
+const startRaceBtn = document.getElementById(
+  "start-race-btn"
+) as HTMLAnchorElement;
+const stopRaceBtn = document.getElementById(
+  "stop-race-btn"
+) as HTMLAnchorElement;
+const [...mobileControlsEls] = document.getElementsByClassName(
+  "mobile-controls"
+) as HTMLCollectionOf<HTMLElement>;
+// const playersListEl = document.getElementById("players-list") as HTMLElement;
+
+let dataFromServer: PlayersFromServer = [];
+
+const game: GameClient = {
+  elements: {
+    joinRaceRoomBtn,
+    leaveRaceRoomBtn,
+    startRaceBtn,
+  },
+  isDevelopment: process.env.NODE_ENV === "development",
+  playersMap: [],
+  roomUsers: [],
+  rootEl: document.getElementById("root"),
+  ui,
+  usernameAlreadySelected: false,
+  windowSize: {
+    width: Infinity,
+    height: Infinity,
+  },
+};
+
+const sessionID = localStorage.getItem("rally-online");
+
+const dialog = new ui.DialogWrapper({ rootEl: game.rootEl });
+
+ui.MobileControls.updateWindowSize(game);
+ui.MobileControls.updateControls({ dialog, game, mobileControlsEls });
+
+const startEngineLoop = ({
+  engine,
+  playersMap,
+  scene,
+}: {
+  engine: Engine;
+  playersMap: PlayersMap;
+  scene: Scene;
+}) => {
+  const camera = new ArcRotateCamera(
+    "camera",
+    -Math.PI / 2,
+    Math.PI / 4,
+    130,
+    new Vector3(0, 0, 0)
+  );
+  camera.attachControl(canvas, true);
+
+  camera.lowerBetaLimit = -Math.PI / 2.5;
+  camera.upperBetaLimit = Math.PI / 2.5;
+  camera.lowerRadiusLimit = 10;
+  camera.upperRadiusLimit = 200;
+
+  camera.maxZ = 500;
+
+  camera.attachControl(canvas, true);
+
+  engine.runRenderLoop(() => {
+    scene.render();
+
+    if (dataFromServer === null || !dataFromServer.length) {
+      return;
     }
+
+    dataFromServer.forEach((playerFromServer: PlayerFromServer) => {
+      const player = playersMap.find(
+        (currentPlayer) => currentPlayer.userID === playerFromServer.userID
+      );
+
+      if (!player || !playerFromServer.vehicle) {
+        return;
+      }
+
+      const {
+        vehicle: {
+          body: { position, quaternion },
+          wheels,
+        },
+      } = playerFromServer;
+
+      player.vehicle?.body.position.set(position.x, position.y, position.z);
+      player.vehicle?.body.rotationQuaternion.set(
+        quaternion.x,
+        quaternion.y,
+        quaternion.z,
+        quaternion.w
+      );
+
+      wheels.forEach((wheel: { position: Position }, idx: number) => {
+        player.vehicle?.wheels[idx].position.set(
+          wheel.position.x,
+          wheel.position.y,
+          wheel.position.z
+        );
+        player.vehicle?.wheels[idx].rotationQuaternion.set(
+          quaternion.x,
+          quaternion.y,
+          quaternion.z,
+          quaternion.w
+        );
+      });
+    });
+
+    FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
   });
-});
-// Resize
-window.addEventListener("resize", function () {
-  engine.resize();
-});
+};
+
+(async () => {
+  const engine = new Engine(canvas, true);
+  let scene: Scene = new Scene(engine);
+
+  const { socket } = createSocketHandler({ dialog, game });
+
+  if (game.rootEl) {
+    game.rootEl.addEventListener("setName", (ev) => {
+      const customEvent = ev as CustomEvent<string>;
+
+      if (customEvent.detail !== undefined) {
+        // const username = customEvent.detail;
+        // game.usernameAlreadySelected = true;
+        socket.emit("client:set name", {
+          username: customEvent.detail,
+        });
+      }
+    });
+  }
+
+  joinRaceRoomBtn.addEventListener("click", async () => {
+    socket.emit("client:join race room");
+  });
+  leaveRaceRoomBtn.addEventListener("click", async () => {
+    socket.emit("client:leave race room");
+  });
+  startRaceBtn.addEventListener("click", async () => {
+    socket.emit("client:start the race");
+  });
+
+  if (game.isDevelopment) {
+    stopRaceBtn.classList.remove("hide");
+
+    stopRaceBtn.addEventListener("click", async () => {
+      socket.emit("client-dev:stop the race");
+
+      scene.dispose();
+      engine.stopRenderLoop();
+    });
+  }
+
+  if (features[FEATURES_NAMES.PERSISTENS_SESSION] && sessionID) {
+    game.usernameAlreadySelected = true;
+    socket.auth = { sessionID };
+  }
+
+  const { labelName, inputName } = loginDialog();
+
+  dialog.show({
+    content: labelName,
+    inputToLook: inputName,
+    closeButtonVisibility: false,
+  });
+
+  socket.connect();
+
+  socket.on("server:action", (playersFromServer: PlayersFromServer) => {
+    dataFromServer = playersFromServer;
+  });
+
+  const sendAction = (playerActions: string[]) => {
+    const player = game.playersMap.find(
+      (currentPlayer) => currentPlayer.isCurrentPlayer
+    );
+    const id = player?.userID;
+
+    if (id) {
+      socket.emit("client:action", {
+        id,
+        playerActions,
+      });
+    }
+  };
+
+  socket.on(
+    "server:start-race",
+    async ({
+      config,
+      isRaceStarted,
+      objects,
+      playersList,
+    }: {
+      config: GameConfig;
+      isRaceStarted: boolean;
+      objects: GameObject[];
+      playersList: PlayersMap;
+    }) => {
+      scene.dispose();
+      engine.stopRenderLoop();
+
+      if (isRaceStarted) {
+        game.ui.hideElement(game.elements.joinRaceRoomBtn);
+        game.ui.hideElement(game.elements.leaveRaceRoomBtn);
+      }
+
+      toggleStartRaceBtns(game.elements.startRaceBtn, !isRaceStarted);
+
+      const newScene = await startRace({
+        engine,
+        gameConfig: config,
+        gameObjects: objects,
+        playersMap: playersList.map((player: Player) => ({
+          ...player,
+          isCurrentPlayer: player.userID === socket.userID,
+        })),
+        sendAction,
+      });
+
+      scene = newScene.scene;
+      game.playersMap = newScene.playersMap;
+
+      startEngineLoop({
+        engine,
+        scene,
+        playersMap: game.playersMap,
+      });
+    }
+  );
+
+  const resizeDebounced = debounce(() => {
+    engine.resize();
+  });
+
+  window.addEventListener("resize", () => {
+    resizeDebounced();
+
+    ui.MobileControls.updateWindowSize(game);
+    ui.MobileControls.updateControls({ dialog, game, mobileControlsEls });
+  });
+})();
