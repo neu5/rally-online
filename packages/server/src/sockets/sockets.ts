@@ -1,3 +1,18 @@
+import { fileURLToPath } from "url";
+import {
+  ArcRotateCamera,
+  HavokPlugin,
+  MeshBuilder,
+  NullEngine,
+  PhysicsAggregate,
+  PhysicsBody,
+  PhysicsMotionType,
+  PhysicsShapeMesh,
+  PhysicsShapeType,
+  Scene,
+  Vector3,
+} from "@babylonjs/core";
+import HavokPhysics from "@babylonjs/havok";
 import type { Server, Socket } from "socket.io";
 import type {
   ActionTypes,
@@ -6,10 +21,23 @@ import type {
   ServerToClientEvents,
   User,
 } from "@neu5/types/src";
+import * as path from "path";
+import * as fs from "fs";
 
+const getDirname = (meta: { url: string }) => fileURLToPath(meta.url);
+const rootDir = getDirname(import.meta);
+
+import type { Engine } from "@babylonjs/core";
 import type { InMemorySessionStore } from "../sessionStore";
 import { Room } from "../room";
-import { startRace } from "../scene/scene";
+
+console.log(rootDir);
+
+const wasm = path.join(
+  rootDir,
+  "../../../../../node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm"
+);
+// import { startRace } from "../scene/scene";
 
 const ACCELERATE = "accelerate";
 const BRAKE = "brake";
@@ -21,6 +49,82 @@ let raceLoop: NodeJS.Timer | null = null;
 let playersMap: PlayersList | null = null;
 
 const roomRace = new Room();
+
+const groundSize = 100;
+let groundPhysicsMaterial = { friction: 0.2, restitution: 0.3 };
+
+async function getInitializedHavok() {
+  try {
+    let binary = fs.readFileSync(wasm);
+    return HavokPhysics({ wasmBinary: binary });
+  } catch (e) {
+    return e;
+  }
+}
+
+const createScene = async function (engine: Engine) {
+  // This creates a basic Babylon Scene object (non-mesh)
+  const scene = new Scene(engine);
+
+  // This creates and positions a free camera (non-mesh)
+  const camera = new ArcRotateCamera(
+    "camera1",
+    -Math.PI / 2,
+    0.8,
+    200,
+    new Vector3(0, 0, 0)
+  );
+
+  // Our built-in 'sphere' shape.
+  const sphere = MeshBuilder.CreateSphere(
+    "sphere",
+    { diameter: 2, segments: 32 },
+    scene
+  );
+
+  // Move the sphere upward at 4 units
+  sphere.position.y = 20;
+
+  // Our built-in 'ground' shape.
+  const ground = MeshBuilder.CreateGround(
+    "ground",
+    { width: groundSize, height: groundSize },
+    scene
+  );
+
+  // initialize plugin
+  const havokInstance = await getInitializedHavok();
+
+  // pass the engine to the plugin
+  const hk = new HavokPlugin(true, havokInstance);
+  // // enable physics in the scene with a gravity
+  scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
+
+  // // Create a sphere shape and the associated body. Size will be determined automatically.
+  // // eslint-disable-next-line
+  const sphereAggregate = new PhysicsAggregate(
+    sphere,
+    PhysicsShapeType.SPHERE,
+    { mass: 1, restitution: 0.75 },
+    scene
+  );
+
+  // // Create a static box shape.
+  // // eslint-disable-next-line
+  const groundAggregate = new PhysicsAggregate(
+    ground,
+    PhysicsShapeType.BOX,
+    { mass: 0 },
+    scene
+  );
+
+  // createHeightmap({
+  //   scene,
+  //   material: groundPhysicsMaterial,
+  // });
+
+  return scene;
+};
 
 const playersMapToArray = (list: PlayersList) =>
   list.map(({ color, username, userID, vehicle }) => ({
@@ -212,22 +316,37 @@ const createSocketHandlers = ({
       depth: 0.1,
     };
 
-    const race = await startRace({ game, room: roomRace, sessionStore });
-    raceLoop = race.loop;
-    playersMap = race.playersMap;
+    const engine = new NullEngine();
+    const scene = await createScene(engine);
 
-    io.emit("server:start-race", {
-      playersList: playersMapToArray(playersMap),
-      isRaceStarted: game.race.isStarted,
-      config: game.config,
-      objects: game.objects.map(({ isWall, name, position, quaternion }) => ({
-        name,
-        isWall,
-        position,
-        quaternion,
-        ...game.config,
-      })),
+    const camera = new ArcRotateCamera( // eslint-disable-line
+      "camera",
+      -Math.PI / 2,
+      Math.PI / 3.5,
+      130,
+      Vector3.Zero()
+    );
+
+    engine.runRenderLoop(() => {
+      scene.render();
     });
+
+    // const race = await startRace({ game, room: roomRace, sessionStore });
+    // raceLoop = race.loop;
+    // playersMap = race.playersMap;
+
+    // io.emit("server:start-race", {
+    //   playersList: playersMapToArray(playersMap),
+    //   isRaceStarted: game.race.isStarted,
+    //   config: game.config,
+    //   objects: game.objects.map(({ isWall, name, position, quaternion }) => ({
+    //     name,
+    //     isWall,
+    //     position,
+    //     quaternion,
+    //     ...game.config,
+    //   })),
+    // });
   });
 
   socket.on("client-dev:stop the race", async () => {
