@@ -1,3 +1,4 @@
+import { fileURLToPath } from "url";
 import {
   ArcRotateCamera,
   HavokPlugin,
@@ -20,10 +21,22 @@ import type {
   ServerToClientEvents,
   User,
 } from "@neu5/types/src";
+import * as path from "path";
+import * as fs from "fs";
+
+const getDirname = (meta: { url: string }) => fileURLToPath(meta.url);
+const rootDir = getDirname(import.meta);
 
 import type { Engine } from "@babylonjs/core";
 import type { InMemorySessionStore } from "../sessionStore";
 import { Room } from "../room";
+
+console.log(rootDir);
+
+const wasm = path.join(
+  rootDir,
+  "../../../../../node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm"
+);
 // import { startRace } from "../scene/scene";
 
 const ACCELERATE = "accelerate";
@@ -42,7 +55,8 @@ let groundPhysicsMaterial = { friction: 0.2, restitution: 0.3 };
 
 async function getInitializedHavok() {
   try {
-    return await HavokPhysics();
+    let binary = fs.readFileSync(wasm);
+    return HavokPhysics({ wasmBinary: binary });
   } catch (e) {
     return e;
   }
@@ -80,14 +94,14 @@ const createScene = async function (engine: Engine) {
 
   // initialize plugin
   const havokInstance = await getInitializedHavok();
-  console.log(havokInstance);
+
   // pass the engine to the plugin
   const hk = new HavokPlugin(true, havokInstance);
-  // enable physics in the scene with a gravity
+  // // enable physics in the scene with a gravity
   scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
 
-  // Create a sphere shape and the associated body. Size will be determined automatically.
-  // eslint-disable-next-line
+  // // Create a sphere shape and the associated body. Size will be determined automatically.
+  // // eslint-disable-next-line
   const sphereAggregate = new PhysicsAggregate(
     sphere,
     PhysicsShapeType.SPHERE,
@@ -95,8 +109,8 @@ const createScene = async function (engine: Engine) {
     scene
   );
 
-  // Create a static box shape.
-  // eslint-disable-next-line
+  // // Create a static box shape.
+  // // eslint-disable-next-line
   const groundAggregate = new PhysicsAggregate(
     ground,
     PhysicsShapeType.BOX,
