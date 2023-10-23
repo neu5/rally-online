@@ -5,14 +5,12 @@ import {
   Scene,
   Vector3,
 } from "@babylonjs/core";
-// import * as CANNON from "cannon-es";
-// import CannonDebugger from "cannon-es-debugger-babylonjs";
 
 import { addBox, addColors, addPlane, addRigidVehicle } from "../utils";
 
 import type { Engine } from "@babylonjs/core";
 import type { GameConfig, GameObject } from "@neu5/types/src";
-import type { Player, PlayersMap } from '../main';
+import type { Player, PlayersMap } from "../main";
 // import { UIPlayersIndicators } from "../ui";
 
 // const speedometerEl = document.getElementById("speedometer") as HTMLElement;
