@@ -32,6 +32,9 @@ type PlayerFromServer = {
     body: { position: any; rotationQuaternion: any; quaternion: any };
     wheels: Array<{ position: any; rotationQuaternion: any; quaternion: any }>;
   };
+  sphere: {
+    position: any;
+  };
 };
 
 type PlayersFromServer = Array<PlayerFromServer>;
