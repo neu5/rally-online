@@ -66,10 +66,17 @@ let playersMap: PlayersList | null = null;
 const roomRace = new Room();
 
 const playersMapToArray = (list: PlayersList) =>
-  list.map(({ color, username, userID, vehicle }) => ({
+  list.map(({ color, username, userID, sphere, vehicle }) => ({
     color,
     username,
     userID,
+    ...(sphere
+      ? {
+          sphere: {
+            position: sphere.position,
+          },
+        }
+      : undefined),
     ...(vehicle
       ? {
           vehicle: {

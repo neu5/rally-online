@@ -122,38 +122,44 @@ const startEngineLoop = ({
         (currentPlayer) => currentPlayer.userID === playerFromServer.userID
       );
 
-      if (!player || !playerFromServer.vehicle) {
+      if (!player || !playerFromServer.sphere) {
         return;
       }
 
       const {
-        vehicle: {
-          body: { position, quaternion },
-          wheels,
-        },
+        sphere: { position },
       } = playerFromServer;
 
-      player.vehicle?.body.position.set(position.x, position.y, position.z);
-      player.vehicle?.body.rotationQuaternion.set(
-        quaternion.x,
-        quaternion.y,
-        quaternion.z,
-        quaternion.w
-      );
+      player.vehicle.body.position.set(position._x, position._y, position._z);
 
-      wheels.forEach((wheel: { position: Position }, idx: number) => {
-        player.vehicle?.wheels[idx].position.set(
-          wheel.position.x,
-          wheel.position.y,
-          wheel.position.z
-        );
-        player.vehicle?.wheels[idx].rotationQuaternion.set(
-          quaternion.x,
-          quaternion.y,
-          quaternion.z,
-          quaternion.w
-        );
-      });
+      // const {
+      //   vehicle: {
+      //     body: { position, quaternion },
+      //     wheels,
+      //   },
+      // } = playerFromServer;
+
+      // player.vehicle?.body.position.set(position.x, position.y, position.z);
+      // player.vehicle?.body.rotationQuaternion.set(
+      //   quaternion.x,
+      //   quaternion.y,
+      //   quaternion.z,
+      //   quaternion.w
+      // );
+
+      // wheels.forEach((wheel: { position: Position }, idx: number) => {
+      //   player.vehicle?.wheels[idx].position.set(
+      //     wheel.position.x,
+      //     wheel.position.y,
+      //     wheel.position.z
+      //   );
+      //   player.vehicle?.wheels[idx].rotationQuaternion.set(
+      //     quaternion.x,
+      //     quaternion.y,
+      //     quaternion.z,
+      //     quaternion.w
+      //   );
+      // });
     });
 
     FPSEl.textContent = `${engine.getFps().toFixed()} fps`;

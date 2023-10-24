@@ -16,7 +16,7 @@ import {
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
 import type { Actions, GameServer } from "@neu5/types/src";
-import type { Engine } from "@babylonjs/core";
+import type { Engine, GroundMesh } from "@babylonjs/core";
 import type { Room } from "../room";
 import type { InMemorySessionStore } from "../sessionStore";
 
@@ -101,29 +101,7 @@ async function getInitializedHavok() {
   }
 }
 
-const createScene = async function (engine: Engine) {
-  // This creates a basic Babylon Scene object (non-mesh)
-  const scene = new Scene(engine);
-
-  // This creates and positions a free camera (non-mesh)
-  const camera = new ArcRotateCamera(
-    "camera1",
-    -Math.PI / 2,
-    0.8,
-    200,
-    new Vector3(0, 0, 0)
-  );
-
-  // Our built-in 'sphere' shape.
-  const sphere = MeshBuilder.CreateSphere(
-    "sphere",
-    { diameter: 2, segments: 32 },
-    scene
-  );
-
-  // Move the sphere upward at 4 units
-  sphere.position.y = 20;
-
+const createGround = (scene: Scene) => {
   // Our built-in 'ground' shape.
   const ground = MeshBuilder.CreateGround(
     "ground",
@@ -131,13 +109,18 @@ const createScene = async function (engine: Engine) {
     scene
   );
 
-  // initialize plugin
-  const havokInstance = await getInitializedHavok();
+  return ground;
+};
 
-  // pass the engine to the plugin
-  const hk = new HavokPlugin(true, havokInstance);
-  // // enable physics in the scene with a gravity
-  scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
+const createSphere = (ground: GroundMesh, scene: Scene) => {
+  // Our built-in 'sphere' shape.
+  const sphere = MeshBuilder.CreateSphere(
+    "sphere",
+    { diameter: 2, segments: 32 },
+    scene
+  );
+
+  sphere.position.y = 20;
 
   // // Create a sphere shape and the associated body. Size will be determined automatically.
   // // eslint-disable-next-line
@@ -156,6 +139,30 @@ const createScene = async function (engine: Engine) {
     { mass: 0 },
     scene
   );
+
+  return sphere;
+};
+
+const createScene = async function (engine: Engine) {
+  // This creates a basic Babylon Scene object (non-mesh)
+  const scene = new Scene(engine);
+
+  // This creates and positions a free camera (non-mesh)
+  const camera = new ArcRotateCamera(
+    "camera1",
+    -Math.PI / 2,
+    0.8,
+    200,
+    new Vector3(0, 0, 0)
+  );
+
+  // initialize plugin
+  const havokInstance = await getInitializedHavok();
+
+  // pass the engine to the plugin
+  const hk = new HavokPlugin(true, havokInstance);
+  // // enable physics in the scene with a gravity
+  scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
 
   // createHeightmap({
   //   scene,
@@ -179,6 +186,8 @@ const startRace = async ({
 
   const engine = new NullEngine();
   const scene = await createScene(engine);
+
+  const ground = createGround(scene);
 
   const camera = new ArcRotateCamera( // eslint-disable-line
     "camera",
@@ -221,7 +230,6 @@ const startRace = async ({
       return {
         accelerateTimeMS: 0,
         actions: { ...actions },
-        vehicle: {},
         turnTimeMS: 0,
         vehicleSteering: 0,
         playerNumber: playerNumber?.idx,
@@ -231,6 +239,8 @@ const startRace = async ({
     });
 
   playersMap.forEach((player) => {
+    player.sphere = createSphere(ground, scene);
+
     // const vehicle = addRigidVehicle({
     //   position: {
     //     x: player?.startingPos?.x || 0,
