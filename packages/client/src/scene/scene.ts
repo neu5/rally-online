@@ -6,7 +6,7 @@ import {
   Vector3,
 } from "@babylonjs/core";
 
-import { addBox, addColors, addPlane, addRigidVehicle } from "../utils";
+import { addBox, addColors, addPlane, addVehicle } from "../utils";
 
 import type { Engine } from "@babylonjs/core";
 import type { GameConfig, GameObject } from "@neu5/types/src";
@@ -130,11 +130,16 @@ const startRace = async ({
 
   if (playersMap.length) {
     playersMap.forEach((player: any) => {
-      player.vehicle = addRigidVehicle({
+      player.vehicle = addVehicle({
         colorName: player.color,
         scene,
         shadowGenerator,
       });
+      // player.vehicle = addRigidVehicle({
+      //   colorName: player.color,
+      //   scene,
+      //   shadowGenerator,
+      // });
     });
   }
 
