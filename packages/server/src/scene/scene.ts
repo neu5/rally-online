@@ -15,7 +15,7 @@ import {
   Vector3,
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
-import type { Actions, GameServer } from "@neu5/types/src";
+import type { Actions, GameServer, Position } from "@neu5/types/src";
 import type { Engine, GroundMesh } from "@babylonjs/core";
 import type { Room } from "../room";
 import type { InMemorySessionStore } from "../sessionStore";
@@ -112,7 +112,15 @@ const createGround = (scene: Scene) => {
   return ground;
 };
 
-const createSphere = (ground: GroundMesh, scene: Scene) => {
+const createSphere = ({
+  ground,
+  scene,
+  startingPos,
+}: {
+  ground: GroundMesh;
+  scene: Scene;
+  startingPos: Position;
+}) => {
   // Our built-in 'sphere' shape.
   const sphere = MeshBuilder.CreateSphere(
     "sphere",
@@ -120,7 +128,7 @@ const createSphere = (ground: GroundMesh, scene: Scene) => {
     scene
   );
 
-  sphere.position.y = 20;
+  sphere.position.set(startingPos.x, startingPos.y, startingPos.z);
 
   // // Create a sphere shape and the associated body. Size will be determined automatically.
   // // eslint-disable-next-line
@@ -224,7 +232,7 @@ const startRace = async ({
         return;
       }
 
-      const vehiclesTemplate = vehicles[playerNumber.idx];
+      const vehicleTemplate = vehicles[playerNumber.idx];
       playerNumber.isFree = false;
 
       return {
@@ -234,12 +242,17 @@ const startRace = async ({
         vehicleSteering: 0,
         playerNumber: playerNumber?.idx,
         ...player,
-        ...vehiclesTemplate,
+        ...vehicleTemplate,
       };
     });
 
   playersMap.forEach((player) => {
-    player.sphere = createSphere(ground, scene);
+    console.log(player);
+    player.sphere = createSphere({
+      ground,
+      scene,
+      startingPos: player.startingPos,
+    });
 
     // const vehicle = addRigidVehicle({
     //   position: {
