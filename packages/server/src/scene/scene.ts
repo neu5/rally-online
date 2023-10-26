@@ -1,4 +1,4 @@
-// import { addRigidVehicle, getMapWalls } from "../utils";
+import { createGround, createSphere } from "../utils";
 import { fileURLToPath } from "url";
 import {
   ArcRotateCamera,
@@ -31,6 +31,8 @@ const wasm = path.join(
   "../../../../../",
   "node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm"
 );
+
+const mapPath = path.join(rootDir, "../../../", "src/assets/heightmap.png");
 
 const FRAME_IN_MS = 1000 / 30; // 30 FPS
 let loop = setInterval(() => {}, FRAME_IN_MS);
@@ -73,85 +75,86 @@ const playerNumbers: PlayerNumbers = [
 const vehicles = [
   {
     color: "BlueMaterial",
-    startingPos: { x: 0, y: 5, z: 0 },
+    startingPos: { x: 0, y: 10, z: 0 },
   },
   {
     color: "RedMaterial",
-    startingPos: { x: 10, y: 5, z: 0 },
+    startingPos: { x: 10, y: 10, z: 0 },
   },
   {
     color: "GreenMaterial",
-    startingPos: { x: -10, y: 5, z: 0 },
+    startingPos: { x: -10, y: 10, z: 0 },
   },
   {
     color: "YellowMaterial",
-    startingPos: { x: 15, y: 5, z: 0 },
+    startingPos: { x: 15, y: 10, z: 0 },
   },
 ];
 
 const groundSize = 100;
 let groundPhysicsMaterial = { friction: 0.2, restitution: 0.3 };
 
-async function getInitializedHavok() {
+const createHeightmap = ({
+  scene,
+  mapInBase64,
+  material,
+}: {
+  scene: Scene;
+  mapInBase64: string;
+  material: Material;
+}) => {
+  const ground = MeshBuilder.CreateGroundFromHeightMap(
+    "ground",
+    mapInBase64,
+    {
+      width: groundSize,
+      height: groundSize,
+      subdivisions: 100,
+      maxHeight: 10,
+      onReady: (mesh) => {
+        // meshesToDispose.push(mesh);
+        mesh.material = new StandardMaterial("heightmapMaterial");
+        // matsToDispose.push(mesh.material);
+        // mesh.material.emissiveColor = Color3.Green();
+        // mesh.material.wireframe = true;
+
+        const groundShape = new PhysicsShapeMesh(ground, scene);
+        // shapesToDispose.push(groundShape);
+
+        const body = new PhysicsBody(
+          ground,
+          PhysicsMotionType.STATIC,
+          false,
+          scene
+        );
+        // bodiesToDispose.push(body);
+        groundShape.material = material;
+        body.shape = groundShape;
+        body.setMassProperties({
+          mass: 0,
+        });
+      },
+    },
+    scene
+  );
+};
+
+const getInitializedHavok = async () => {
   try {
-    let binary = fs.readFileSync(wasm);
+    const binary = fs.readFileSync(wasm);
     return HavokPhysics({ wasmBinary: binary });
   } catch (e) {
     return e;
   }
-}
-
-const createGround = (scene: Scene) => {
-  // Our built-in 'ground' shape.
-  const ground = MeshBuilder.CreateGround(
-    "ground",
-    { width: groundSize, height: groundSize },
-    scene
-  );
-
-  return ground;
 };
 
-const createSphere = ({
-  ground,
-  scene,
-  startingPos,
-}: {
-  ground: GroundMesh;
-  scene: Scene;
-  startingPos: Position;
-}) => {
-  // Our built-in 'sphere' shape.
-  const sphere = MeshBuilder.CreateSphere(
-    "sphere",
-    { diameter: 2, segments: 32 },
-    scene
-  );
+const getMap = () => {
+  const map = fs.readFileSync(mapPath);
 
-  sphere.position.set(startingPos.x, startingPos.y, startingPos.z);
-
-  // // Create a sphere shape and the associated body. Size will be determined automatically.
-  // // eslint-disable-next-line
-  const sphereAggregate = new PhysicsAggregate(
-    sphere,
-    PhysicsShapeType.SPHERE,
-    { mass: 1, restitution: 0.75 },
-    scene
-  );
-
-  // // Create a static box shape.
-  // // eslint-disable-next-line
-  const groundAggregate = new PhysicsAggregate(
-    ground,
-    PhysicsShapeType.BOX,
-    { mass: 0 },
-    scene
-  );
-
-  return sphere;
+  return "data:image/png;base64,".concat(Buffer.from(map).toString("base64"));
 };
 
-const createScene = async function (engine: Engine) {
+const createScene = async (engine: Engine) => {
   // This creates a basic Babylon Scene object (non-mesh)
   const scene = new Scene(engine);
 
@@ -169,13 +172,8 @@ const createScene = async function (engine: Engine) {
 
   // pass the engine to the plugin
   const hk = new HavokPlugin(true, havokInstance);
-  // // enable physics in the scene with a gravity
+  // enable physics in the scene with a gravity
   scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
-
-  // createHeightmap({
-  //   scene,
-  //   material: groundPhysicsMaterial,
-  // });
 
   return scene;
 };
@@ -247,36 +245,20 @@ const startRace = async ({
     });
 
   playersMap.forEach((player) => {
-    console.log(player);
     player.sphere = createSphere({
       ground,
       scene,
       startingPos: player.startingPos,
     });
-
-    // const vehicle = addRigidVehicle({
-    //   position: {
-    //     x: player?.startingPos?.x || 0,
-    //     y: player?.startingPos?.y || 0,
-    //     z: player?.startingPos?.z || 0,
-    //   },
-    //   world: physicsWorld,
-    // });
-    // player.vehicle = {
-    //   physicalVehicle: vehicle,
-    //   wheels: vehicle.wheelBodies.map((wheel) => ({
-    //     position: wheel.position,
-    //     quaternion: wheel.quaternion,
-    //   })),
-    //   body: {
-    //     position: vehicle.chassisBody.position,
-    //     quaternion: vehicle.chassisBody.quaternion,
-    //   },
-    // };
   });
 
-  //   const maxSteerVal = Math.PI / 8;
-  //   const maxForce = 50;
+  const mapInBase64 = await getMap();
+
+  createHeightmap({
+    scene,
+    mapInBase64,
+    material: groundPhysicsMaterial,
+  });
 
   // Start the simulation loop
   loop = setInterval(() => {
@@ -286,27 +268,6 @@ const startRace = async ({
       if (!vehicle) {
         return;
       }
-
-      //   if (playersActions.accelerate) {
-      //     vehicle.physicalVehicle.setWheelForce(maxForce, 2);
-      //     vehicle.physicalVehicle.setWheelForce(maxForce, 3);
-      //   } else if (playersActions.brake) {
-      //     vehicle.physicalVehicle.setWheelForce(-maxForce / 2, 2);
-      //     vehicle.physicalVehicle.setWheelForce(-maxForce / 2, 3);
-      //   } else {
-      //     vehicle.physicalVehicle.setWheelForce(0, 2);
-      //     vehicle.physicalVehicle.setWheelForce(0, 3);
-      //   }
-      //   if (playersActions.left) {
-      //     vehicle.physicalVehicle.setSteeringValue(maxSteerVal, 0);
-      //     vehicle.physicalVehicle.setSteeringValue(maxSteerVal, 1);
-      //   } else if (playersActions.right) {
-      //     vehicle.physicalVehicle.setSteeringValue(-maxSteerVal, 0);
-      //     vehicle.physicalVehicle.setSteeringValue(-maxSteerVal, 1);
-      //   } else {
-      //     vehicle.physicalVehicle.setSteeringValue(0, 0);
-      //     vehicle.physicalVehicle.setSteeringValue(0, 1);
-      //   }
     });
   }, FRAME_IN_MS);
 
