@@ -112,14 +112,11 @@ const createHeightmap = ({
       subdivisions: 100,
       maxHeight: 10,
       onReady: (mesh) => {
-        // meshesToDispose.push(mesh);
         mesh.material = new StandardMaterial("heightmapMaterial");
-        // matsToDispose.push(mesh.material);
         // mesh.material.emissiveColor = Color3.Green();
         // mesh.material.wireframe = true;
 
         const groundShape = new PhysicsShapeMesh(ground, scene);
-        // shapesToDispose.push(groundShape);
 
         const body = new PhysicsBody(
           ground,
@@ -127,7 +124,7 @@ const createHeightmap = ({
           false,
           scene
         );
-        // bodiesToDispose.push(body);
+
         groundShape.material = material;
         body.shape = groundShape;
         body.setMassProperties({
