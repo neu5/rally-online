@@ -75,7 +75,7 @@ const playerNumbers: PlayerNumbers = [
 const vehicles = [
   {
     color: "BlueMaterial",
-    startingPos: { x: 0, y: 10, z: 0 },
+    startingPos: { x: 0, y: 20, z: 0 },
   },
   {
     color: "RedMaterial",

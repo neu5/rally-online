@@ -1,4 +1,14 @@
 import {
+  ArcRotateCamera,
+  // Color3,
+  HavokPlugin,
+  MeshBuilder,
+  PhysicsAggregate,
+  PhysicsBody,
+  PhysicsMotionType,
+  PhysicsShapeMesh,
+  PhysicsShapeType,
+  StandardMaterial,
   CascadedShadowGenerator,
   DirectionalLight,
   HemisphericLight,
@@ -37,6 +47,29 @@ let actions = {
 // const playersIndicatorsEl = document.getElementById(
 //   "players-indicators"
 // ) as HTMLElement;
+
+const groundSize = 100;
+let groundPhysicsMaterial = { friction: 0.2, restitution: 0.3 };
+
+const createHeightmap = ({
+  scene,
+  material,
+}: {
+  scene: Scene;
+  material: StandardMaterial;
+}) => {
+  var ground = MeshBuilder.CreateGroundFromHeightMap(
+    "ground",
+    "assets/heightmap.png",
+    {
+      width: groundSize,
+      height: groundSize,
+      subdivisions: 100,
+      maxHeight: 10,
+    },
+    scene
+  );
+};
 
 const createScene = async (engine: Engine) => {
   const scene: Scene = new Scene(engine);
@@ -120,6 +153,8 @@ const startRace = async ({
   };
 
   const { scene, shadowGenerator } = await createScene(engine);
+
+  createHeightmap({ scene, material: groundPhysicsMaterial });
 
   gameObjects.forEach((gameObject) => {
     addBox({ ...gameObject, shadowGenerator });
