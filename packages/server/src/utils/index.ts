@@ -2,10 +2,9 @@ import {
   MeshBuilder,
   PhysicsAggregate,
   PhysicsShapeType,
-  Scene,
 } from "@babylonjs/core";
 
-import type { GroundMesh } from "@babylonjs/core";
+import type { GroundMesh, Scene } from "@babylonjs/core";
 import type { Position } from "@neu5/types/src";
 // import type { GameConfig, Position } from "@neu5/types/src";
 
@@ -41,6 +40,7 @@ const createSphere = ({
   sphere.position.set(startingPos.x, startingPos.y, startingPos.z);
 
   // Create a sphere shape and the associated body. Size will be determined automatically.
+  // eslint-disable-next-line
   const sphereAggregate = new PhysicsAggregate(
     sphere,
     PhysicsShapeType.SPHERE,
@@ -49,6 +49,7 @@ const createSphere = ({
   );
 
   // Create a static box shape.
+  // eslint-disable-next-line
   const groundAggregate = new PhysicsAggregate(
     ground,
     PhysicsShapeType.BOX,

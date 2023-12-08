@@ -5,18 +5,18 @@ import {
   HavokPlugin,
   MeshBuilder,
   NullEngine,
-  PhysicsAggregate,
+  // PhysicsAggregate,
   PhysicsBody,
   PhysicsMotionType,
   PhysicsShapeMesh,
-  PhysicsShapeType,
+  // PhysicsShapeType,
   Scene,
   StandardMaterial,
   Vector3,
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
-import type { Actions, GameServer, Position } from "@neu5/types/src";
-import type { Engine, GroundMesh } from "@babylonjs/core";
+import type { Actions, GameServer } from "@neu5/types/src";
+import type { Engine } from "@babylonjs/core";
 import type { Room } from "../room";
 import type { InMemorySessionStore } from "../sessionStore";
 
@@ -101,6 +101,7 @@ const createHeightmap = ({
 }: {
   scene: Scene;
   mapInBase64: string;
+  // @ts-ignore
   material: Material;
 }) => {
   const ground = MeshBuilder.CreateGroundFromHeightMap(
@@ -113,8 +114,6 @@ const createHeightmap = ({
       maxHeight: 10,
       onReady: (mesh) => {
         mesh.material = new StandardMaterial("heightmapMaterial");
-        // mesh.material.emissiveColor = Color3.Green();
-        // mesh.material.wireframe = true;
 
         const groundShape = new PhysicsShapeMesh(ground, scene);
 
@@ -139,7 +138,7 @@ const createHeightmap = ({
 const getInitializedHavok = async () => {
   try {
     const binary = fs.readFileSync(wasm);
-    return HavokPhysics({ wasmBinary: binary });
+    return await HavokPhysics({ wasmBinary: binary });
   } catch (e) {
     return e;
   }
@@ -156,6 +155,7 @@ const createScene = async (engine: Engine) => {
   const scene = new Scene(engine);
 
   // This creates and positions a free camera (non-mesh)
+  // eslint-disable-next-line
   const camera = new ArcRotateCamera(
     "camera1",
     -Math.PI / 2,
@@ -261,7 +261,7 @@ const startRace = async ({
   loop = setInterval(() => {
     // physicsWorld.fixedStep();
 
-    playersMap.forEach(({ actions: playersActions, vehicle }) => {
+    playersMap.forEach(({ vehicle }) => {
       if (!vehicle) {
         return;
       }
