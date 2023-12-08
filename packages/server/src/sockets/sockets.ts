@@ -11,6 +11,49 @@ import type { InMemorySessionStore } from "../sessionStore";
 import { Room } from "../room";
 import { startRace } from "../scene/scene";
 
+// function createHeightmap({
+//   scene,
+//   material,
+// }: {
+//   scene: Scene;
+//   material: StandardMaterial;
+// }) {
+//   const ground = MeshBuilder.CreateGroundFromHeightMap(
+//     "ground",
+//     "assets/heightmap.png",
+//     {
+//       width: groundSize,
+//       height: groundSize,
+//       subdivisions: 100,
+//       maxHeight: 10,
+//       onReady: (mesh) => {
+//         // meshesToDispose.push(mesh);
+//         mesh.material = new StandardMaterial("heightmapMaterial");
+//         // matsToDispose.push(mesh.material);
+//         // mesh.material.emissiveColor = Color3.Green();
+//         // mesh.material.wireframe = true;
+
+//         const groundShape = new PhysicsShapeMesh(ground, scene);
+//         // shapesToDispose.push(groundShape);
+
+//         const body = new PhysicsBody(
+//           ground,
+//           PhysicsMotionType.STATIC,
+//           false,
+//           scene
+//         );
+//         // bodiesToDispose.push(body);
+//         groundShape.material = material;
+//         body.shape = groundShape;
+//         body.setMassProperties({
+//           mass: 0,
+//         });
+//       },
+//     },
+//     scene
+//   );
+// }
+
 const ACCELERATE = "accelerate";
 const BRAKE = "brake";
 const LEFT = "left";
@@ -23,10 +66,17 @@ let playersMap: PlayersList | null = null;
 const roomRace = new Room();
 
 const playersMapToArray = (list: PlayersList) =>
-  list.map(({ color, username, userID, vehicle }) => ({
+  list.map(({ color, username, userID, sphere, vehicle }) => ({
     color,
     username,
     userID,
+    ...(sphere
+      ? {
+          sphere: {
+            position: sphere.position,
+          },
+        }
+      : undefined),
     ...(vehicle
       ? {
           vehicle: {

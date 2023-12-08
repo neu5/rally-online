@@ -28,6 +28,7 @@ type PlayersList = Array<
     vehicleSteering: number;
     playerNumber: number;
     color: string;
+    sphere: any;
     startingPos: Position;
   }
 >;

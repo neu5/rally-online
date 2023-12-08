@@ -149,6 +149,25 @@ const addSphere = ({
   return sphere;
 };
 
+const addVehicle = ({
+  colorName,
+  scene,
+  shadowGenerator,
+}: {
+  colorName: string;
+  scene: Scene;
+  shadowGenerator: ShadowGenerator;
+}) => {
+  const car = addSphere({
+    diameter: 2,
+    shadowGenerator,
+  });
+
+  car.material = scene.getMaterialByName(colorName);
+
+  return car;
+};
+
 const addRigidVehicle = ({
   colorName,
   scene,
@@ -244,6 +263,7 @@ export {
   addPlane,
   addSphere,
   addRigidVehicle,
+  addVehicle,
   debounce,
   log,
   toggleStartRaceBtns,
