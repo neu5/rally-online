@@ -14,7 +14,7 @@ import type {
   GameObject,
   PlayerFromServer,
   PlayersFromServer,
-  Position,
+  // Position,
 } from "@neu5/types/src";
 import type { Quaternion } from "@babylonjs/core";
 

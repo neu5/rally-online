@@ -139,7 +139,7 @@ const createHeightmap = ({
 const getInitializedHavok = async () => {
   try {
     const binary = fs.readFileSync(wasm);
-    return HavokPhysics({ wasmBinary: binary });
+    return await HavokPhysics({ wasmBinary: binary });
   } catch (e) {
     return e;
   }
@@ -156,6 +156,7 @@ const createScene = async (engine: Engine) => {
   const scene = new Scene(engine);
 
   // This creates and positions a free camera (non-mesh)
+  // eslint-disable-next-line
   const camera = new ArcRotateCamera(
     "camera1",
     -Math.PI / 2,
@@ -261,7 +262,7 @@ const startRace = async ({
   loop = setInterval(() => {
     // physicsWorld.fixedStep();
 
-    playersMap.forEach(({ actions: playersActions, vehicle }) => {
+    playersMap.forEach(({ vehicle }) => {
       if (!vehicle) {
         return;
       }

@@ -41,6 +41,7 @@ const createSphere = ({
   sphere.position.set(startingPos.x, startingPos.y, startingPos.z);
 
   // Create a sphere shape and the associated body. Size will be determined automatically.
+  // eslint-disable-next-line
   const sphereAggregate = new PhysicsAggregate(
     sphere,
     PhysicsShapeType.SPHERE,
@@ -49,6 +50,7 @@ const createSphere = ({
   );
 
   // Create a static box shape.
+  // eslint-disable-next-line
   const groundAggregate = new PhysicsAggregate(
     ground,
     PhysicsShapeType.BOX,
