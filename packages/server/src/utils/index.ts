@@ -2,8 +2,9 @@ import {
   MeshBuilder,
   PhysicsAggregate,
   PhysicsShapeType,
-  Scene,
 } from "@babylonjs/core";
+
+import type { Scene } from "@babylonjs/core";
 
 import type { GroundMesh } from "@babylonjs/core";
 import type { Position } from "@neu5/types/src";

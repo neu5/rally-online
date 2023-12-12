@@ -130,6 +130,7 @@ const startEngineLoop = ({
         sphere: { position },
       } = playerFromServer;
 
+      // @ts-ignore
       player.vehicle.position.set(position._x, position._y, position._z);
 
       // const {

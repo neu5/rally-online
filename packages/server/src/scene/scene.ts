@@ -5,18 +5,16 @@ import {
   HavokPlugin,
   MeshBuilder,
   NullEngine,
-  PhysicsAggregate,
   PhysicsBody,
   PhysicsMotionType,
   PhysicsShapeMesh,
-  PhysicsShapeType,
   Scene,
   StandardMaterial,
   Vector3,
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
-import type { Actions, GameServer, Position } from "@neu5/types/src";
-import type { Engine, GroundMesh } from "@babylonjs/core";
+import type { Actions, GameServer } from "@neu5/types/src";
+import type { Engine } from "@babylonjs/core";
 import type { Room } from "../room";
 import type { InMemorySessionStore } from "../sessionStore";
 
@@ -101,7 +99,7 @@ const createHeightmap = ({
 }: {
   scene: Scene;
   mapInBase64: string;
-  material: Material;
+  material: StandardMaterial;
 }) => {
   const ground = MeshBuilder.CreateGroundFromHeightMap(
     "ground",
@@ -125,6 +123,7 @@ const createHeightmap = ({
           scene
         );
 
+        // @ts-ignore
         groundShape.material = material;
         body.shape = groundShape;
         body.setMassProperties({
@@ -255,6 +254,7 @@ const startRace = async ({
   createHeightmap({
     scene,
     mapInBase64,
+    // @ts-ignore
     material: groundPhysicsMaterial,
   });
 

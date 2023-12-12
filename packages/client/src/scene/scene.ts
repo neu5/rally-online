@@ -1,17 +1,8 @@
 import {
-  ArcRotateCamera,
-  // Color3,
-  HavokPlugin,
-  MeshBuilder,
-  PhysicsAggregate,
-  PhysicsBody,
-  PhysicsMotionType,
-  PhysicsShapeMesh,
-  PhysicsShapeType,
-  StandardMaterial,
   CascadedShadowGenerator,
   DirectionalLight,
   HemisphericLight,
+  MeshBuilder,
   Scene,
   Vector3,
 } from "@babylonjs/core";
@@ -51,14 +42,9 @@ let actions = {
 const groundSize = 100;
 let groundPhysicsMaterial = { friction: 0.2, restitution: 0.3 };
 
-const createHeightmap = ({
-  scene,
-  material,
-}: {
-  scene: Scene;
-  material: StandardMaterial;
-}) => {
-  var ground = MeshBuilder.CreateGroundFromHeightMap(
+const createHeightmap = ({ scene }: { scene: Scene }) => {
+  // eslint-disable-next-line
+  const ground = MeshBuilder.CreateGroundFromHeightMap(
     "ground",
     "assets/heightmap.png",
     {
@@ -154,7 +140,7 @@ const startRace = async ({
 
   const { scene, shadowGenerator } = await createScene(engine);
 
-  createHeightmap({ scene, material: groundPhysicsMaterial });
+  createHeightmap({ scene });
 
   gameObjects.forEach((gameObject) => {
     addBox({ ...gameObject, shadowGenerator });
