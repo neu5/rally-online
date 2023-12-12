@@ -40,7 +40,6 @@ let actions = {
 // ) as HTMLElement;
 
 const groundSize = 100;
-let groundPhysicsMaterial = { friction: 0.2, restitution: 0.3 };
 
 const createHeightmap = ({ scene }: { scene: Scene }) => {
   // eslint-disable-next-line
