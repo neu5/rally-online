@@ -126,11 +126,12 @@ const startEngineLoop = ({
         return;
       }
 
-      // const {
-      //   sphere: { position },
-      // } = playerFromServer;
+      const {
+        sphere: { position },
+      } = playerFromServer;
 
-      // player.vehicle.position.set(position._x, position._y, position._z);
+      // @ts-ignore
+      player.vehicle.position.set(position._x, position._y, position._z);
 
       // const {
       //   vehicle: {

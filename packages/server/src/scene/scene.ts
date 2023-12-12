@@ -5,11 +5,9 @@ import {
   HavokPlugin,
   MeshBuilder,
   NullEngine,
-  // PhysicsAggregate,
   PhysicsBody,
   PhysicsMotionType,
   PhysicsShapeMesh,
-  // PhysicsShapeType,
   Scene,
   StandardMaterial,
   Vector3,
@@ -75,7 +73,7 @@ const playerNumbers: PlayerNumbers = [
 const vehicles = [
   {
     color: "BlueMaterial",
-    startingPos: { x: 0, y: 10, z: 0 },
+    startingPos: { x: 0, y: 20, z: 0 },
   },
   {
     color: "RedMaterial",
@@ -101,8 +99,7 @@ const createHeightmap = ({
 }: {
   scene: Scene;
   mapInBase64: string;
-  // @ts-ignore
-  material: Material;
+  material: StandardMaterial;
 }) => {
   const ground = MeshBuilder.CreateGroundFromHeightMap(
     "ground",
@@ -114,6 +111,8 @@ const createHeightmap = ({
       maxHeight: 10,
       onReady: (mesh) => {
         mesh.material = new StandardMaterial("heightmapMaterial");
+        // mesh.material.emissiveColor = Color3.Green();
+        // mesh.material.wireframe = true;
 
         const groundShape = new PhysicsShapeMesh(ground, scene);
 
@@ -124,6 +123,7 @@ const createHeightmap = ({
           scene
         );
 
+        // @ts-ignore
         groundShape.material = material;
         body.shape = groundShape;
         body.setMassProperties({
@@ -254,6 +254,7 @@ const startRace = async ({
   createHeightmap({
     scene,
     mapInBase64,
+    // @ts-ignore
     material: groundPhysicsMaterial,
   });
 
