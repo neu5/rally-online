@@ -30,8 +30,6 @@ const wasm = path.join(
   "node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm"
 );
 
-const mapPath = path.join(rootDir, "../../../", "src/assets/heightmap.png");
-
 const FRAME_IN_MS = 1000 / 30; // 30 FPS
 let loop = setInterval(() => {}, FRAME_IN_MS);
 
@@ -144,12 +142,6 @@ const getInitializedHavok = async () => {
   }
 };
 
-const getMap = () => {
-  const map = fs.readFileSync(mapPath);
-
-  return "data:image/png;base64,".concat(Buffer.from(map).toString("base64"));
-};
-
 const createScene = async (engine: Engine) => {
   // This creates a basic Babylon Scene object (non-mesh)
   const scene = new Scene(engine);
@@ -247,15 +239,6 @@ const startRace = async ({
       scene,
       startingPos: player.startingPos,
     });
-  });
-
-  const mapInBase64 = await getMap();
-
-  createHeightmap({
-    scene,
-    mapInBase64,
-    // @ts-ignore
-    material: groundPhysicsMaterial,
   });
 
   // Start the simulation loop
