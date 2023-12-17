@@ -3,13 +3,8 @@ import { fileURLToPath } from "url";
 import {
   ArcRotateCamera,
   HavokPlugin,
-  MeshBuilder,
   NullEngine,
-  PhysicsBody,
-  PhysicsMotionType,
-  PhysicsShapeMesh,
   Scene,
-  StandardMaterial,
   Vector3,
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
@@ -86,52 +81,6 @@ const vehicles = [
     startingPos: { x: 15, y: 10, z: 0 },
   },
 ];
-
-const groundSize = 100;
-let groundPhysicsMaterial = { friction: 0.2, restitution: 0.3 };
-
-const createHeightmap = ({
-  scene,
-  mapInBase64,
-  material,
-}: {
-  scene: Scene;
-  mapInBase64: string;
-  material: StandardMaterial;
-}) => {
-  const ground = MeshBuilder.CreateGroundFromHeightMap(
-    "ground",
-    mapInBase64,
-    {
-      width: groundSize,
-      height: groundSize,
-      subdivisions: 100,
-      maxHeight: 10,
-      onReady: (mesh) => {
-        mesh.material = new StandardMaterial("heightmapMaterial");
-        // mesh.material.emissiveColor = Color3.Green();
-        // mesh.material.wireframe = true;
-
-        const groundShape = new PhysicsShapeMesh(ground, scene);
-
-        const body = new PhysicsBody(
-          ground,
-          PhysicsMotionType.STATIC,
-          false,
-          scene
-        );
-
-        // @ts-ignore
-        groundShape.material = material;
-        body.shape = groundShape;
-        body.setMassProperties({
-          mass: 0,
-        });
-      },
-    },
-    scene
-  );
-};
 
 const getInitializedHavok = async () => {
   try {

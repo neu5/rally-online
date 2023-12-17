@@ -2,7 +2,6 @@ import {
   CascadedShadowGenerator,
   DirectionalLight,
   HemisphericLight,
-  MeshBuilder,
   Scene,
   Vector3,
 } from "@babylonjs/core";
