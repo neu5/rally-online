@@ -2,7 +2,6 @@ import {
   CascadedShadowGenerator,
   DirectionalLight,
   HemisphericLight,
-  MeshBuilder,
   Scene,
   Vector3,
 } from "@babylonjs/core";
@@ -38,23 +37,6 @@ let actions = {
 // const playersIndicatorsEl = document.getElementById(
 //   "players-indicators"
 // ) as HTMLElement;
-
-const groundSize = 100;
-
-const createHeightmap = ({ scene }: { scene: Scene }) => {
-  // eslint-disable-next-line
-  const ground = MeshBuilder.CreateGroundFromHeightMap(
-    "ground",
-    "assets/heightmap.png",
-    {
-      width: groundSize,
-      height: groundSize,
-      subdivisions: 100,
-      maxHeight: 10,
-    },
-    scene
-  );
-};
 
 const createScene = async (engine: Engine) => {
   const scene: Scene = new Scene(engine);
@@ -138,8 +120,6 @@ const startRace = async ({
   };
 
   const { scene, shadowGenerator } = await createScene(engine);
-
-  createHeightmap({ scene });
 
   gameObjects.forEach((gameObject) => {
     addBox({ ...gameObject, shadowGenerator });

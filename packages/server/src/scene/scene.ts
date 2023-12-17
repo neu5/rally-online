@@ -3,13 +3,8 @@ import { fileURLToPath } from "url";
 import {
   ArcRotateCamera,
   HavokPlugin,
-  MeshBuilder,
   NullEngine,
-  PhysicsBody,
-  PhysicsMotionType,
-  PhysicsShapeMesh,
   Scene,
-  StandardMaterial,
   Vector3,
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
@@ -29,8 +24,6 @@ const wasm = path.join(
   "../../../../../",
   "node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm"
 );
-
-const mapPath = path.join(rootDir, "../../../", "src/assets/heightmap.png");
 
 const FRAME_IN_MS = 1000 / 30; // 30 FPS
 let loop = setInterval(() => {}, FRAME_IN_MS);
@@ -89,52 +82,6 @@ const vehicles = [
   },
 ];
 
-const groundSize = 100;
-let groundPhysicsMaterial = { friction: 0.2, restitution: 0.3 };
-
-const createHeightmap = ({
-  scene,
-  mapInBase64,
-  material,
-}: {
-  scene: Scene;
-  mapInBase64: string;
-  material: StandardMaterial;
-}) => {
-  const ground = MeshBuilder.CreateGroundFromHeightMap(
-    "ground",
-    mapInBase64,
-    {
-      width: groundSize,
-      height: groundSize,
-      subdivisions: 100,
-      maxHeight: 10,
-      onReady: (mesh) => {
-        mesh.material = new StandardMaterial("heightmapMaterial");
-        // mesh.material.emissiveColor = Color3.Green();
-        // mesh.material.wireframe = true;
-
-        const groundShape = new PhysicsShapeMesh(ground, scene);
-
-        const body = new PhysicsBody(
-          ground,
-          PhysicsMotionType.STATIC,
-          false,
-          scene
-        );
-
-        // @ts-ignore
-        groundShape.material = material;
-        body.shape = groundShape;
-        body.setMassProperties({
-          mass: 0,
-        });
-      },
-    },
-    scene
-  );
-};
-
 const getInitializedHavok = async () => {
   try {
     const binary = fs.readFileSync(wasm);
@@ -142,12 +89,6 @@ const getInitializedHavok = async () => {
   } catch (e) {
     return e;
   }
-};
-
-const getMap = () => {
-  const map = fs.readFileSync(mapPath);
-
-  return "data:image/png;base64,".concat(Buffer.from(map).toString("base64"));
 };
 
 const createScene = async (engine: Engine) => {
@@ -247,15 +188,6 @@ const startRace = async ({
       scene,
       startingPos: player.startingPos,
     });
-  });
-
-  const mapInBase64 = await getMap();
-
-  createHeightmap({
-    scene,
-    mapInBase64,
-    // @ts-ignore
-    material: groundPhysicsMaterial,
   });
 
   // Start the simulation loop
