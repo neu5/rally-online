@@ -158,12 +158,12 @@ const addVehicle = ({
   scene: Scene;
   shadowGenerator: ShadowGenerator;
 }) => {
-  const car = addSphere({
-    diameter: 2,
-    shadowGenerator,
-  });
+  // const car = addSphere({
+  //   diameter: 2,
+  //   shadowGenerator,
+  // });
 
-  car.material = scene.getMaterialByName(colorName);
+  // car.material = scene.getMaterialByName(colorName);
 
   return car;
 };
