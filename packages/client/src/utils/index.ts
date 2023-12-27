@@ -1,6 +1,9 @@
 import {
   Color3,
   MeshBuilder,
+  PhysicsBody,
+  PhysicsMotionType,
+  PhysicsShapeConvexHull,
   Quaternion,
   StandardMaterial,
   Vector3,
@@ -165,7 +168,79 @@ const addVehicle = ({
 
   // car.material = scene.getMaterialByName(colorName);
 
-  return car;
+  const chassisMesh = MeshBuilder.CreateBox("Chassis", {
+    width: 1,
+    height: 0.4,
+    depth: 2,
+  });
+  chassisMesh.position.y = 5;
+  chassisMesh.position.x = 0;
+  chassisMesh.rotationQuaternion = new Quaternion();
+
+  const chassisPhysicsShape = new PhysicsShapeConvexHull(chassisMesh, scene);
+
+  const chassisPhysicsBody = new PhysicsBody(
+    chassisMesh,
+    PhysicsMotionType.DYNAMIC,
+    false,
+    scene
+  );
+  chassisPhysicsBody.shape = chassisPhysicsShape;
+  chassisPhysicsBody.setMassProperties({
+    centerOfMass: new Vector3(0, -0.5, 0),
+  });
+  chassisPhysicsShape.filterMembershipMask = 2;
+
+  const wheelMesh = MeshBuilder.CreateCylinder("WheelMesh", {
+    height: 0.3,
+    diameter: 0.4,
+  });
+  const wheelMeshes = [
+    wheelMesh,
+    wheelMesh.createInstance(1),
+    wheelMesh.createInstance(2),
+    wheelMesh.createInstance(3),
+  ];
+  wheelMeshes.forEach((mesh) => {
+    mesh.rotationQuaternion = new Quaternion();
+  });
+
+  const vehicle = new RaycastVehicle(chassisPhysicsBody, scene);
+  vehicle.numberOfFramesToPredict = 20; //Number of frames to predict future upwards orientation if airborne
+  vehicle.predictionRatio = 1; //[0-1]How quickly to correct angular velocity towards future orientation. 0 = disabled
+
+  const wheelConfig = {
+    positionLocal: new Vector3(0.49, 0, -0.7), //Local connection point on the chassis
+    suspensionRestLength: 0.6, //Rest length when suspension is fully decompressed
+    suspensionForce: 15000, //Max force to apply to the suspension/spring
+    suspensionDamping: 0.15, //[0-1] Damper force in percentage of suspensionForce
+    suspensionAxisLocal: new Vector3(0, -1, 0), //Direction of the spring
+    axleAxisLocal: new Vector3(1, 0, 0), //Axis the wheel spins around
+    forwardAxisLocal: new Vector3(0, 0, 1), //Forward direction of the wheel
+    sideForcePositionRatio: 0.1, //[0-1]0 = wheel position, 1 = connection point
+    sideForce: 40, //Force applied to counter wheel drifting
+    radius: 0.2,
+    rotationMultiplier: 0.1, //How fast to spin the wheel
+  };
+
+  vehicle.addWheel(new RaycastWheel(wheelConfig)); //Right rear
+
+  vehicle.addWheel(new RaycastWheel(wheelConfig)); //Right rear
+
+  wheelConfig.positionLocal.set(-0.49, 0, -0.7); //Left rear
+  vehicle.addWheel(new RaycastWheel(wheelConfig));
+
+  wheelConfig.positionLocal.set(-0.49, 0, 0.8);
+  vehicle.addWheel(new RaycastWheel(wheelConfig)); //Left front
+
+  wheelConfig.positionLocal.set(0.49, 0, 0.8);
+  vehicle.addWheel(new RaycastWheel(wheelConfig)); //Right front
+
+  //Attempt at some anti rolling
+  vehicle.addAntiRollAxle({ wheelA: 0, wheelB: 1, force: 10000 }); // right rear - left rear
+  vehicle.addAntiRollAxle({ wheelA: 2, wheelB: 3, force: 10000 }); // left front - right rear
+
+  return vehicle;
 };
 
 const addRigidVehicle = ({
