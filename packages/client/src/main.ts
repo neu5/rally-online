@@ -118,28 +118,23 @@ const startEngineLoop = ({
     }
 
     dataFromServer.forEach((playerFromServer: PlayerFromServer) => {
-      const player = playersMap.find(
-        (currentPlayer) => currentPlayer.userID === playerFromServer.userID
-      );
-
-      if (!player || !playerFromServer.sphere) {
-        return;
-      }
-
-      const {
-        sphere: { position },
-      } = playerFromServer;
-
+      // const player = playersMap.find(
+      //   (currentPlayer) => currentPlayer.userID === playerFromServer.userID
+      // );
+      // if (!player || !playerFromServer.sphere) {
+      //   return;
+      // }
+      // const {
+      //   sphere: { position },
+      // } = playerFromServer;
       // @ts-ignore
-      player.vehicle.position.set(position._x, position._y, position._z);
-
+      // player.vehicle.position.set(position._x, position._y, position._z);
       // const {
       //   vehicle: {
       //     body: { position, quaternion },
       //     wheels,
       //   },
       // } = playerFromServer;
-
       // player.vehicle?.body.position.set(position.x, position.y, position.z);
       // player.vehicle?.body.rotationQuaternion.set(
       //   quaternion.x,
@@ -147,7 +142,6 @@ const startEngineLoop = ({
       //   quaternion.z,
       //   quaternion.w
       // );
-
       // wheels.forEach((wheel: { position: Position }, idx: number) => {
       //   player.vehicle?.wheels[idx].position.set(
       //     wheel.position.x,

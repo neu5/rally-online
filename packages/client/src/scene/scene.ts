@@ -130,11 +130,11 @@ const startRace = async ({
 
   if (playersMap.length) {
     playersMap.forEach((player: any) => {
-      player.vehicle = addVehicle({
-        colorName: player.color,
-        scene,
-        shadowGenerator,
-      });
+      // player.vehicle = addVehicle({
+      //   colorName: player.color,
+      //   scene,
+      //   shadowGenerator,
+      // });
       // player.vehicle = addRigidVehicle({
       //   colorName: player.color,
       //   scene,
