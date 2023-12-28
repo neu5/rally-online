@@ -85,7 +85,7 @@ ui.MobileControls.updateControls({ dialog, game, mobileControlsEls });
 
 const startEngineLoop = ({
   engine,
-  playersMap,
+  // playersMap,
   scene,
 }: {
   engine: Engine;
@@ -117,51 +117,45 @@ const startEngineLoop = ({
       return;
     }
 
-    dataFromServer.forEach((playerFromServer: PlayerFromServer) => {
-      const player = playersMap.find(
-        (currentPlayer) => currentPlayer.userID === playerFromServer.userID
-      );
-
-      if (!player || !playerFromServer.sphere) {
-        return;
-      }
-
-      const {
-        sphere: { position },
-      } = playerFromServer;
-
-      // @ts-ignore
-      player.vehicle.position.set(position._x, position._y, position._z);
-
-      // const {
-      //   vehicle: {
-      //     body: { position, quaternion },
-      //     wheels,
-      //   },
-      // } = playerFromServer;
-
-      // player.vehicle?.body.position.set(position.x, position.y, position.z);
-      // player.vehicle?.body.rotationQuaternion.set(
-      //   quaternion.x,
-      //   quaternion.y,
-      //   quaternion.z,
-      //   quaternion.w
-      // );
-
-      // wheels.forEach((wheel: { position: Position }, idx: number) => {
-      //   player.vehicle?.wheels[idx].position.set(
-      //     wheel.position.x,
-      //     wheel.position.y,
-      //     wheel.position.z
-      //   );
-      //   player.vehicle?.wheels[idx].rotationQuaternion.set(
-      //     quaternion.x,
-      //     quaternion.y,
-      //     quaternion.z,
-      //     quaternion.w
-      //   );
-      // });
-    });
+    // dataFromServer.forEach((playerFromServer: PlayerFromServer) => {
+    // const player = playersMap.find(
+    //   (currentPlayer) => currentPlayer.userID === playerFromServer.userID
+    // );
+    // if (!player || !playerFromServer.sphere) {
+    //   return;
+    // }
+    // const {
+    //   sphere: { position },
+    // } = playerFromServer;
+    // @ts-ignore
+    // player.vehicle.position.set(position._x, position._y, position._z);
+    // const {
+    //   vehicle: {
+    //     body: { position, quaternion },
+    //     wheels,
+    //   },
+    // } = playerFromServer;
+    // player.vehicle?.body.position.set(position.x, position.y, position.z);
+    // player.vehicle?.body.rotationQuaternion.set(
+    //   quaternion.x,
+    //   quaternion.y,
+    //   quaternion.z,
+    //   quaternion.w
+    // );
+    // wheels.forEach((wheel: { position: Position }, idx: number) => {
+    //   player.vehicle?.wheels[idx].position.set(
+    //     wheel.position.x,
+    //     wheel.position.y,
+    //     wheel.position.z
+    //   );
+    //   player.vehicle?.wheels[idx].rotationQuaternion.set(
+    //     quaternion.x,
+    //     quaternion.y,
+    //     quaternion.z,
+    //     quaternion.w
+    //   );
+    // });
+    // });
 
     FPSEl.textContent = `${engine.getFps().toFixed()} fps`;
   });
