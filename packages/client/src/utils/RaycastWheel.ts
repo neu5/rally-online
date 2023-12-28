@@ -1,3 +1,5 @@
+import { Quaternion, TransformNode, Vector3 } from "@babylonjs/core";
+
 class RaycastWheel {
   constructor(options) {
     this.positionLocal = options.positionLocal.clone();
@@ -28,3 +30,5 @@ class RaycastWheel {
     this.transform.rotationQuaternion = new Quaternion();
   }
 }
+
+export { RaycastWheel };

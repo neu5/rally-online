@@ -11,7 +11,7 @@ import {
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
 
-import { addBox, addColors } from "../utils";
+import { addBox, addColors, addVehicle } from "../utils";
 
 import type { Engine } from "@babylonjs/core";
 import type { GameConfig, GameObject } from "@neu5/types/src";
@@ -172,6 +172,7 @@ const startRace = async ({
     scene
   );
 
+  sphere.position.x = 20;
   sphere.position.y = 20;
   shadowGenerator.addShadowCaster(sphere, true);
 
@@ -184,18 +185,18 @@ const startRace = async ({
   );
 
   if (playersMap.length) {
-    // playersMap.forEach((player: any) => {
-    // player.vehicle = addVehicle({
-    //   colorName: player.color,
-    //   scene,
-    //   shadowGenerator,
-    // });
-    // player.vehicle = addRigidVehicle({
-    //   colorName: player.color,
-    //   scene,
-    //   shadowGenerator,
-    // });
-    // });
+    playersMap.forEach((player: any) => {
+      player.vehicle = addVehicle({
+        colorName: player.color,
+        scene,
+        shadowGenerator,
+      });
+      // player.vehicle = addRigidVehicle({
+      //   colorName: player.color,
+      //   scene,
+      //   shadowGenerator,
+      // });
+    });
   }
 
   setInterval(() => {

@@ -278,3 +278,5 @@ class RaycastVehicle {
     });
   }
 }
+
+export { RaycastVehicle };

@@ -12,6 +12,9 @@ import {
 import type { Scene, ShadowGenerator } from "@babylonjs/core";
 import type { GameQuaternion, Position } from "@neu5/types/src";
 
+import { RaycastVehicle } from "./RaycastVehicle";
+import { RaycastWheel } from "./RaycastWheel";
+
 const COLOR_NAMES = {
   BLACK: "BlackMaterial",
   BLUE: "BlueMaterial",
