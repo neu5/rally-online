@@ -1,12 +1,17 @@
 import {
   CascadedShadowGenerator,
   DirectionalLight,
+  HavokPlugin,
   HemisphericLight,
+  MeshBuilder,
+  PhysicsAggregate,
+  PhysicsShapeType,
   Scene,
   Vector3,
 } from "@babylonjs/core";
+import HavokPhysics from "@babylonjs/havok";
 
-import { addBox, addColors, addPlane, addVehicle } from "../utils";
+import { addBox, addColors } from "../utils";
 
 import type { Engine } from "@babylonjs/core";
 import type { GameConfig, GameObject } from "@neu5/types/src";
@@ -38,6 +43,17 @@ let actions = {
 //   "players-indicators"
 // ) as HTMLElement;
 
+const groundSize = 100;
+// let groundPhysicsMaterial = { friction: 0.2, restitution: 0.3 };
+
+async function getInitializedHavok() {
+  try {
+    return await HavokPhysics();
+  } catch (e) {
+    return e;
+  }
+}
+
 const createScene = async (engine: Engine) => {
   const scene: Scene = new Scene(engine);
 
@@ -47,6 +63,12 @@ const createScene = async (engine: Engine) => {
   light.intensity = 0.4;
 
   const shadowGenerator = new CascadedShadowGenerator(1024, light);
+
+  const havokInstance = await getInitializedHavok();
+
+  const hk = new HavokPlugin(true, havokInstance);
+
+  scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
 
   return { scene, shadowGenerator };
 };
@@ -101,7 +123,7 @@ const keyup = (event: KeyboardEvent) => {
 
 const startRace = async ({
   engine,
-  gameConfig,
+  // gameConfig,
   gameObjects,
   playersMap,
   sendAction,
@@ -126,21 +148,54 @@ const startRace = async ({
   });
 
   addColors(scene);
-  addPlane({ scene, width: gameConfig.width, height: gameConfig.height });
+  // addPlane({ scene, width: gameConfig.width, height: gameConfig.height });
+
+  const ground = MeshBuilder.CreateGround(
+    "ground",
+    { width: groundSize, height: groundSize },
+    scene
+  );
+  ground.receiveShadows = true;
+
+  // eslint-disable-next-line
+  const groundAggregate = new PhysicsAggregate(
+    ground,
+    PhysicsShapeType.BOX,
+    { mass: 0 },
+    scene
+  );
+
+  // const sphere = addSphere({ diameter: 2, shadowGenerator });
+  const sphere = MeshBuilder.CreateSphere(
+    "sphere",
+    { diameter: 4, segments: 32 },
+    scene
+  );
+
+  sphere.position.y = 20;
+  shadowGenerator.addShadowCaster(sphere, true);
+
+  // eslint-disable-next-line
+  const sphereAggregate = new PhysicsAggregate(
+    sphere,
+    PhysicsShapeType.SPHERE,
+    { mass: 1, restitution: 0.75 },
+    scene
+  );
 
   if (playersMap.length) {
-    playersMap.forEach((player: any) => {
-      // player.vehicle = addVehicle({
-      //   colorName: player.color,
-      //   scene,
-      //   shadowGenerator,
-      // });
-      // player.vehicle = addRigidVehicle({
-      //   colorName: player.color,
-      //   scene,
-      //   shadowGenerator,
-      // });
-    });
+    // playersMap.forEach((player: any) => {
+    // player.vehicle = addVehicle({
+    //   colorName: player.color,
+    //   scene,
+    //   shadowGenerator,
+    // });
+    // player.vehicle = addRigidVehicle({
+    //   colorName: player.color,
+    //   scene,
+    //   shadowGenerator,
+    // });
+    // });
   }
 
   setInterval(() => {
