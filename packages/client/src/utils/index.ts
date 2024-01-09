@@ -1,10 +1,12 @@
 import {
+  Axis,
   Color3,
   MeshBuilder,
   PhysicsBody,
   PhysicsMotionType,
   PhysicsShapeConvexHull,
   Quaternion,
+  Space,
   StandardMaterial,
   Vector3,
 } from "@babylonjs/core";
@@ -242,6 +244,48 @@ const addVehicle = ({
   //Attempt at some anti rolling
   vehicle.addAntiRollAxle({ wheelA: 0, wheelB: 1, force: 10000 }); // right rear - left rear
   vehicle.addAntiRollAxle({ wheelA: 2, wheelB: 3, force: 10000 }); // left front - right rear
+
+  const maxVehicleForce = 2200;
+  const maxSteerValue = 0.6;
+  const steeringIncrement = 0.005;
+  const steerRecover = 0.05;
+  let forwardForce = 0;
+  let steerValue = 0;
+  let steerDirection = 0;
+
+  scene.onBeforeRenderObservable.add(() => {
+    forwardForce = 0;
+    steerDirection = 0;
+
+    steerValue += steerDirection * steeringIncrement;
+    steerValue = Math.min(Math.max(steerValue, -maxSteerValue), maxSteerValue);
+    steerValue *= 1 - (1 - Math.abs(steerDirection)) * steerRecover;
+    vehicle.wheels[2].steering = steerValue;
+    vehicle.wheels[3].steering = steerValue;
+
+    vehicle.wheels[2].force = forwardForce * maxVehicleForce;
+    vehicle.wheels[3].force = forwardForce * maxVehicleForce;
+
+    vehicle.update();
+
+    vehicle.wheels.forEach((wheel, index) => {
+      if (!wheelMeshes[index]) return;
+      const wheelMesh = wheelMeshes[index];
+      wheelMesh.position.copyFrom(wheel.transform.position);
+      wheelMesh.rotationQuaternion.copyFrom(wheel.transform.rotationQuaternion);
+      wheelMesh.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
+    });
+
+    if (vehicle.nWheelsOnGround <= 2) {
+      chassisPhysicsBody.setMassProperties({
+        centerOfMass: new Vector3(0, 0, 0),
+      });
+    } else {
+      chassisPhysicsBody.setMassProperties({
+        centerOfMass: new Vector3(0, -0.5, 0),
+      });
+    }
+  });
 
   return vehicle;
 };

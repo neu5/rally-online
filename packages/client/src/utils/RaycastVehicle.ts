@@ -1,3 +1,34 @@
+import {
+  Axis,
+  PhysicsRaycastResult,
+  Quaternion,
+  Vector3,
+} from "@babylonjs/core";
+
+const getBodyVelocityAtPoint = (body, point) => {
+  const r = point.subtract(body.transformNode.position);
+  const angularVelocity = body.getAngularVelocity();
+  Vector3.Cross(angularVelocity, r);
+  const res = Vector3.Cross(angularVelocity, r);
+  const velocity = body.getLinearVelocity();
+  res.addInPlace(velocity);
+  return res;
+};
+
+const clampNumber = (num, a, b) =>
+  Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
+
+const tmp1 = new Vector3();
+const tmp2 = new Vector3();
+const tmpq1 = new Quaternion();
+const upAxisLocal = new Vector3(0, 1, 0);
+const rightAxisLocal = new Vector3(1, 0, 0);
+const forwardAxisLocal = Vector3.Cross(upAxisLocal, rightAxisLocal);
+forwardAxisLocal.normalize();
+rightAxisLocal.normalize();
+
+const raycastResult = new PhysicsRaycastResult();
+
 class RaycastVehicle {
   constructor(body, scene) {
     this.body = body;
