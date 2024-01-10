@@ -267,7 +267,7 @@ class RaycastVehicle {
     this.nWheelsOnGround = 0;
     this.updateVehicleSpeed();
 
-    this.wheels.forEach((wheel, index) => {
+    this.wheels.forEach((wheel) => {
       this.updateWheelTransform(wheel);
       this.updateWheelSteering(wheel);
       this.updateWheelRaycast(wheel);

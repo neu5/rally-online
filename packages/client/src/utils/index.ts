@@ -158,10 +158,10 @@ const addSphere = ({
 };
 
 const addVehicle = ({
-  colorName,
+  // colorName,
   scene,
-  shadowGenerator,
-}: {
+}: // shadowGenerator,
+{
   colorName: string;
   scene: Scene;
   shadowGenerator: ShadowGenerator;
@@ -270,7 +270,7 @@ const addVehicle = ({
 
     vehicle.wheels.forEach((wheel, index) => {
       if (!wheelMeshes[index]) return;
-      const wheelMesh = wheelMeshes[index];
+      wheelMesh = wheelMeshes[index];
       wheelMesh.position.copyFrom(wheel.transform.position);
       wheelMesh.rotationQuaternion.copyFrom(wheel.transform.rotationQuaternion);
       wheelMesh.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
