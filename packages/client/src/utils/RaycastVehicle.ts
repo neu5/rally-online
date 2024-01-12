@@ -5,6 +5,8 @@ import {
   Vector3,
 } from "@babylonjs/core";
 
+import type { PhysicsBody, Scene } from "@babylonjs/core";
+
 const getBodyVelocityAtPoint = (body, point) => {
   const r = point.subtract(body.transformNode.position);
   const angularVelocity = body.getAngularVelocity();
@@ -15,7 +17,7 @@ const getBodyVelocityAtPoint = (body, point) => {
   return res;
 };
 
-const clampNumber = (num, a, b) =>
+const clampNumber = (num: number, a: number, b: number) =>
   Math.max(Math.min(num, Math.max(a, b)), Math.min(a, b));
 
 const tmp1 = new Vector3();
@@ -30,7 +32,13 @@ rightAxisLocal.normalize();
 const raycastResult = new PhysicsRaycastResult();
 
 class RaycastVehicle {
-  constructor(body, scene) {
+  body: PhysicsBody;
+  numberOfFramesToPredict: number;
+  predictionRatio: number;
+  scene: Scene;
+  wheels: Array<{ force: number; steering: number }>;
+
+  constructor(body: PhysicsBody, scene: Scene) {
     this.body = body;
     this.scene = scene;
     this.physicsEngine = body._physicsEngine;

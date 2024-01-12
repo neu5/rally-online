@@ -196,15 +196,15 @@ const addVehicle = ({
   });
   chassisPhysicsShape.filterMembershipMask = 2;
 
-  const wheelMesh = MeshBuilder.CreateCylinder("WheelMesh", {
+  let wheelMesh = MeshBuilder.CreateCylinder("WheelMesh", {
     height: 0.3,
     diameter: 0.4,
   });
   const wheelMeshes = [
     wheelMesh,
-    wheelMesh.createInstance(1),
-    wheelMesh.createInstance(2),
-    wheelMesh.createInstance(3),
+    wheelMesh.createInstance("1"),
+    wheelMesh.createInstance("2"),
+    wheelMesh.createInstance("3"),
   ];
   wheelMeshes.forEach((mesh) => {
     mesh.rotationQuaternion = new Quaternion();
