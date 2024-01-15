@@ -11,7 +11,12 @@ import {
   Vector3,
 } from "@babylonjs/core";
 
-import type { Scene, ShadowGenerator } from "@babylonjs/core";
+import type {
+  InstancedMesh,
+  Mesh,
+  Scene,
+  ShadowGenerator,
+} from "@babylonjs/core";
 import type { GameQuaternion, Position } from "@neu5/types/src";
 
 import { RaycastVehicle } from "./RaycastVehicle";
@@ -199,7 +204,7 @@ const addVehicle = ({
   let wheelMesh = MeshBuilder.CreateCylinder("WheelMesh", {
     height: 0.3,
     diameter: 0.4,
-  });
+  }) as Mesh | InstancedMesh;
   const wheelMeshes = [
     wheelMesh,
     wheelMesh.createInstance("1"),
@@ -268,11 +273,19 @@ const addVehicle = ({
 
     vehicle.update();
 
+    console.log(vehicle.wheels[0].transform.position);
+
     vehicle.wheels.forEach((wheel, index) => {
       if (!wheelMeshes[index]) return;
       wheelMesh = wheelMeshes[index];
       wheelMesh.position.copyFrom(wheel.transform.position);
-      wheelMesh.rotationQuaternion.copyFrom(wheel.transform.rotationQuaternion);
+
+      if (wheelMesh.rotationQuaternion) {
+        wheelMesh.rotationQuaternion.copyFrom(
+          wheel.transform.rotationQuaternion
+        );
+      }
+
       wheelMesh.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
     });
 

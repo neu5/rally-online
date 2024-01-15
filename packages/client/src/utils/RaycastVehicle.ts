@@ -33,10 +33,15 @@ const raycastResult = new PhysicsRaycastResult();
 
 class RaycastVehicle {
   body: PhysicsBody;
+  nWheelsOnGround: number;
   numberOfFramesToPredict: number;
   predictionRatio: number;
   scene: Scene;
-  wheels: Array<{ force: number; steering: number }>;
+  wheels: Array<{
+    force: number;
+    steering: number;
+    transform: { position: Vector3; rotationQuaternion: Quaternion };
+  }>;
 
   constructor(body: PhysicsBody, scene: Scene) {
     this.body = body;
