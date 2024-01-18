@@ -5,9 +5,10 @@ import {
   Vector3,
 } from "@babylonjs/core";
 
-import type { PhysicsBody, Scene } from "@babylonjs/core";
+import type { RaycastWheel } from "./RaycastWheel";
+import type { PhysicsBody, PhysicsEngine, Scene } from "@babylonjs/core";
 
-const getBodyVelocityAtPoint = (body, point) => {
+const getBodyVelocityAtPoint = (body: PhysicsBody, point: Vector3) => {
   const r = point.subtract(body.transformNode.position);
   const angularVelocity = body.getAngularVelocity();
   Vector3.Cross(angularVelocity, r);
@@ -37,15 +38,15 @@ class RaycastVehicle {
   numberOfFramesToPredict: number;
   predictionRatio: number;
   scene: Scene;
-  wheels: Array<{
-    force: number;
-    steering: number;
-    transform: { position: Vector3; rotationQuaternion: Quaternion };
-  }>;
+  wheels: Array<RaycastWheel>;
+  physicsEngine: PhysicsEngine;
+  speed: number;
+  antiRollAxles: Array<any>;
 
   constructor(body: PhysicsBody, scene: Scene) {
     this.body = body;
     this.scene = scene;
+    // @ts-ignore
     this.physicsEngine = body._physicsEngine;
     this.wheels = [];
     this.numberOfFramesToPredict = 60;
@@ -55,25 +56,25 @@ class RaycastVehicle {
     this.antiRollAxles = [];
   }
 
-  addWheel(wheel) {
+  addWheel(wheel: RaycastWheel) {
     this.wheels.push(wheel);
   }
 
-  removeWheel(wheel, index) {
+  removeWheel(wheel: RaycastWheel, index: number) {
     if (index) this.wheels.splice(index, 1);
     this.wheels.splice(this.wheels.indexOf(wheel), 1);
   }
 
-  addAntiRollAxle(axle) {
+  addAntiRollAxle(axle: { wheelA: number; wheelB: number; force: number }) {
     this.antiRollAxles.push(axle);
   }
 
-  removeAntiRollAxle(axle, index) {
+  removeAntiRollAxle(axle: Vector3, index: number) {
     if (index) this.antiRollAxles.splice(index, 1);
     this.antiRollAxles.splice(this.antiRollAxles.indexOf(axle), 1);
   }
 
-  updateWheelTransform(wheel) {
+  updateWheelTransform(wheel: RaycastWheel) {
     Vector3.TransformCoordinatesToRef(
       wheel.positionLocal,
       this.body.transformNode.getWorldMatrix(),
@@ -95,21 +96,26 @@ class RaycastVehicle {
     this.speed = tmp1.z;
   }
 
-  updateWheelSteering(wheel) {
+  updateWheelSteering(wheel: RaycastWheel) {
     Quaternion.RotationAxisToRef(
       wheel.suspensionAxisLocal.negateToRef(tmp1),
       wheel.steering,
       tmpq1
     );
-    this.body.transformNode.rotationQuaternion.multiplyToRef(
-      tmpq1,
+    if (
+      this.body.transformNode.rotationQuaternion &&
       wheel.transform.rotationQuaternion
-    );
-    wheel.transform.rotationQuaternion.normalize();
+    ) {
+      this.body.transformNode.rotationQuaternion.multiplyToRef(
+        tmpq1,
+        wheel.transform.rotationQuaternion
+      );
+      wheel.transform.rotationQuaternion.normalize();
+    }
     wheel.transform.computeWorldMatrix(true);
   }
 
-  updateWheelRaycast(wheel) {
+  updateWheelRaycast(wheel: RaycastWheel) {
     tmp1
       .copyFrom(wheel.suspensionAxisWorld)
       .scaleInPlace(wheel.suspensionRestLength)
@@ -128,7 +134,7 @@ class RaycastVehicle {
     this.nWheelsOnGround++;
   }
 
-  updateWheelSuspension(wheel) {
+  updateWheelSuspension(wheel: RaycastWheel) {
     if (!wheel.inContact) {
       wheel.prevSuspensionLength = wheel.suspensionLength;
       wheel.hitDistance = wheel.suspensionRestLength;
@@ -148,9 +154,15 @@ class RaycastVehicle {
     const compressionForce = wheel.suspensionForce * compressionRatio;
     force += compressionForce;
 
-    const rate =
-      (wheel.prevSuspensionLength - wheel.suspensionLength) /
-      this.scene.getPhysicsEngine().getTimeStep();
+    const physicsEngine = this.scene.getPhysicsEngine();
+    let rate = 0;
+
+    if (physicsEngine !== null) {
+      rate =
+        (wheel.prevSuspensionLength - wheel.suspensionLength) /
+        physicsEngine.getTimeStep();
+    }
+
     wheel.prevSuspensionLength = wheel.suspensionLength;
 
     const dampingForce = rate * wheel.suspensionForce * wheel.suspensionDamping;
@@ -165,7 +177,7 @@ class RaycastVehicle {
     this.body.applyForce(suspensionForce, wheel.hitPoint);
   }
 
-  updateWheelSideForce(wheel) {
+  updateWheelSideForce(wheel: RaycastWheel) {
     if (!wheel.inContact) return;
     const tireWorldVel = getBodyVelocityAtPoint(this.body, wheel.positionWorld);
     const steeringDir = Vector3.TransformNormalToRef(
@@ -175,8 +187,12 @@ class RaycastVehicle {
     );
     const steeringVel = Vector3.Dot(steeringDir, tireWorldVel);
     const desiredVelChange = -steeringVel;
-    const desiredAccel =
-      desiredVelChange / this.scene.getPhysicsEngine().getTimeStep();
+    const physicsEngine = this.scene.getPhysicsEngine();
+    let desiredAccel = 0;
+
+    if (physicsEngine) {
+      desiredAccel = desiredVelChange / physicsEngine.getTimeStep();
+    }
     this.body.applyForce(
       steeringDir.scaleInPlace(wheel.sideForce * desiredAccel),
       Vector3.LerpToRef(
@@ -188,7 +204,7 @@ class RaycastVehicle {
     );
   }
 
-  updateWheelForce(wheel) {
+  updateWheelForce(wheel: RaycastWheel) {
     if (!wheel.inContact) return;
     if (wheel.force !== 0) {
       const forwardDirectionWorld = Vector3.TransformNormalToRef(
@@ -203,17 +219,20 @@ class RaycastVehicle {
     }
   }
 
-  updateWheelRotation(wheel) {
+  updateWheelRotation(wheel: RaycastWheel) {
     wheel.rotation += this.speed * wheel.rotationMultiplier * wheel.radius;
     Quaternion.RotationAxisToRef(wheel.axleAxisLocal, wheel.rotation, tmpq1);
-    wheel.transform.rotationQuaternion.multiplyToRef(
-      tmpq1,
-      wheel.transform.rotationQuaternion
-    );
-    wheel.transform.rotationQuaternion.normalize();
+
+    if (wheel.transform.rotationQuaternion) {
+      wheel.transform.rotationQuaternion.multiplyToRef(
+        tmpq1,
+        wheel.transform.rotationQuaternion
+      );
+      wheel.transform.rotationQuaternion.normalize();
+    }
   }
 
-  updateWheelTransformPosition(wheel) {
+  updateWheelTransformPosition(wheel: RaycastWheel) {
     wheel.transform.position.copyFrom(wheel.positionWorld);
     wheel.transform.position.addInPlace(
       wheel.suspensionAxisWorld.scale(wheel.hitDistance - wheel.radius)
@@ -226,7 +245,12 @@ class RaycastVehicle {
     const gravity = tmp1
       .copyFrom(this.physicsEngine.gravity)
       .scaleInPlace(this.body.getGravityFactor());
-    const frameTime = this.scene.getPhysicsEngine().getTimeStep();
+
+    const physicsEngine = this.scene.getPhysicsEngine();
+    let frameTime = 0;
+    if (physicsEngine) {
+      frameTime = physicsEngine.getTimeStep();
+    }
     const predictTime = this.numberOfFramesToPredict * frameTime;
 
     const predictedPosition = tmp2;

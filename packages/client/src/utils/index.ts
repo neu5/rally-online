@@ -273,14 +273,12 @@ const addVehicle = ({
 
     vehicle.update();
 
-    console.log(vehicle.wheels[0].transform.position);
-
     vehicle.wheels.forEach((wheel, index) => {
       if (!wheelMeshes[index]) return;
       wheelMesh = wheelMeshes[index];
       wheelMesh.position.copyFrom(wheel.transform.position);
 
-      if (wheelMesh.rotationQuaternion) {
+      if (wheelMesh.rotationQuaternion && wheel.transform.rotationQuaternion) {
         wheelMesh.rotationQuaternion.copyFrom(
           wheel.transform.rotationQuaternion
         );
