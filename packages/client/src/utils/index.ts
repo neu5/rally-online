@@ -3,6 +3,7 @@ import {
   Color3,
   MeshBuilder,
   PhysicsBody,
+  PhysicsEngine,
   PhysicsMotionType,
   PhysicsShapeConvexHull,
   Quaternion,
@@ -11,7 +12,12 @@ import {
   Vector3,
 } from "@babylonjs/core";
 
-import type { Scene, ShadowGenerator } from "@babylonjs/core";
+import type {
+  InstancedMesh,
+  Mesh,
+  Scene,
+  ShadowGenerator,
+} from "@babylonjs/core";
 import type { GameQuaternion, Position } from "@neu5/types/src";
 
 import { RaycastVehicle } from "./RaycastVehicle";
@@ -196,21 +202,31 @@ const addVehicle = ({
   });
   chassisPhysicsShape.filterMembershipMask = 2;
 
-  const wheelMesh = MeshBuilder.CreateCylinder("WheelMesh", {
+  let wheelMesh = MeshBuilder.CreateCylinder("WheelMesh", {
     height: 0.3,
     diameter: 0.4,
-  });
+  }) as Mesh | InstancedMesh;
   const wheelMeshes = [
     wheelMesh,
-    wheelMesh.createInstance(1),
-    wheelMesh.createInstance(2),
-    wheelMesh.createInstance(3),
+    wheelMesh.createInstance("1"),
+    wheelMesh.createInstance("2"),
+    wheelMesh.createInstance("3"),
   ];
   wheelMeshes.forEach((mesh) => {
     mesh.rotationQuaternion = new Quaternion();
   });
 
-  const vehicle = new RaycastVehicle(chassisPhysicsBody, scene);
+  const physicsEngine = scene.getPhysicsEngine();
+  let vehicle: RaycastVehicle | null = null;
+
+  if (physicsEngine instanceof PhysicsEngine) {
+    vehicle = new RaycastVehicle(chassisPhysicsBody, physicsEngine, scene);
+  }
+
+  if (vehicle === null) {
+    return;
+  }
+
   vehicle.numberOfFramesToPredict = 20; //Number of frames to predict future upwards orientation if airborne
   vehicle.predictionRatio = 1; //[0-1]How quickly to correct angular velocity towards future orientation. 0 = disabled
 
@@ -260,6 +276,11 @@ const addVehicle = ({
     steerValue += steerDirection * steeringIncrement;
     steerValue = Math.min(Math.max(steerValue, -maxSteerValue), maxSteerValue);
     steerValue *= 1 - (1 - Math.abs(steerDirection)) * steerRecover;
+
+    if (vehicle === null) {
+      return;
+    }
+
     vehicle.wheels[2].steering = steerValue;
     vehicle.wheels[3].steering = steerValue;
 
@@ -272,7 +293,13 @@ const addVehicle = ({
       if (!wheelMeshes[index]) return;
       wheelMesh = wheelMeshes[index];
       wheelMesh.position.copyFrom(wheel.transform.position);
-      wheelMesh.rotationQuaternion.copyFrom(wheel.transform.rotationQuaternion);
+
+      if (wheelMesh.rotationQuaternion && wheel.transform.rotationQuaternion) {
+        wheelMesh.rotationQuaternion.copyFrom(
+          wheel.transform.rotationQuaternion
+        );
+      }
+
       wheelMesh.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
     });
 

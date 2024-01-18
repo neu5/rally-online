@@ -1,7 +1,44 @@
 import { Quaternion, TransformNode, Vector3 } from "@babylonjs/core";
 
 class RaycastWheel {
-  constructor(options) {
+  positionLocal: Vector3;
+  positionWorld: Vector3;
+  suspensionAxisLocal: Vector3;
+  suspensionAxisWorld: Vector3;
+  axleAxisLocal: Vector3;
+  forwardAxisLocal: Vector3;
+  sideForce: number;
+  sideForcePositionRatio: number;
+  radius: number;
+  suspensionRestLength: number;
+  prevSuspensionLength: number;
+  suspensionLength: number;
+  suspensionForce: number;
+  suspensionDamping: number;
+  rotationMultiplier: number;
+  hitDistance: number;
+  hitNormal: Vector3;
+  hitPoint: Vector3;
+  inContact: boolean;
+  steering: number;
+  rotation: number;
+  force: number;
+  transform: TransformNode;
+
+  constructor(options: {
+    positionLocal: Vector3;
+    positionWorld?: Vector3;
+    suspensionAxisLocal: Vector3;
+    axleAxisLocal: Vector3;
+    forwardAxisLocal: Vector3;
+    sideForce?: number;
+    sideForcePositionRatio: number;
+    radius?: number;
+    suspensionRestLength?: number;
+    suspensionForce?: number;
+    suspensionDamping?: number;
+    rotationMultiplier?: number;
+  }) {
     this.positionLocal = options.positionLocal.clone();
     this.positionWorld = options.positionLocal.clone();
     this.suspensionAxisLocal = options.suspensionAxisLocal.clone();
