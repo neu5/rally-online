@@ -43,11 +43,10 @@ class RaycastVehicle {
   speed: number;
   antiRollAxles: Array<any>;
 
-  constructor(body: PhysicsBody, scene: Scene) {
+  constructor(body: PhysicsBody, physicsEngine: PhysicsEngine, scene: Scene) {
     this.body = body;
     this.scene = scene;
-    // @ts-ignore
-    this.physicsEngine = body._physicsEngine;
+    this.physicsEngine = physicsEngine;
     this.wheels = [];
     this.numberOfFramesToPredict = 60;
     this.predictionRatio = 0.6;

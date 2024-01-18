@@ -3,6 +3,7 @@ import {
   Color3,
   MeshBuilder,
   PhysicsBody,
+  PhysicsEngine,
   PhysicsMotionType,
   PhysicsShapeConvexHull,
   Quaternion,
@@ -215,7 +216,17 @@ const addVehicle = ({
     mesh.rotationQuaternion = new Quaternion();
   });
 
-  const vehicle = new RaycastVehicle(chassisPhysicsBody, scene);
+  const physicsEngine = scene.getPhysicsEngine();
+  let vehicle: RaycastVehicle | null = null;
+
+  if (physicsEngine instanceof PhysicsEngine) {
+    vehicle = new RaycastVehicle(chassisPhysicsBody, physicsEngine, scene);
+  }
+
+  if (vehicle === null) {
+    return;
+  }
+
   vehicle.numberOfFramesToPredict = 20; //Number of frames to predict future upwards orientation if airborne
   vehicle.predictionRatio = 1; //[0-1]How quickly to correct angular velocity towards future orientation. 0 = disabled
 
@@ -265,6 +276,11 @@ const addVehicle = ({
     steerValue += steerDirection * steeringIncrement;
     steerValue = Math.min(Math.max(steerValue, -maxSteerValue), maxSteerValue);
     steerValue *= 1 - (1 - Math.abs(steerDirection)) * steerRecover;
+
+    if (vehicle === null) {
+      return;
+    }
+
     vehicle.wheels[2].steering = steerValue;
     vehicle.wheels[3].steering = steerValue;
 
