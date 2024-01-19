@@ -70,32 +70,6 @@ const getName = (name: string) => {
   return `${name}_${meshCounter}`;
 };
 
-const addPlane = ({
-  name = "plane",
-  width = 100,
-  height = 100,
-  scene,
-}: {
-  name?: string;
-  width?: number;
-  height?: number;
-  scene: Scene;
-}) => {
-  // Graphics
-  const plane = MeshBuilder.CreatePlane(
-    getName(name),
-    {
-      width,
-      height,
-    },
-    scene
-  );
-  plane.rotation = new Vector3(Math.PI / 2, 0, 0);
-  plane.receiveShadows = true;
-
-  return plane;
-};
-
 const addBox = ({
   width,
   height,
@@ -145,24 +119,6 @@ const addBox = ({
   return box;
 };
 
-const addSphere = ({
-  diameter,
-  name = "sphere",
-  shadowGenerator,
-}: {
-  name?: string;
-  diameter: number;
-  shadowGenerator: ShadowGenerator;
-}) => {
-  // Graphics
-  const sphere = MeshBuilder.CreateSphere(getName(name));
-  sphere.scalingDeterminant = diameter * 2;
-  sphere.rotationQuaternion = sphere.rotationQuaternion || new Quaternion();
-  shadowGenerator.addShadowCaster(sphere, true);
-
-  return sphere;
-};
-
 const addVehicle = ({
   // colorName,
   scene,
@@ -172,11 +128,6 @@ const addVehicle = ({
   scene: Scene;
   shadowGenerator: ShadowGenerator;
 }) => {
-  // const car = addSphere({
-  //   diameter: 2,
-  //   shadowGenerator,
-  // });
-
   // car.material = scene.getMaterialByName(colorName);
 
   const chassisMesh = MeshBuilder.CreateBox("Chassis", {
@@ -317,49 +268,6 @@ const addVehicle = ({
   return vehicle;
 };
 
-const addRigidVehicle = ({
-  colorName,
-  scene,
-  shadowGenerator,
-}: {
-  colorName: string;
-  scene: Scene;
-  shadowGenerator: ShadowGenerator;
-}) => {
-  const carChassisSize = {
-    width: 4,
-    height: 0.5,
-    depth: 2,
-  };
-  const carWheelSize = 0.8;
-
-  const carBody = addBox({
-    width: carChassisSize.width,
-    height: carChassisSize.height,
-    depth: carChassisSize.depth,
-    shadowGenerator,
-  });
-
-  carBody.material = scene.getMaterialByName(colorName);
-
-  let wheels = [];
-
-  // wheels
-  for (let idx = 0; idx < 4; idx++) {
-    const wheel = addSphere({
-      diameter: carWheelSize,
-      shadowGenerator,
-    });
-    wheel.material = scene.getMaterialByName(COLOR_NAMES.BLACK);
-    wheels.push(wheel);
-  }
-
-  return {
-    body: carBody,
-    wheels,
-  };
-};
-
 const TOAST_COLORS = {
   RED: "linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))",
 };
@@ -409,9 +317,6 @@ const toggleStartRaceBtns = (
 export {
   addBox,
   addColors,
-  addPlane,
-  addSphere,
-  addRigidVehicle,
   addVehicle,
   debounce,
   log,

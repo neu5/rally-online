@@ -11,7 +11,7 @@ import {
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
 
-import { addBox, addColors, addVehicle } from "../utils";
+import { addColors, addVehicle } from "../utils";
 
 import type { Engine } from "@babylonjs/core";
 import type { GameConfig, GameObject } from "@neu5/types/src";
@@ -165,7 +165,6 @@ const startRace = async ({
     scene
   );
 
-  // const sphere = addSphere({ diameter: 2, shadowGenerator });
   const sphere = MeshBuilder.CreateSphere(
     "sphere",
     { diameter: 4, segments: 32 },
