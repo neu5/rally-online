@@ -165,7 +165,6 @@ const startRace = async ({
     scene
   );
 
-  // const sphere = addSphere({ diameter: 2, shadowGenerator });
   const sphere = MeshBuilder.CreateSphere(
     "sphere",
     { diameter: 4, segments: 32 },
