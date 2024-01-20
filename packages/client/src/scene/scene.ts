@@ -11,7 +11,7 @@ import {
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
 
-import { addColors, addVehicle } from "../utils";
+import { addBox, addColors, addVehicle } from "../utils";
 
 import type { Engine } from "@babylonjs/core";
 import type { GameConfig, GameObject } from "@neu5/types/src";
