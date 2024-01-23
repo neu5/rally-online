@@ -1,4 +1,11 @@
-import { ArcRotateCamera, Engine, Scene, Vector3 } from "@babylonjs/core";
+import {
+  ArcRotateCamera,
+  Axis,
+  Engine,
+  Scene,
+  Space,
+  Vector3,
+} from "@babylonjs/core";
 import "toastify-js/src/toastify.css";
 import { FEATURES_NAMES, features } from "@neu5/types/src";
 
@@ -85,7 +92,7 @@ ui.MobileControls.updateControls({ dialog, game, mobileControlsEls });
 
 const startEngineLoop = ({
   engine,
-  // playersMap,
+  playersMap,
   scene,
 }: {
   engine: Engine;
@@ -109,6 +116,65 @@ const startEngineLoop = ({
   camera.maxZ = 500;
 
   camera.attachControl(canvas, true);
+
+  const maxVehicleForce = 2200;
+  const maxSteerValue = 0.6;
+  const steeringIncrement = 0.005;
+  const steerRecover = 0.05;
+  let forwardForce = 0;
+  let steerValue = 0;
+  let steerDirection = 0;
+
+  const chassisPhysicsBody = playersMap[0].chassisPhysicsBody;
+  const vehicle = playersMap[0].vehicle;
+  const wheelMeshes = playersMap[0].wheelMeshes;
+
+  scene.onBeforeRenderObservable.add(() => {
+    forwardForce = 0;
+    steerDirection = 0;
+
+    steerValue += steerDirection * steeringIncrement;
+    steerValue = Math.min(Math.max(steerValue, -maxSteerValue), maxSteerValue);
+    steerValue *= 1 - (1 - Math.abs(steerDirection)) * steerRecover;
+
+    if (vehicle === null) {
+      return;
+    }
+
+    console.log(vehicle);
+
+    vehicle.wheels[2].steering = steerValue;
+    vehicle.wheels[3].steering = steerValue;
+
+    vehicle.wheels[2].force = forwardForce * maxVehicleForce;
+    vehicle.wheels[3].force = forwardForce * maxVehicleForce;
+
+    vehicle.update();
+
+    vehicle.wheels.forEach((wheel, index) => {
+      if (!wheelMeshes[index]) return;
+      wheelMesh = wheelMeshes[index];
+      wheelMesh.position.copyFrom(wheel.transform.position);
+
+      if (wheelMesh.rotationQuaternion && wheel.transform.rotationQuaternion) {
+        wheelMesh.rotationQuaternion.copyFrom(
+          wheel.transform.rotationQuaternion
+        );
+      }
+
+      wheelMesh.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
+    });
+
+    if (vehicle.nWheelsOnGround <= 2) {
+      chassisPhysicsBody.setMassProperties({
+        centerOfMass: new Vector3(0, 0, 0),
+      });
+    } else {
+      chassisPhysicsBody.setMassProperties({
+        centerOfMass: new Vector3(0, -0.5, 0),
+      });
+    }
+  });
 
   engine.runRenderLoop(() => {
     scene.render();

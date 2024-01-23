@@ -185,11 +185,18 @@ const startRace = async ({
 
   if (playersMap.length) {
     playersMap.forEach((player: any) => {
-      player.vehicle = addVehicle({
+      const { chassisPhysicsBody, wheelMeshes, vehicle } = addVehicle({
         colorName: player.color,
         scene,
         shadowGenerator,
       });
+
+      Object.assign(player, {
+        chassisPhysicsBody,
+        wheelMeshes,
+        vehicle,
+      });
+
       // player.vehicle = addRigidVehicle({
       //   colorName: player.color,
       //   scene,
@@ -198,19 +205,19 @@ const startRace = async ({
     });
   }
 
-  setInterval(() => {
-    playersMap.forEach((player: Player) => {
-      if (player.isCurrentPlayer) {
-        sendAction(
-          Object.entries(actions)
-            .filter(
-              ([key, value]) => value === true // eslint-disable-line
-            )
-            .map(([name]) => name)
-        );
-      }
-    });
-  }, 50);
+  // setInterval(() => {
+  //   playersMap.forEach((player: Player) => {
+  //     if (player.isCurrentPlayer) {
+  //       sendAction(
+  //         Object.entries(actions)
+  //           .filter(
+  //             ([key, value]) => value === true // eslint-disable-line
+  //           )
+  //           .map(([name]) => name)
+  //       );
+  //     }
+  //   });
+  // }, 50);
 
   return { playersMap, scene };
 };
